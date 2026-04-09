@@ -367,13 +367,13 @@ export default function Account() {
           </motion.div>
           
           <Tabs defaultValue="kyc" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 bg-white shadow-lg">
-                <TabsTrigger value="kyc" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm"><UserCheck className="w-3 h-3 md:w-4 md:h-4 mr-1" />KYC</TabsTrigger>
-                <TabsTrigger value="inventory" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm"><Package className="w-3 h-3 md:w-4 md:h-4 mr-1" />Inventory</TabsTrigger>
-                <TabsTrigger value="funds" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm"><UserIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />Funds</TabsTrigger>
-                <TabsTrigger value="activity" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm"><Activity className="w-3 h-3 md:w-4 md:h-4 mr-1" />Activity</TabsTrigger>
-                <TabsTrigger value="statements" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm"><FileText className="w-3 h-3 md:w-4 md:h-4 mr-1" />Statement</TabsTrigger>
-                <TabsTrigger value="support" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs md:text-sm"><LifeBuoy className="w-3 h-3 md:w-4 md:h-4 mr-1" />Support</TabsTrigger>
+            <TabsList className="inline-flex flex-wrap gap-2 bg-transparent w-full">
+                <TabsTrigger value="kyc" className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-blue-50"><UserCheck className="w-3 h-3 md:w-4 md:h-4 mr-1" />KYC</TabsTrigger>
+                <TabsTrigger value="inventory" className="data-[state=active]:bg-green-100 data-[state=active]:text-green-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-green-50"><Package className="w-3 h-3 md:w-4 md:h-4 mr-1" />Inventory</TabsTrigger>
+                <TabsTrigger value="funds" className="data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-purple-50"><UserIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />Funds</TabsTrigger>
+                <TabsTrigger value="activity" className="data-[state=active]:bg-orange-100 data-[state=active]:text-orange-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-orange-50"><Activity className="w-3 h-3 md:w-4 md:h-4 mr-1" />Activity</TabsTrigger>
+                <TabsTrigger value="statements" className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-amber-50"><FileText className="w-3 h-3 md:w-4 md:h-4 mr-1" />Statement</TabsTrigger>
+                <TabsTrigger value="support" className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-red-50"><LifeBuoy className="w-3 h-3 md:w-4 md:h-4 mr-1" />Support</TabsTrigger>
             </TabsList>
 
             <TabsContent value="kyc">
