@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -181,6 +180,12 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, on
     return balance * (price || 0);
   };
 
+  const formatBalance = (balance, symbol) => {
+    const decimals = ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'AED', 'SGD', 'CNH', 'USDT', 'INR', 'MYR', 'THB', 'HKD'].includes(symbol) ? 2 : 
+                     ['VND', 'IDR', 'LAK', 'JPY', 'TWD'].includes(symbol) ? 0 : 4;
+    return balance.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -221,7 +226,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, on
                           </div>
                       </div>
                       <p className="text-4xl font-bold">
-                        {(user?.wallet_balances?.eve || 0).toFixed(2)}
+                        {(user?.wallet_balances?.eve || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </p>
                       <p className="text-sm text-violet-200">Total Tokens Held</p>
                     </div>
@@ -281,13 +286,10 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, on
                         <div className="space-y-2">
                           <div>
                             <p className="text-2xl font-bold text-slate-900">
-                              {totalBalance.toFixed(
-                                ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'AED', 'SGD', 'CNH', 'USDT', 'INR', 'MYR', 'THB', 'HKD'].includes(asset.symbol) ? 2 : 
-                                ['VND', 'IDR', 'LAK', 'JPY', 'TWD'].includes(asset.symbol) ? 0 : 4
-                              )}
+                              {formatBalance(totalBalance, asset.symbol)}
                             </p>
                             <p className="text-sm text-slate-500">
-                              Total Value ≈ ${totalValue.toFixed(2)}
+                              Total Value ≈ ${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </p>
                           </div>
                           
@@ -295,20 +297,14 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, on
                              <div className="flex items-center justify-between">
                                 <span>Available:</span>
                                 <span className="font-medium text-green-600">
-                                  {availableBalance.toFixed(
-                                    ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'AED', 'SGD', 'CNH', 'USDT', 'INR', 'MYR', 'THB', 'HKD'].includes(asset.symbol) ? 2 : 
-                                    ['VND', 'IDR', 'LAK', 'JPY', 'TWD'].includes(asset.symbol) ? 0 : 4
-                                  )}
+                                  {formatBalance(availableBalance, asset.symbol)}
                                 </span>
                              </div>
                              {lockedBalance > 0 && (
                                 <div className="flex items-center justify-between">
                                     <span className="flex items-center gap-1 text-slate-600"><Lock className="w-3 h-3"/>Locked:</span>
                                     <span className="font-medium text-yellow-800">
-                                      {lockedBalance.toFixed(
-                                        ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'AED', 'SGD', 'CNH', 'USDT', 'INR', 'MYR', 'THB', 'HKD'].includes(asset.symbol) ? 2 : 
-                                        ['VND', 'IDR', 'LAK', 'JPY', 'TWD'].includes(asset.symbol) ? 0 : 4
-                                      )}
+                                      {formatBalance(lockedBalance, asset.symbol)}
                                     </span>
                                 </div>
                              )}
