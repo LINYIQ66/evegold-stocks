@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FundRequest, SystemSetting, Transaction, PhysicalRedemption, SupportTicket } from "@/entities/all";
-import { User } from "@/entities/User";
+import { FundRequest, SystemSetting, Transaction, PhysicalRedemption, SupportTicket, User } from "@/entities/all";
 import { base44 } from "@/api/base44Client";
 import { UploadFile } from "@/integrations/Core";
 import { Button } from "@/components/ui/button";
@@ -82,12 +81,8 @@ export default function Account() {
       }
   };
 
-  const handleLogin = async () => {
-    try {
-      await base44.auth.redirectToLogin();
-    } catch (error) {
-      console.error("Login error:", error);
-    }
+  const handleLogin = () => {
+    base44.auth.redirectToLogin();
   };
 
   const handleLogout = async () => {
