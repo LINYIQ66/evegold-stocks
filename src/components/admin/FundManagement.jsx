@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +38,13 @@ export default function FundManagement({ users, onAddFunds, onDeductFunds, isLoa
     user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Auto-select if search matches exactly one user
+  React.useEffect(() => {
+    if (filteredUsers.length === 1 && searchTerm) {
+      setSelectedUser(filteredUsers[0].id);
+    }
+  }, [filteredUsers, searchTerm]);
 
   const handleAddFunds = async () => {
     if (!selectedUser || !amount || parseFloat(amount) <= 0) return;
@@ -110,11 +116,17 @@ export default function FundManagement({ users, onAddFunds, onDeductFunds, isLoa
                 <SelectValue placeholder="Choose a user" />
               </SelectTrigger>
               <SelectContent className="max-h-48">
-                {filteredUsers.map(user => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.full_name} ({user.email})
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map(user => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.full_name} ({user.email})
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="no-user" disabled>
+                    No user found
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
           </div>
