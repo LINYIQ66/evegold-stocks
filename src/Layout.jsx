@@ -30,6 +30,7 @@ import {
   SidebarFooter,
   SidebarProvider,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -112,11 +113,43 @@ const LanguageSwitcher = () => {
     );
 };
 
+const SidebarMenuContent = ({ visibleNavItems, location }) => {
+  const { setOpen } = useSidebar();
+
+  const handleMenuClick = () => {
+    if (window.innerWidth < 768) {
+      setOpen(false);
+    }
+  };
+
+  return (
+    <SidebarMenu>
+      {visibleNavItems.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton 
+            asChild 
+            onClick={handleMenuClick}
+            className={`hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 transition-all duration-300 rounded-xl mb-1 ${
+              location.pathname === item.url 
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg' 
+                : 'text-slate-600'
+            }`}
+          >
+            <Link to={item.url} className="flex items-center gap-3 px-4 py-3">
+              <item.icon className="w-5 h-5" />
+              <span className="font-medium">{item.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+};
+
 const AppLayout = ({ children }) => {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const { t } = useLanguage();
-  const [open, setOpen] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -148,7 +181,7 @@ const AppLayout = ({ children }) => {
     : navigationItems.filter(item => item.roles.includes('public'));
 
   return (
-    <SidebarProvider open={open} onOpenChange={setOpen}>
+    <SidebarProvider>
       <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50">
         <Sidebar className="border-r border-slate-200/50 bg-white">
           <SidebarHeader className="border-b border-slate-200/50 p-6 bg-white">
@@ -172,30 +205,7 @@ const AppLayout = ({ children }) => {
           <SidebarContent className="p-3 bg-white">
             <SidebarGroup>
               <SidebarGroupContent>
-                  <SidebarMenu>
-                    {visibleNavItems.map((item) => (
-                      <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton 
-                          asChild 
-                          onClick={() => {
-                            if (window.innerWidth < 768) {
-                              setOpen(false);
-                            }
-                          }}
-                          className={`hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 transition-all duration-300 rounded-xl mb-1 ${
-                            location.pathname === item.url 
-                              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg' 
-                              : 'text-slate-600'
-                          }`}
-                        >
-                          <Link to={item.url} className="flex items-center gap-3 px-4 py-3">
-                            <item.icon className="w-5 h-5" />
-                            <span className="font-medium">{item.title}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
+                <SidebarMenuContent visibleNavItems={visibleNavItems} location={location} />
               </SidebarGroupContent>
             </SidebarGroup>
 
@@ -254,7 +264,7 @@ const AppLayout = ({ children }) => {
                   scale: [1, 1.1, 1],
                   rotate: [0, 5, -5, 0],
                   boxShadow: [
-                    "0 0 0px rgba(99, 102, 241, 0)", // indigo-500
+                    "0 0 0px rgba(99, 102, 241, 0)",
                     "0 0 30px rgba(99, 102, 241, 0.6)",
                     "0 0 0px rgba(99, 102, 241, 0)"
                   ]
