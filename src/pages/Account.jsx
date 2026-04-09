@@ -1,6 +1,7 @@
-
 import React, { useState, useEffect } from "react";
-import { User, FundRequest, SystemSetting, Transaction, PhysicalRedemption, SupportTicket } from "@/entities/all"; // Added SupportTicket
+import { FundRequest, SystemSetting, Transaction, PhysicalRedemption, SupportTicket } from "@/entities/all";
+import { User } from "@/entities/User";
+import { base44 } from "@/api/base44Client";
 import { UploadFile } from "@/integrations/Core";
 import { Button } from "@/components/ui/button";
 import { UserCheck, LogIn, LogOut, User as UserIcon, Activity, FileText, Package, LifeBuoy, Shield, Zap, Star } from "lucide-react"; // Added LifeBuoy, Shield, Zap, Star. Removed TrendingUp as per outline.
@@ -83,7 +84,7 @@ export default function Account() {
 
   const handleLogin = async () => {
     try {
-      await User.loginWithRedirect(window.location.href);
+      await base44.auth.redirectToLogin();
     } catch (error) {
       console.error("Login error:", error);
     }
