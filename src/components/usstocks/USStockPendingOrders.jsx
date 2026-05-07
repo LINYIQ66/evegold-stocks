@@ -93,7 +93,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
   const handleSaveEdit = async (order) => {
     const newPrice = parseFloat(editPrice);
     if (!newPrice || newPrice <= 0) {
-      setEditError("Please enter a valid price.");
+      setEditError("请输入有效的价格。");
       return;
     }
 
@@ -119,7 +119,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
       setEditError("");
       onRefresh();
     } catch (e) {
-      setEditError("Failed to save. Please try again.");
+      setEditError("保存失败，请重试。");
     }
     setSavingId(null);
   };
@@ -132,7 +132,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
             <Clock className="w-4 h-4 text-yellow-500" />
-            Pending Limit Orders
+            待执行限价订单
             <Badge className="bg-yellow-100 text-yellow-700 text-xs font-bold">
               {pendingOrders.length}
             </Badge>
@@ -157,7 +157,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
         <div className="flex items-start gap-2 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2 mt-2">
           <AlertCircle className="w-3.5 h-3.5 text-yellow-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-yellow-700 leading-relaxed">
-            Funds are <strong>frozen</strong> while orders are pending. Cancelling returns them to your available balance immediately. Modifying the limit price does not change your frozen amount.
+            订单待执行期间资金已<strong>冻结</strong>。取消订单后资金将立即返还至可用余额。修改限价不会改变冻结金额。
           </p>
         </div>
       </CardHeader>
@@ -219,16 +219,16 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-0.5">
                               <span className="font-bold text-slate-900 text-sm">
-                                {isBuy ? "Buy" : "Sell"} {displaySymbol}
+                                {isBuy ? "买入" : "卖出"} {displaySymbol}
                               </span>
                               <Badge className={`text-xs px-1.5 ${isBuy ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
-                                {isBuy ? "LIMIT BUY" : "LIMIT SELL"}
+                                {isBuy ? "限价买入" : "限价卖出"}
                               </Badge>
                               <Badge className="bg-yellow-100 text-yellow-700 text-xs px-1.5 flex items-center gap-1">
-                                <Lock className="w-2.5 h-2.5" /> Frozen
+                                <Lock className="w-2.5 h-2.5" /> 已冻结
                               </Badge>
                               {modifiedAt && (
-                                <Badge className="bg-blue-100 text-blue-600 text-xs px-1.5">Modified</Badge>
+                                <Badge className="bg-blue-100 text-blue-600 text-xs px-1.5">已修改</Badge>
                               )}
                             </div>
 
@@ -236,23 +236,23 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                               <div className="flex flex-wrap gap-x-3 gap-y-0.5">
                                 <span>
                                   {isBuy
-                                    ? <><strong className="text-slate-600">${order.amount_usd?.toFixed(2)}</strong> {currency || "USDT"} frozen</>
-                                    : <><strong className="text-slate-600">{parseFloat(shares || 0).toFixed(6)}</strong> {displaySymbol} frozen</>
+                                    ? <><strong className="text-slate-600">${order.amount_usd?.toFixed(2)}</strong> {currency || "USDT"} 已冻结</>
+                                    : <><strong className="text-slate-600">{parseFloat(shares || 0).toFixed(6)}</strong> {displaySymbol} 已冻结</>
                                   }
                                 </span>
                                 <span className="text-slate-300">|</span>
-                                <span>Limit @ <strong className="text-slate-700">${displayPrice.toFixed(2)}</strong></span>
+                                <span>限价 @ <strong className="text-slate-700">${displayPrice.toFixed(2)}</strong></span>
                                 {orderMarketPrice && (
                                   <>
                                     <span className="text-slate-300">|</span>
-                                    <span>Market <strong className={orderMarketPrice >= displayPrice ? "text-green-600" : "text-red-500"}>${orderMarketPrice.toFixed(2)}</strong></span>
+                                    <span>市价 <strong className={orderMarketPrice >= displayPrice ? "text-green-600" : "text-red-500"}>${orderMarketPrice.toFixed(2)}</strong></span>
                                   </>
                                 )}
                               </div>
                               {estimatedNote && <p className="text-indigo-500 font-medium">{estimatedNote}</p>}
                               <p className="text-slate-400">
-                                Placed {order.created_date ? format(new Date(order.created_date), "MMM d, yyyy HH:mm") : "—"}
-                                {modifiedAt && ` · Edited ${format(new Date(modifiedAt), "MMM d HH:mm")}`}
+                                下单时间 {order.created_date ? format(new Date(order.created_date), "MM月dd日 HH:mm") : "—"}
+                                {modifiedAt && ` · 已修改 ${format(new Date(modifiedAt), "MM月dd日 HH:mm")}`}
                               </p>
                             </div>
                           </div>
@@ -266,7 +266,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                                 disabled={isCancelling}
                                 className="h-7 px-2 text-blue-600 border-blue-200 hover:bg-blue-50 text-xs gap-1"
                               >
-                                <Edit2 className="w-3 h-3" /> Edit
+                                <Edit2 className="w-3 h-3" /> 修改
                               </Button>
                               <Button
                                 variant="outline"
@@ -278,7 +278,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                                 {isCancelling
                                   ? <div className="w-3 h-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
                                   : <X className="w-3 h-3" />}
-                                Cancel
+                                取消
                               </Button>
                             </div>
                           )}
@@ -291,8 +291,8 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                             className="mt-3 pt-3 border-t border-blue-200"
                           >
                             <p className="text-xs font-medium text-slate-700 mb-2">
-                              Modify Limit Price
-                              {orderMarketPrice && <span className="ml-2 text-slate-400 font-normal">(Market: ${orderMarketPrice.toFixed(2)})</span>}
+                              修改限价
+                              {orderMarketPrice && <span className="ml-2 text-slate-400 font-normal">(当前市价: ${orderMarketPrice.toFixed(2)})</span>}
                             </p>
                             <div className="flex gap-2 items-start">
                               <div className="flex-1">
@@ -302,7 +302,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                                     type="number"
                                     value={editPrice}
                                     onChange={e => { setEditPrice(e.target.value); setEditError(""); }}
-                                    placeholder="New limit price"
+                                    placeholder="输入新限价"
                                     className="pl-7 h-8 text-sm"
                                     step="0.01"
                                     min="0.01"
@@ -315,7 +315,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                                   </p>
                                 )}
                                 <p className="text-xs text-slate-400 mt-1">
-                                  {isBuy ? "Executes when market ≤ limit." : "Executes when market ≥ limit."} Frozen amount unchanged.
+                                  {isBuy ? "市价 ≤ 限价时触发成交。" : "市价 ≥ 限价时触发成交。"} 冻结金额不变。
                                 </p>
                               </div>
                               <div className="flex gap-1.5 flex-shrink-0">
@@ -328,10 +328,10 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                                   {isSaving
                                     ? <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                     : <Check className="w-3 h-3" />}
-                                  Save
+                                  保存
                                 </Button>
                                 <Button variant="outline" size="sm" onClick={cancelEdit} disabled={isSaving} className="h-8 px-3 text-xs">
-                                  Discard
+                                  放弃
                                 </Button>
                               </div>
                             </div>
@@ -351,12 +351,12 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                         .filter(o => { let m = {}; try { m = JSON.parse(o.description || "{}"); } catch {} return m.side === "buy"; })
                         .reduce((s, o) => s + (o.amount_usd || 0), 0)
                         .toFixed(2)}
-                    </strong> USDT frozen in buy orders
+                    </strong> USDT 冻结于买入订单
                   </span>
                   <span>
                     <strong className="text-slate-700">
                       {pendingOrders.filter(o => { let m = {}; try { m = JSON.parse(o.description || "{}"); } catch {} return m.side === "sell"; }).length}
-                    </strong> sell orders pending
+                    </strong> 笔卖出订单待执行
                   </span>
                 </div>
               </div>

@@ -68,13 +68,13 @@ export default function StockTradeHistory({ transactions = [] }) {
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
             <History className="w-4 h-4 text-indigo-500" />
-            Trade History
-            <Badge className="bg-indigo-100 text-indigo-700 text-xs">{stockTrades.length} trades</Badge>
+            交易记录
+            <Badge className="bg-indigo-100 text-indigo-700 text-xs">{stockTrades.length} 笔交易</Badge>
           </CardTitle>
 
           {/* Filter tabs */}
           <div className="flex rounded-lg overflow-hidden border border-slate-200 text-xs">
-            {[["all", "All"], ["buy", "Buys"], ["sell", "Sells"]].map(([val, label]) => (
+            {[["all", "全部"], ["buy", "买入"], ["sell", "卖出"]].map(([val, label]) => (
               <button
                 key={val}
                 onClick={() => setFilter(val)}
@@ -93,15 +93,15 @@ export default function StockTradeHistory({ transactions = [] }) {
         {/* Summary stats */}
         <div className="grid grid-cols-3 gap-3 mt-2">
           <div className="bg-green-50 rounded-lg px-3 py-2 text-center">
-            <p className="text-xs text-slate-500">Total Bought</p>
+            <p className="text-xs text-slate-500">累计买入</p>
             <p className="text-sm font-bold text-green-700">${totalBought.toFixed(2)}</p>
           </div>
           <div className="bg-red-50 rounded-lg px-3 py-2 text-center">
-            <p className="text-xs text-slate-500">Total Sold</p>
+            <p className="text-xs text-slate-500">累计卖出</p>
             <p className="text-sm font-bold text-red-600">${totalSold.toFixed(2)}</p>
           </div>
           <div className="bg-slate-50 rounded-lg px-3 py-2 text-center">
-            <p className="text-xs text-slate-500">Total Fees</p>
+            <p className="text-xs text-slate-500">累计手续费</p>
             <p className="text-sm font-bold text-slate-600">${totalFees.toFixed(4)}</p>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function StockTradeHistory({ transactions = [] }) {
 
       <CardContent className="p-3 pt-0">
         {filtered.length === 0 ? (
-          <div className="text-center py-6 text-slate-400 text-sm">No trades match this filter</div>
+          <div className="text-center py-6 text-slate-400 text-sm">暂无符合条件的交易记录</div>
         ) : (
           <>
             <div className="space-y-2">
@@ -137,7 +137,7 @@ export default function StockTradeHistory({ transactions = [] }) {
                       <div className="flex items-center gap-1.5">
                         <span className="font-bold text-slate-900 text-sm">{trade.symbol}</span>
                         <Badge className={`text-xs px-1.5 py-0 ${trade.side === "buy" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
-                          {trade.side === "buy" ? "BUY" : "SELL"}
+                          {trade.side === "buy" ? "买入" : "卖出"}
                         </Badge>
                       </div>
                       <p className="text-xs text-slate-400 truncate">{trade.name}</p>
@@ -145,7 +145,7 @@ export default function StockTradeHistory({ transactions = [] }) {
 
                     {/* Shares & price */}
                     <div className="text-right text-xs text-slate-500 hidden sm:block">
-                      <div>{trade.shares.toFixed(6)} shares</div>
+                      <div>{trade.shares.toFixed(6)} 股</div>
                       <div>@ ${trade.price.toFixed(2)}</div>
                     </div>
 
@@ -174,9 +174,9 @@ export default function StockTradeHistory({ transactions = [] }) {
                 className="mt-3 w-full flex items-center justify-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 py-2 rounded-lg hover:bg-blue-50 transition-colors font-medium"
               >
                 {expanded ? (
-                  <><ChevronUp className="w-3.5 h-3.5" /> Show less</>
+                  <><ChevronUp className="w-3.5 h-3.5" /> 收起</>
                 ) : (
-                  <><ChevronDown className="w-3.5 h-3.5" /> Show all {filtered.length} trades</>
+                  <><ChevronDown className="w-3.5 h-3.5" /> 查看全部 {filtered.length} 笔交易</>
                 )}
               </button>
             )}

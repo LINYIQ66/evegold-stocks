@@ -151,14 +151,14 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
     <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-2xl">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between text-slate-900">
-          <span>Trade {selectedSymbol}</span>
+          <span>交易 {selectedSymbol}</span>
           <div className="text-right">
             {livePrice ? (
               <span className="text-xl font-bold text-slate-900">${livePrice.toFixed(2)}</span>
             ) : (
-              <span className="text-sm text-slate-400 animate-pulse">Loading price...</span>
+              <span className="text-sm text-slate-400 animate-pulse">行情加载中...</span>
             )}
-            <p className="text-xs text-slate-400 font-normal">Market Price</p>
+            <p className="text-xs text-slate-400 font-normal">市场价格</p>
           </div>
         </CardTitle>
       </CardHeader>
@@ -172,7 +172,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
               side === "buy" ? "bg-green-500 text-white" : "bg-white text-slate-500 hover:bg-green-50"
             }`}
           >
-            <TrendingUp className="w-4 h-4" /> Buy
+            <TrendingUp className="w-4 h-4" /> 买入
           </button>
           <button
             onClick={() => switchSide("sell")}
@@ -180,7 +180,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
               side === "sell" ? "bg-red-500 text-white" : "bg-white text-slate-500 hover:bg-red-50"
             }`}
           >
-            <TrendingDown className="w-4 h-4" /> Sell
+            <TrendingDown className="w-4 h-4" /> 卖出
           </button>
         </div>
 
@@ -196,7 +196,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
                   : "bg-white text-slate-500 border-slate-200 hover:border-blue-300"
               }`}
             >
-              {type === "market" ? "Market Order" : "Limit Order"}
+              {type === "market" ? "市价单" : "限价单"}
             </button>
           ))}
         </div>
@@ -205,23 +205,23 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
         {orderType === "limit" && (
           <div className="space-y-1">
             <Label className="text-sm text-slate-700">
-              {side === "buy" ? "Limit Buy Price" : "Limit Sell Price"} (USD)
+              {side === "buy" ? "限价买入价格" : "限价卖出价格"} (USD)
             </Label>
             <Input
               type="number"
-              placeholder={livePrice ? `e.g. ${livePrice.toFixed(2)}` : "Enter limit price"}
+              placeholder={livePrice ? `如 ${livePrice.toFixed(2)}` : "输入限价"}
               value={limitPrice}
               onChange={e => handleLimitPriceChange(e.target.value)}
               min="0"
             />
-            <p className="text-xs text-slate-400">Current market: {livePrice ? `$${livePrice.toFixed(2)}` : "—"}</p>
+            <p className="text-xs text-slate-400">当前市价: {livePrice ? `$${livePrice.toFixed(2)}` : "—"}</p>
           </div>
         )}
 
         {/* Market price display (read-only) */}
         {orderType === "market" && (
           <div className="flex items-center justify-between px-3 py-2 bg-blue-50 rounded-lg border border-blue-100">
-            <span className="text-xs text-blue-600 font-medium">Execution Price</span>
+            <span className="text-xs text-blue-600 font-medium">成交价格</span>
             <span className="text-sm font-bold text-blue-700">
               {livePrice ? `$${livePrice.toFixed(2)}` : "—"}
             </span>
@@ -235,15 +235,15 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             <div className="flex gap-2">
               {["USDT", "USD"].map(c => (
                 <button
-                  key={c}
-                  onClick={() => { setCurrency(c); setSpendAmount(""); setBuyShares(""); }}
-                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-all ${
-                    currency === c
-                      ? "bg-slate-800 text-white border-slate-800"
-                      : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
-                  }`}
+                key={c}
+                onClick={() => { setCurrency(c); setSpendAmount(""); setBuyShares(""); }}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-all ${
+                  currency === c
+                    ? "bg-slate-800 text-white border-slate-800"
+                    : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
+                }`}
                 >
-                  Pay with {c}
+                用 {c} 支付
                 </button>
               ))}
             </div>
@@ -251,8 +251,8 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             {/* Spend Amount */}
             <div className="space-y-1">
               <div className="flex justify-between text-sm">
-                <Label className="text-slate-700">Amount to Spend ({currency})</Label>
-                <span className="text-slate-500">Balance: {payBalance.toFixed(2)} {currency}</span>
+                <Label className="text-slate-700">支付金额 ({currency})</Label>
+                <span className="text-slate-500">余额: {payBalance.toFixed(2)} {currency}</span>
               </div>
               <Input
                 type="number"
@@ -275,10 +275,10 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             {/* Quantity (Shares) */}
             <div className="space-y-1">
               <div className="flex justify-between text-sm">
-                <Label className="text-slate-700">Quantity (Shares)</Label>
+                <Label className="text-slate-700">数量（股数）</Label>
                 {execPrice > 0 && (
                   <span className="text-xs text-slate-400">
-                    Max ≈ {((payBalance * (1 - FEE_RATE)) / execPrice).toFixed(6)} {selectedSymbol}
+                    最多 ≈ {((payBalance * (1 - FEE_RATE)) / execPrice).toFixed(6)} {selectedSymbol}
                   </span>
                 )}
               </div>
@@ -310,7 +310,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
                       : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
                   }`}
                 >
-                  Receive {c}
+                  收取 {c}
                 </button>
               ))}
             </div>
@@ -318,8 +318,8 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             {/* Shares to Sell */}
             <div className="space-y-1">
               <div className="flex justify-between text-sm">
-                <Label className="text-slate-700">Shares to Sell ({selectedSymbol})</Label>
-                <span className="text-slate-500">Balance: {stockBalance.toFixed(6)} {selectedSymbol}</span>
+                <Label className="text-slate-700">卖出股数 ({selectedSymbol})</Label>
+                <span className="text-slate-500">持仓: {stockBalance.toFixed(6)} {selectedSymbol}</span>
               </div>
               <Input
                 type="number"
@@ -343,7 +343,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             {/* Estimated proceeds */}
             {execPrice > 0 && sellShares !== "" && parseFloat(sellShares) > 0 && (
               <div className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
-                <span className="text-xs text-slate-500">Estimated Proceeds</span>
+                <span className="text-xs text-slate-500">预计到账</span>
                 <span className="text-sm font-bold text-green-600">
                   ≈ ${((parseFloat(sellShares) * execPrice) * (1 - FEE_RATE)).toFixed(2)} {currency}
                 </span>
@@ -359,46 +359,46 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             animate={{ opacity: 1, y: 0 }}
             className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-2 text-sm"
           >
-            <p className="font-semibold text-slate-700 text-xs uppercase tracking-wide mb-2">Order Summary</p>
+            <p className="font-semibold text-slate-700 text-xs uppercase tracking-wide mb-2">订单摘要</p>
             {side === "buy" ? (
               <>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Exec. Price</span>
+                  <span className="text-slate-500">成交价格</span>
                   <span className="font-medium">${calc.execPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">You Spend</span>
+                  <span className="text-slate-500">支付金额</span>
                   <span className="font-medium">${calc.spent.toFixed(2)} {currency}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Fee (0.1%)</span>
+                  <span className="text-slate-500">手续费 (0.1%)</span>
                   <span className="text-red-500 font-medium">-${calc.fee.toFixed(4)} {currency}</span>
                 </div>
                 <div className="flex justify-between border-t border-slate-200 pt-2">
-                  <span className="font-semibold text-slate-700">You Receive</span>
+                  <span className="font-semibold text-slate-700">实际到账</span>
                   <span className="font-bold text-green-600">{calc.sharesReceived.toFixed(6)} {selectedSymbol}</span>
                 </div>
               </>
             ) : (
               <>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Exec. Price</span>
+                  <span className="text-slate-500">成交价格</span>
                   <span className="font-medium">${calc.execPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">You Sell</span>
+                  <span className="text-slate-500">卖出数量</span>
                   <span className="font-medium">{calc.shares.toFixed(6)} {selectedSymbol}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Gross Value</span>
+                  <span className="text-slate-500">交易总额</span>
                   <span className="font-medium">${calc.gross.toFixed(2)} {currency}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Fee (0.1%)</span>
+                  <span className="text-slate-500">手续费 (0.1%)</span>
                   <span className="text-red-500 font-medium">-${calc.fee.toFixed(4)} {currency}</span>
                 </div>
                 <div className="flex justify-between border-t border-slate-200 pt-2">
-                  <span className="font-semibold text-slate-700">You Receive</span>
+                  <span className="font-semibold text-slate-700">实际到账</span>
                   <span className="font-bold text-green-600">${calc.netUsdt.toFixed(2)} {currency}</span>
                 </div>
               </>
@@ -412,21 +412,21 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              Insufficient {side === "buy" ? `${currency} balance (max: ${payBalance.toFixed(2)})` : `${selectedSymbol} balance (max: ${stockBalance.toFixed(6)})`}
+              {side === "buy" ? `${currency} 余额不足（最多可用: ${payBalance.toFixed(2)}）` : `${selectedSymbol} 持仓不足（最多可卖: ${stockBalance.toFixed(6)}）`}
             </motion.div>
           )}
           {isLimitPriceInvalid && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex items-center gap-2 text-amber-600 text-sm bg-amber-50 p-3 rounded-lg">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              Please enter a valid limit price
+              请输入有效的限价
             </motion.div>
           )}
           {!livePrice && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex items-center gap-2 text-amber-600 text-sm bg-amber-50 p-3 rounded-lg">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              Waiting for live price data...
+              正在获取实时行情，请稍候...
             </motion.div>
           )}
           {result && (
@@ -454,18 +454,18 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
           {isTrading ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-              Processing...
+              处理中...
             </div>
           ) : (
-            `${orderType === "limit" ? "Place Limit Order" : side === "buy" ? "Buy" : "Sell"} ${selectedSymbol}`
+            `${orderType === "limit" ? "提交限价单" : side === "buy" ? "买入" : "卖出"} ${selectedSymbol}`
           )}
         </Button>
 
         <p className="text-xs text-slate-400 text-center">
           {orderType === "limit"
-            ? "Limit orders execute when market reaches your target price"
-            : "Market orders execute at current market price"}
-          {" · "}0.1% fee on all trades
+            ? "限价单将在市价触达目标价格时自动成交"
+            : "市价单按当前市场价格立即成交"}
+          {" · "}所有交易收取 0.1% 手续费
         </p>
       </CardContent>
     </Card>

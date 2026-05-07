@@ -70,8 +70,8 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
     <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg h-full flex flex-col">
       <CardHeader className="pb-2 flex-shrink-0">
         <CardTitle className="text-slate-900 text-base flex items-center gap-2">
-          US Stocks
-          <Badge className="bg-green-100 text-green-800 text-xs">Live</Badge>
+          美股行情
+          <Badge className="bg-green-100 text-green-800 text-xs">实时</Badge>
           {loading && <RefreshCw className="w-3 h-3 animate-spin text-slate-400" />}
         </CardTitle>
       </CardHeader>

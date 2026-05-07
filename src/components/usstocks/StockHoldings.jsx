@@ -102,8 +102,8 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
             <Briefcase className="w-4 h-4 text-blue-500" />
-            My Stock Holdings
-            <Badge className="bg-blue-100 text-blue-700 text-xs">{holdings.length} positions</Badge>
+            我的股票持仓
+            <Badge className="bg-blue-100 text-blue-700 text-xs">{holdings.length} 个持仓</Badge>
           </CardTitle>
 
           {/* View toggle */}
@@ -114,7 +114,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
                 view === "overview" ? "bg-blue-600 text-white" : "bg-white text-slate-500 hover:bg-slate-50"
               }`}
             >
-              <BarChart2 className="w-3 h-3" /> Overview
+              <BarChart2 className="w-3 h-3" /> 概览
             </button>
             <button
               onClick={() => setView("pnl")}
@@ -122,7 +122,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
                 view === "pnl" ? "bg-blue-600 text-white" : "bg-white text-slate-500 hover:bg-slate-50"
               }`}
             >
-              <DollarSign className="w-3 h-3" /> P&amp;L
+              <DollarSign className="w-3 h-3" /> 盈亏
             </button>
           </div>
         </div>
@@ -137,15 +137,15 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
             }`}
           >
             <div>
-              <span className="text-slate-500 text-xs">Total Cost</span>
+              <span className="text-slate-500 text-xs">总成本</span>
               <p className="font-semibold text-slate-800">${totalCost.toFixed(2)}</p>
             </div>
             <div>
-              <span className="text-slate-500 text-xs">Market Value</span>
+              <span className="text-slate-500 text-xs">市值</span>
               <p className="font-semibold text-slate-800">${totalMarketValue.toFixed(2)}</p>
             </div>
             <div className="text-right">
-              <span className="text-slate-500 text-xs">Unrealized P&L</span>
+              <span className="text-slate-500 text-xs">未实现盈亏</span>
               <p className={`font-bold text-base flex items-center gap-1 justify-end ${totalPnl >= 0 ? "text-green-600" : "text-red-500"}`}>
                 {totalPnl >= 0 ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
                 {totalPnl >= 0 ? "+" : ""}${totalPnl.toFixed(2)}
@@ -179,7 +179,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
                   )}
                 </div>
                 <p className="text-xs text-slate-500 truncate">{h.name}</p>
-                <p className="text-xs text-slate-600 mt-1">{h.shares.toFixed(6)} shares</p>
+                <p className="text-xs text-slate-600 mt-1">{h.shares.toFixed(6)} 股</p>
                 {h.marketValue !== null && (
                   <p className="text-sm font-semibold text-blue-700 mt-0.5">${h.marketValue.toFixed(2)}</p>
                 )}
@@ -195,12 +195,12 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-slate-400 border-b border-slate-100">
-                  <th className="text-left py-2 px-2 font-medium">Stock</th>
-                  <th className="text-right py-2 px-2 font-medium">Shares</th>
-                  <th className="text-right py-2 px-2 font-medium">Avg Cost</th>
-                  <th className="text-right py-2 px-2 font-medium">Mkt Price</th>
-                  <th className="text-right py-2 px-2 font-medium">Mkt Value</th>
-                  <th className="text-right py-2 px-2 font-medium">Unrealized P&L</th>
+                  <th className="text-left py-2 px-2 font-medium">股票</th>
+                  <th className="text-right py-2 px-2 font-medium">持股数</th>
+                  <th className="text-right py-2 px-2 font-medium">均价成本</th>
+                  <th className="text-right py-2 px-2 font-medium">市价</th>
+                  <th className="text-right py-2 px-2 font-medium">市值</th>
+                  <th className="text-right py-2 px-2 font-medium">未实现盈亏</th>
                 </tr>
               </thead>
               <tbody>
@@ -249,7 +249,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
                         </div>
                       ) : (
                         <span className="text-slate-300 flex items-center justify-end gap-0.5">
-                          <Minus className="w-3 h-3" /> N/A
+                          <Minus className="w-3 h-3" /> 暂无
                         </span>
                       )}
                     </td>
