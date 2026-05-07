@@ -171,7 +171,7 @@ export default function USStocks() {
               <div className="space-y-3 text-blue-100 text-sm">
                 <div className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                  <p>Prices sourced via Binance for tokenized US stocks (BUSDT pairs)</p>
+                  <p>Real-time prices sourced via CoinMarketCap for tokenized US stocks</p>
                 </div>
                 <div className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
