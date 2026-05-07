@@ -30,7 +30,7 @@ const DEFAULT_STOCKS = [
 
 export { DEFAULT_STOCKS as US_STOCKS };
 
-export default function StockMarketOverview({ onStockClick, selectedSymbol, onPriceUpdate }) {
+export default function StockMarketOverview({ onStockClick, selectedSymbol, onPriceUpdate, onAllPricesUpdate }) {
   const [prices, setPrices] = useState({});
   const [loading, setLoading] = useState(true);
   const intervalRef = useRef(null);
@@ -43,6 +43,9 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
         setLoading(false);
         if (onPriceUpdate && selectedSymbol && res.data.prices[selectedSymbol]) {
           onPriceUpdate(res.data.prices[selectedSymbol].price);
+        }
+        if (onAllPricesUpdate) {
+          onAllPricesUpdate(res.data.prices);
         }
       }
     } catch (e) {

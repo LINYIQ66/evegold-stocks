@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import StockChart from "../components/usstocks/StockChart";
 import StockMarketOverview from "../components/usstocks/StockMarketOverview";
 import StockTradeInterface from "../components/usstocks/StockTradeInterface";
+import StockHoldings from "../components/usstocks/StockHoldings";
 
 const FEE_RATE = 0.001; // 0.1%
 
@@ -14,9 +15,17 @@ export default function USStocks() {
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
   const [user, setUser] = useState(null);
   const [livePrice, setLivePrice] = useState(null);
+  const [allPrices, setAllPrices] = useState({});
+
+  const refreshUser = async () => {
+    try {
+      const u = await User.me();
+      setUser(u);
+    } catch {}
+  };
 
   useEffect(() => {
-    User.me().then(setUser).catch(() => {});
+    refreshUser();
   }, []);
 
   // Reset livePrice when symbol changes
@@ -81,8 +90,7 @@ export default function USStocks() {
       }
 
       await User.updateMyUserData({ wallet_balances: newBalances });
-      const updated = await User.me();
-      setUser(updated);
+      await refreshUser();
 
       const received = side === "buy"
         ? `${calc.sharesReceived.toFixed(6)} ${symbol}`
@@ -141,6 +149,7 @@ export default function USStocks() {
               onStockClick={setSelectedSymbol}
               selectedSymbol={selectedSymbol}
               onPriceUpdate={setLivePrice}
+              onAllPricesUpdate={setAllPrices}
             />
           </motion.div>
         </div>
@@ -151,13 +160,18 @@ export default function USStocks() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-2"
+            className="lg:col-span-2 space-y-4"
           >
             <StockTradeInterface
               user={user}
               selectedSymbol={selectedSymbol}
               livePrice={livePrice}
               onTrade={handleTrade}
+            />
+            <StockHoldings
+              user={user}
+              prices={allPrices}
+              onSymbolClick={setSelectedSymbol}
             />
           </motion.div>
 
