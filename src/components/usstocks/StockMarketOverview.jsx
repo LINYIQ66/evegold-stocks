@@ -2,38 +2,33 @@ import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
+import { getStockPrices } from "@/functions/getStockPrices";
 
-export const US_STOCKS = [
-  { symbol: "AAPL",  name: "Apple",              binance: "aaplbusdt" },
-  { symbol: "MSFT",  name: "Microsoft",           binance: "msftbusdt" },
-  { symbol: "GOOGL", name: "Alphabet",            binance: "googlbusdt" },
-  { symbol: "AMZN",  name: "Amazon",              binance: "amznbusdt" },
-  { symbol: "NVDA",  name: "NVIDIA",              binance: "nvdabusdt" },
-  { symbol: "TSLA",  name: "Tesla",               binance: "tslabusdt" },
-  { symbol: "META",  name: "Meta",                binance: "metabusdt" },
-  { symbol: "JPM",   name: "JPMorgan",            binance: "jpmbusdt" },
-  { symbol: "V",     name: "Visa",                binance: "vbusdt" },
-  { symbol: "JNJ",   name: "Johnson & Johnson",   binance: "jnjbusdt" },
-  { symbol: "WMT",   name: "Walmart",             binance: "wmtbusdt" },
-  { symbol: "XOM",   name: "ExxonMobil",          binance: "xombusdt" },
-  { symbol: "MA",    name: "Mastercard",          binance: "mabusdt" },
-  { symbol: "PG",    name: "Procter & Gamble",    binance: "pgbusdt" },
-  { symbol: "HD",    name: "Home Depot",          binance: "hdbusdt" },
-  { symbol: "CVX",   name: "Chevron",             binance: "cvxbusdt" },
-  { symbol: "MRK",   name: "Merck",               binance: "mrkbusdt" },
-  { symbol: "ABBV",  name: "AbbVie",              binance: "abbvbusdt" },
-  { symbol: "KO",    name: "Coca-Cola",           binance: "kobusdt" },
-  { symbol: "BAC",   name: "Bank of America",     binance: "bacbusdt" },
+// Default stock list — dynamically updated from backend
+const DEFAULT_STOCKS = [
+  { symbol: "AAPL",   name: "Apple" },
+  { symbol: "MSFT",   name: "Microsoft" },
+  { symbol: "NVDA",   name: "NVIDIA" },
+  { symbol: "AMZN",   name: "Amazon" },
+  { symbol: "GOOGL",  name: "Alphabet" },
+  { symbol: "META",   name: "Meta" },
+  { symbol: "TSLA",   name: "Tesla" },
+  { symbol: "AMD",    name: "AMD" },
+  { symbol: "INTC",   name: "Intel" },
+  { symbol: "SNDK",   name: "SanDisk" },
+  { symbol: "MU",     name: "Micron" },
+  { symbol: "MSTR",   name: "MicroStrategy" },
+  { symbol: "PLTR",   name: "Palantir" },
+  { symbol: "HOOD",   name: "Robinhood" },
+  { symbol: "NFLX",   name: "Netflix" },
+  { symbol: "ORCL",   name: "Oracle" },
+  { symbol: "COIN",   name: "Coinbase" },
+  { symbol: "BABA",   name: "Alibaba" },
+  { symbol: "OPENAI", name: "OpenAI" },
+  { symbol: "CRWV",   name: "CoreWeave" },
 ];
 
-// Fetch all 24hr tickers from Binance REST API (no CORS issues for public data)
-async function fetchAllPrices() {
-  const symbols = US_STOCKS.map(s => `"${s.binance.toUpperCase()}"`).join(",");
-  const url = `https://api.binance.com/api/v3/ticker/24hr?symbols=[${symbols}]`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch prices");
-  return res.json();
-}
+export { DEFAULT_STOCKS as US_STOCKS };
 
 export default function StockMarketOverview({ onStockClick, selectedSymbol, onPriceUpdate }) {
   const [prices, setPrices] = useState({});
@@ -42,23 +37,13 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
 
   const loadPrices = async () => {
     try {
-      const data = await fetchAllPrices();
-      const priceMap = {};
-      data.forEach(ticker => {
-        const stock = US_STOCKS.find(s => s.binance.toUpperCase() === ticker.symbol);
-        if (stock) {
-          priceMap[stock.symbol] = {
-            price: parseFloat(ticker.lastPrice),
-            change: parseFloat(ticker.priceChangePercent),
-            open: parseFloat(ticker.openPrice),
-          };
+      const res = await getStockPrices({});
+      if (res?.data?.prices) {
+        setPrices(res.data.prices);
+        setLoading(false);
+        if (onPriceUpdate && selectedSymbol && res.data.prices[selectedSymbol]) {
+          onPriceUpdate(res.data.prices[selectedSymbol].price);
         }
-      });
-      setPrices(priceMap);
-      setLoading(false);
-      // Notify parent with selected stock price
-      if (onPriceUpdate && selectedSymbol && priceMap[selectedSymbol]) {
-        onPriceUpdate(priceMap[selectedSymbol].price);
       }
     } catch (e) {
       setLoading(false);
@@ -67,7 +52,7 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
 
   useEffect(() => {
     loadPrices();
-    intervalRef.current = setInterval(loadPrices, 5000);
+    intervalRef.current = setInterval(loadPrices, 30000); // every 30s (API rate limits)
     return () => clearInterval(intervalRef.current);
   }, []);
 
@@ -89,7 +74,7 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto p-2 min-h-0">
         <div className="space-y-0.5">
-          {US_STOCKS.map((stock) => {
+          {DEFAULT_STOCKS.map((stock) => {
             const data = prices[stock.symbol];
             const isPositive = data ? data.change >= 0 : true;
             const isSelected = selectedSymbol === stock.symbol;
@@ -109,11 +94,11 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
                     {stock.symbol}
                   </p>
                   <p className={`text-xs truncate leading-tight ${isSelected ? "text-blue-100" : "text-slate-400"}`}>
-                    {stock.name}
+                    {data?.name || stock.name}
                   </p>
                 </div>
                 <div className="text-right ml-2 flex-shrink-0">
-                  {data ? (
+                  {data?.price ? (
                     <>
                       <p className={`font-semibold text-sm leading-tight ${isSelected ? "text-white" : "text-slate-900"}`}>
                         ${data.price.toFixed(2)}
@@ -126,7 +111,9 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
                       </div>
                     </>
                   ) : (
-                    <p className="text-xs text-slate-400">Loading...</p>
+                    <p className={`text-xs ${loading ? "text-slate-400 animate-pulse" : "text-slate-400"}`}>
+                      {loading ? "Loading..." : "—"}
+                    </p>
                   )}
                 </div>
               </div>
