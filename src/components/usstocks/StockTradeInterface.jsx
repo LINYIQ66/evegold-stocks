@@ -122,7 +122,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
     if (isDisabled) return;
     setIsTrading(true);
     setResult(null);
-    const res = await onTrade(side, selectedSymbol, calc, currency);
+    const res = await onTrade(side, selectedSymbol, calc, currency, orderType);
     setResult(res);
     setIsTrading(false);
     if (res.success) {

@@ -40,13 +40,30 @@ export default function USStocks() {
    * SELL: calc = { shares, gross, fee, netUsdt, execPrice }
    *       Deduct `shares` stock, add `netUsdt` USDT
    */
-  const handleTrade = async (side, symbol, calc, currency = "USDT") => {
+  const handleTrade = async (side, symbol, calc, currency = "USDT", orderType = "market") => {
     try {
       if (!user) return { success: false, error: "Please log in to trade." };
 
+      // Limit orders: record as pending, no balance change, no fee, no EVE reward
+      if (orderType === "limit") {
+        await Transaction.create({
+          transaction_type: "swap",
+          user_email: user.email,
+          from_asset: side === "buy" ? currency : symbol,
+          to_asset: side === "buy" ? symbol : currency,
+          amount_usd: side === "buy" ? calc.spent : calc.gross,
+          fee_usd: 0,
+          exchange_rate: calc.execPrice,
+          status: "pending",
+          description: `Limit ${side} @ $${calc.execPrice.toFixed(2)} — awaiting execution`,
+        });
+        return { success: true, message: `Limit order placed @ $${calc.execPrice.toFixed(2)}. Pending execution.` };
+      }
+
+      // Market orders: execute immediately
       const newBalances = { ...(user.wallet_balances || {}) };
       const stockKey = symbol.toLowerCase();
-      const currencyKey = currency.toLowerCase(); // "usdt" or "usd"
+      const currencyKey = currency.toLowerCase();
 
       if (side === "buy") {
         const newCurrBal = (newBalances[currencyKey] || 0) - calc.spent;
@@ -67,7 +84,6 @@ export default function USStocks() {
         newBalances.eve = (newBalances.eve || 0) + eveReward;
       }
 
-      // Record transaction
       await Transaction.create({
         transaction_type: "swap",
         user_email: user.email,
