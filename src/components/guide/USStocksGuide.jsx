@@ -830,21 +830,21 @@ export default function USStocksGuide() {
   const [selectedStock, setSelectedStock] = useState(null);
 
   const sectors = ["All", "Technology", "Communication Services", "Consumer Discretionary / Technology", "Financials", "Technology / Crypto", "Technology / AI", "Technology / Cloud", "Financials / Crypto"];
-  const sectorShort = ["All", "Tech", "Media", "Consumer", "Finance", "Crypto-Tech", "AI", "Cloud", "Crypto-Finance"];
+  const sectorShort = ["全部", "科技", "媒体", "消费", "金融", "加密货币", "人工智能", "云计算", "加密金融"];
 
   const filteredStocks = STOCKS.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(searchQ.toLowerCase()) ||
       s.symbol.toLowerCase().includes(searchQ.toLowerCase()) ||
       s.industry.toLowerCase().includes(searchQ.toLowerCase());
-    const matchSector = selectedSector === "All" || s.sector.includes(selectedSector.replace("-", "/"));
+    const matchSector = selectedSector === "全部" || selectedSector === "All" || s.sector.includes(selectedSector.replace("-", "/"));
     return matchSearch && matchSector;
   });
 
   const tabs = [
-    { id: "intro", label: "US Stocks 101", icon: BookOpen },
-    { id: "stocks", label: "Stock Directory", icon: BarChart2 },
-    { id: "charts", label: "Market Analytics", icon: LineChart },
-    { id: "qa", label: "Q&A", icon: HelpCircle },
+    { id: "intro", label: "美股入门", icon: BookOpen },
+    { id: "stocks", label: "股票大全", icon: BarChart2 },
+    { id: "charts", label: "市场分析", icon: LineChart },
+    { id: "qa", label: "常见问题", icon: HelpCircle },
   ];
 
   return (
@@ -879,10 +879,10 @@ export default function USStocksGuide() {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 to-blue-900/60" />
             <div className="absolute inset-0 flex flex-col justify-center px-8">
-              <Badge className="bg-blue-500/80 text-white border-0 w-fit mb-3">EVE FINANCE · US Stocks</Badge>
-              <h2 className="text-3xl font-bold text-white mb-2">Invest in America's Best Companies</h2>
+              <Badge className="bg-blue-500/80 text-white border-0 w-fit mb-3">EVE FINANCE · 美股交易</Badge>
+              <h2 className="text-3xl font-bold text-white mb-2">投资美国最优质企业</h2>
               <p className="text-blue-100 max-w-lg text-sm">
-                Trade tokenized shares of 20 top US stocks — Apple, NVIDIA, Tesla, OpenAI and more — with as little as $10, 24/7, from anywhere in the world.
+                交易 20 只热门美股通证化份额 —— Apple、NVIDIA、Tesla、OpenAI 等，最低$10 起投，7×24 小时，全球随时随地交易。
               </p>
             </div>
           </div>
@@ -890,10 +890,10 @@ export default function USStocksGuide() {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "Stocks Available", val: 20, suffix: "", icon: BarChart2, color: "from-blue-500 to-indigo-600" },
-              { label: "Total Market Cap", val: 18, suffix: "T+", prefix: "$", icon: DollarSign, color: "from-green-500 to-emerald-600" },
-              { label: "Min. Investment", val: 10, suffix: "", prefix: "$", icon: TrendingUp, color: "from-orange-400 to-red-500" },
-              { label: "Trading Fee", val: 0.1, suffix: "%", icon: Activity, color: "from-purple-500 to-violet-600" },
+              { label: "可交易股票", val: 20, suffix: "只", icon: BarChart2, color: "from-blue-500 to-indigo-600" },
+              { label: "总市值", val: 18, suffix: "T+", prefix: "$", icon: DollarSign, color: "from-green-500 to-emerald-600" },
+              { label: "最低投资", val: 10, suffix: "", prefix: "$", icon: TrendingUp, color: "from-orange-400 to-red-500" },
+              { label: "交易费率", val: 0.1, suffix: "%", icon: Activity, color: "from-purple-500 to-violet-600" },
             ].map((stat, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
                 <Card className={`bg-gradient-to-br ${stat.color} border-0 text-white`}>
@@ -913,14 +913,14 @@ export default function USStocksGuide() {
           <Card className="border-0 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <BookOpen className="w-5 h-5 text-blue-600" /> What Is a Stock?
+                <BookOpen className="w-5 h-5 text-blue-600" /> 什么是股票？
               </CardTitle>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4 text-sm text-slate-600 leading-relaxed">
-                <p>A <strong className="text-slate-800">stock</strong> (also called a <em>share</em> or <em>equity</em>) represents a unit of ownership in a company. When you buy Apple stock, you become a part-owner of Apple Inc.</p>
-                <p>Companies issue stocks on <strong className="text-slate-800">stock exchanges</strong> (like NYSE or NASDAQ) to raise money for growth. In return, investors share in the company's profits through <strong>price appreciation</strong> and sometimes <strong>dividends</strong>.</p>
-                <p>On EVE FINANCE, you trade <strong>tokenized stocks</strong> — digital representations that mirror the price of real shares, giving you full market exposure without needing a US brokerage account.</p>
+                <p><strong className="text-slate-800">股票</strong>（也称为<em>股份</em>或<em>股权</em>）代表公司所有权的一个单位。当您购买 Apple 股票时，您就成为 Apple Inc. 的部分所有者。</p>
+                <p>公司在<strong className="text-slate-800">证券交易所</strong>（如纽约证券交易所或纳斯达克）发行股票以筹集资金用于发展。作为回报，投资者通过<strong>股价上涨</strong>和有时<strong>股息分红</strong>分享公司利润。</p>
+                <p>在 EVE FINANCE，您交易的是<strong>通证化股票</strong>—— 数字化代表，追踪真实股票价格，让您无需美国券商账户即可 fully 参与市场。</p>
               </div>
               <div>
                 <img
@@ -936,18 +936,18 @@ export default function USStocksGuide() {
           <Card className="border-0 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Play className="w-5 h-5 text-green-600" /> How to Trade US Stocks on EVE FINANCE
+                <Play className="w-5 h-5 text-green-600" /> 如何在 EVE FINANCE 交易美股
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   {[
-                    { step: "1", title: "Deposit USDT or USD", desc: "Fund your wallet using bank transfer or USDT (ERC20/TRC20/SOL). Min deposit $50." },
-                    { step: "2", title: "Go to US Stocks", desc: "Navigate to the US Stocks page from the sidebar. Browse real-time prices." },
-                    { step: "3", title: "Choose a Stock & Order Type", desc: "Select Market Order for instant execution, or Limit Order to set your target price." },
-                    { step: "4", title: "Enter Amount & Confirm", desc: "Enter how much USDT to spend. Review the fee and estimated shares. Confirm your trade." },
-                    { step: "5", title: "Track Your Holdings", desc: "Your shares appear in Holdings immediately. P&L updates in real-time with live prices." },
+                    { step: "1", title: "存入 USDT 或 USD", desc: "使用银行转账或 USDT（ERC20/TRC20/SOL）为钱包充值。最低存款$50。" },
+                    { step: "2", title: "进入美股页面", desc: "从侧边栏导航到美股页面。浏览实时价格。" },
+                    { step: "3", title: "选择股票和订单类型", desc: "选择市价单立即成交，或限价单设定目标价格。" },
+                    { step: "4", title: "输入金额并确认", desc: "输入要花费的 USDT 金额。查看手续费和预估股数。确认交易。" },
+                    { step: "5", title: "跟踪持仓", desc: "您的股份立即显示在持仓中。盈亏随实时价格更新。" },
                   ].map((s, i) => (
                     <div key={i} className="flex gap-3">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">
@@ -969,12 +969,12 @@ export default function USStocksGuide() {
                   {/* Order types */}
                   <div className="grid grid-cols-2 gap-2">
                     <div className="bg-green-50 border border-green-200 rounded-xl p-3">
-                      <p className="text-green-700 font-semibold text-xs mb-1">Market Order</p>
-                      <p className="text-green-600 text-xs">Executes immediately at current market price. Best for quick entry.</p>
+                      <p className="text-green-700 font-semibold text-xs mb-1">市价单</p>
+                      <p className="text-green-600 text-xs">按当前市价立即成交。适合快速建仓。</p>
                     </div>
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-                      <p className="text-blue-700 font-semibold text-xs mb-1">Limit Order</p>
-                      <p className="text-blue-600 text-xs">Set your target price. Funds frozen until price is reached or cancelled.</p>
+                      <p className="text-blue-700 font-semibold text-xs mb-1">限价单</p>
+                      <p className="text-blue-600 text-xs">设定目标价格。资金冻结直至价格触达或取消。</p>
                     </div>
                   </div>
                 </div>
@@ -986,19 +986,19 @@ export default function USStocksGuide() {
           <Card className="border-0 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <PieChart className="w-5 h-5 text-purple-600" /> What Sectors Can I Invest In?
+                <PieChart className="w-5 h-5 text-purple-600" /> 可以投资哪些行业？
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   {[
-                    { icon: Cpu, label: "Technology", desc: "Semiconductors, software, cloud — AAPL, MSFT, NVDA, AMD, INTC", color: "text-indigo-600 bg-indigo-50" },
-                    { icon: Globe, label: "Communication", desc: "Advertising, social, streaming — GOOGL, META, NFLX", color: "text-cyan-600 bg-cyan-50" },
-                    { icon: ShoppingBag, label: "Consumer / E-Commerce", desc: "Retail & logistics — AMZN, BABA", color: "text-amber-600 bg-amber-50" },
-                    { icon: Building2, label: "Fintech & Crypto", desc: "Brokerage, exchange — HOOD, COIN, MSTR", color: "text-emerald-600 bg-emerald-50" },
-                    { icon: Zap, label: "AI Infrastructure", desc: "Pure-play AI — OPENAI, CRWV, PLTR", color: "text-violet-600 bg-violet-50" },
-                    { icon: Car, label: "EV & Energy", desc: "Electric vehicles, autonomy — TSLA", color: "text-red-600 bg-red-50" },
+                    { icon: Cpu, label: "科技", desc: "半导体、软件、云计算 — AAPL, MSFT, NVDA, AMD, INTC", color: "text-indigo-600 bg-indigo-50" },
+                    { icon: Globe, label: "通信服务", desc: "广告、社交、流媒体 — GOOGL, META, NFLX", color: "text-cyan-600 bg-cyan-50" },
+                    { icon: ShoppingBag, label: "消费/电商", desc: "零售与物流 — AMZN, BABA", color: "text-amber-600 bg-amber-50" },
+                    { icon: Building2, label: "金融科技与加密货币", desc: "券商、交易所 — HOOD, COIN, MSTR", color: "text-emerald-600 bg-emerald-50" },
+                    { icon: Zap, label: "AI 基础设施", desc: "纯 AI 公司 — OPENAI, CRWV, PLTR", color: "text-violet-600 bg-violet-50" },
+                    { icon: Car, label: "电动车与能源", desc: "电动汽车、自动驾驶 — TSLA", color: "text-red-600 bg-red-50" },
                   ].map((s, i) => (
                     <div key={i} className={`flex items-center gap-3 p-3 rounded-xl ${s.color}`}>
                       <s.icon className="w-5 h-5 flex-shrink-0" />
@@ -1016,8 +1016,8 @@ export default function USStocksGuide() {
                     alt="Sectors"
                   />
                   <div className="bg-gradient-to-br from-slate-800 to-blue-900 rounded-xl p-4 text-white">
-                    <p className="text-sm font-semibold mb-1">💡 Diversification Tip</p>
-                    <p className="text-xs text-blue-100">Spreading investments across sectors reduces risk. When tech dips, consumer staples may hold steady.</p>
+                    <p className="text-sm font-semibold mb-1">💡 分散投资提示</p>
+                    <p className="text-xs text-blue-100">跨行业分散投资可降低风险。当科技股下跌时，消费股可能保持稳定。</p>
                   </div>
                 </div>
               </div>
@@ -1028,15 +1028,15 @@ export default function USStocksGuide() {
           <Card className="border-0 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Shield className="w-5 h-5 text-orange-500" /> Understanding Risk Levels
+                <Shield className="w-5 h-5 text-orange-500" /> 理解风险等级
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { level: "Low / Low-Medium", stocks: "AAPL, MSFT, AMZN, GOOGL", desc: "Mature, profitable companies with diversified revenue and decades of history. Best for long-term hold.", color: "border-green-300 bg-green-50", badge: "bg-green-100 text-green-700" },
-                  { level: "Medium / High", stocks: "META, INTC, MU, NFLX, ORCL, BABA, AMD", desc: "Strong companies with real revenue but higher growth expectations or cyclical exposure. Moderate volatility.", color: "border-yellow-300 bg-yellow-50", badge: "bg-yellow-100 text-yellow-700" },
-                  { level: "Very High", stocks: "NVDA, TSLA, MSTR, COIN, OPENAI, CRWV, PLTR", desc: "Speculative or early-stage growth companies. High upside potential but can fall 50%+ in downturns.", color: "border-red-300 bg-red-50", badge: "bg-red-100 text-red-700" },
+                  { level: "低/中低", stocks: "AAPL, MSFT, AMZN, GOOGL", desc: "成熟盈利公司，收入多元化，数十年历史。适合长期持有。", color: "border-green-300 bg-green-50", badge: "bg-green-100 text-green-700" },
+                  { level: "中/中高", stocks: "META, INTC, MU, NFLX, ORCL, BABA, AMD", desc: "实力强劲公司，有真实收入但增长预期较高或周期性敞口。中等波动。", color: "border-yellow-300 bg-yellow-50", badge: "bg-yellow-100 text-yellow-700" },
+                  { level: "非常高", stocks: "NVDA, TSLA, MSTR, COIN, OPENAI, CRWV, PLTR", desc: "投机性或早期成长公司。上涨潜力大但下跌可能超 50%。", color: "border-red-300 bg-red-50", badge: "bg-red-100 text-red-700" },
                 ].map((r, i) => (
                   <div key={i} className={`border rounded-xl p-4 ${r.color}`}>
                     <Badge className={`text-xs mb-2 ${r.badge}`}>{r.level} Risk</Badge>
@@ -1047,7 +1047,7 @@ export default function USStocksGuide() {
               </div>
               <div className="mt-4 flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
                 <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-amber-700">Past performance is not a guarantee of future results. All investments carry risk of loss.</p>
+                <p className="text-xs text-amber-700">过往表现不保证未来结果。所有投资均存在亏损风险。</p>
               </div>
             </CardContent>
           </Card>
@@ -1063,7 +1063,7 @@ export default function USStocksGuide() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search by name, symbol, or industry…"
+                placeholder="按名称、代码或行业搜索…"
                 value={searchQ}
                 onChange={e => setSearchQ(e.target.value)}
                 className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
@@ -1073,10 +1073,10 @@ export default function USStocksGuide() {
 
           {/* Sector quick filters */}
           <div className="flex gap-2 flex-wrap">
-            {["All", "Technology", "AI", "Crypto"].map(s => (
+            {["全部", "科技", "人工智能", "加密货币"].map(s => (
               <button
                 key={s}
-                onClick={() => setSelectedSector(s === selectedSector ? "All" : s)}
+                onClick={() => setSelectedSector(s === selectedSector ? "全部" : s)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                   selectedSector === s ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
                 }`}
@@ -1086,7 +1086,7 @@ export default function USStocksGuide() {
             ))}
           </div>
 
-          <p className="text-xs text-slate-400">{filteredStocks.length} stocks</p>
+          <p className="text-xs text-slate-400">{filteredStocks.length} 只股票</p>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredStocks.map((stock, i) => (
@@ -1105,7 +1105,7 @@ export default function USStocksGuide() {
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4 text-blue-500" /> Market Cap (Billion USD) — Top 10
+                  <BarChart2 className="w-4 h-4 text-blue-500" /> 市值（十亿美元）— 前 10 大
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1116,7 +1116,7 @@ export default function USStocksGuide() {
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-green-500" /> Revenue Growth 2020–2023 ($B)
+                  <Activity className="w-4 h-4 text-green-500" /> 营收增长 2020–2023（十亿美元）
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1134,7 +1134,7 @@ export default function USStocksGuide() {
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <PieChart className="w-4 h-4 text-purple-500" /> Portfolio Quality Factors (US Tech)
+                  <PieChart className="w-4 h-4 text-purple-500" /> 投资组合质量因子（美国科技）
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1145,7 +1145,7 @@ export default function USStocksGuide() {
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-cyan-500" /> Sector Breakdown — Listed Stocks
+                  <Globe className="w-4 h-4 text-cyan-500" /> 行业分布 — 已上市股票
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1180,19 +1180,19 @@ export default function USStocksGuide() {
           {/* Comparison table */}
           <Card className="border-0 shadow-md">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-slate-700">Mega-Cap Comparison (Top 6)</CardTitle>
+              <CardTitle className="text-sm font-semibold text-slate-700">巨型市值公司对比（前 6 大）</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-slate-100">
-                      <th className="text-left py-2 text-slate-500 font-medium">Stock</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">Market Cap</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">Revenue</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">P/E</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">Risk</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">Div.</th>
+                      <th className="text-left py-2 text-slate-500 font-medium">股票</th>
+                      <th className="text-right py-2 text-slate-500 font-medium">市值</th>
+                      <th className="text-right py-2 text-slate-500 font-medium">营收</th>
+                      <th className="text-right py-2 text-slate-500 font-medium">市盈率</th>
+                      <th className="text-right py-2 text-slate-500 font-medium">风险</th>
+                      <th className="text-right py-2 text-slate-500 font-medium">股息</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1233,8 +1233,8 @@ export default function USStocksGuide() {
               />
               <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-blue-800/70 flex flex-col justify-center px-8">
                 <HelpCircle className="w-8 h-8 text-white mb-2 opacity-80" />
-                <h3 className="text-2xl font-bold text-white">Frequently Asked Questions</h3>
-                <p className="text-blue-100 text-sm">Everything you need to know about US stock trading on EVE FINANCE</p>
+                <h3 className="text-2xl font-bold text-white">常见问题解答</h3>
+                <p className="text-blue-100 text-sm">了解 EVE FINANCE 美股交易的一切</p>
               </div>
             </div>
             <CardContent className="p-6">
@@ -1250,9 +1250,9 @@ export default function USStocksGuide() {
                   <AlertCircle className="w-5 h-5 text-red-400" />
                 </div>
                 <div>
-                  <h4 className="font-bold mb-2">Investment Risk Disclosure</h4>
+                  <h4 className="font-bold mb-2">投资风险披露</h4>
                   <p className="text-slate-300 text-xs leading-relaxed">
-                    Trading tokenized stocks involves significant risk, including the potential loss of your entire investment. Stock prices can be highly volatile and are affected by market conditions, company performance, economic factors, and geopolitical events. Past performance is not indicative of future results. This guide is for educational purposes only and does not constitute investment advice. Please invest only what you can afford to lose and consider consulting a licensed financial advisor.
+                    交易通证化股票涉及重大风险，包括可能损失全部投资。股价可能高度波动，受市场状况、公司业绩、经济因素和地缘政治事件影响。过往表现不代表未来结果。本指南仅供教育用途，不构成投资建议。请仅投资您能承受损失的资金，并考虑咨询持牌财务顾问。
                   </p>
                 </div>
               </div>

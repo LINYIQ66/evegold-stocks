@@ -416,7 +416,7 @@ export default function Guide() {
               </TabsTrigger>
               <TabsTrigger value="usstocks" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white relative">
                 <BarChart2 className="w-4 h-4 mr-2" />
-                US Stocks
+                美股
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
               </TabsTrigger>
             </TabsList>
