@@ -1,16 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, CheckCircle, TrendingUp, TrendingDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getStockPrices } from "@/functions/getStockPrices";
 
 const FEE_RATE = 0.001; // 0.1%
 
-export default function StockTradeInterface({ user, selectedSymbol, livePrice, onTrade }) {
+export default function StockTradeInterface({ user, selectedSymbol, livePrice: livePriceProp, onTrade }) {
   const [side, setSide] = useState("buy");       // "buy" | "sell"
   const [orderType, setOrderType] = useState("market"); // "market" | "limit"
+  const [fetchedPrice, setFetchedPrice] = useState(null);
+
+  // If parent hasn't provided a price yet, fetch it ourselves
+  useEffect(() => {
+    setFetchedPrice(null);
+    if (!livePriceProp) {
+      getStockPrices({}).then(res => {
+        const p = res?.data?.prices?.[selectedSymbol]?.price;
+        if (p) setFetchedPrice(p);
+      }).catch(() => {});
+    }
+  }, [selectedSymbol, livePriceProp]);
+
+  const livePrice = livePriceProp || fetchedPrice;
   // For buy: usdtAmount is how much USDT to spend
   // For sell: sharesAmount is how many shares to sell
   const [usdtAmount, setUsdtAmount] = useState("");
