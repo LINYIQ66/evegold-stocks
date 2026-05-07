@@ -73,7 +73,13 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
   const [sortByValue, setSortByValue] = useState(false);
 
   const getAvailableBalance = (symbol) => user?.wallet_balances?.[symbol.toLowerCase()] || 0;
-  const getLockedBalance = (symbol) => user?.locked_balances?.[symbol.toLowerCase()] || 0;
+  // locked_balances = staking locks; frozen_* in wallet_balances = pending limit order freezes
+  const getLockedBalance = (symbol) => {
+    const key = symbol.toLowerCase();
+    const staked = user?.locked_balances?.[key] || 0;
+    const frozen = user?.wallet_balances?.[`frozen_${key}`] || 0;
+    return staked + frozen;
+  };
 
   const formatBalance = (balance, symbol) => {
     const decimals = ['VND', 'IDR', 'LAK', 'JPY', 'TWD'].includes(symbol) ? 0 :
