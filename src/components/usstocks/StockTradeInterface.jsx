@@ -111,8 +111,9 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
 
   const calc = side === "buy" ? calcBuy() : calcSell();
 
-  const isInsufficientBuy = side === "buy" && (parseFloat(spendAmount) || 0) > payBalance;
-  const isInsufficientSell = side === "sell" && (parseFloat(sellShares) || 0) > stockBalance;
+  const EPSILON = 1e-9;
+  const isInsufficientBuy = side === "buy" && (parseFloat(spendAmount) || 0) > payBalance + EPSILON;
+  const isInsufficientSell = side === "sell" && (parseFloat(sellShares) || 0) > stockBalance + EPSILON;
   const isInsufficient = isInsufficientBuy || isInsufficientSell;
   const isLimitPriceInvalid = orderType === "limit" && (parseFloat(limitPrice) || 0) <= 0;
   const isDisabled = !calc || isInsufficient || isTrading || isLimitPriceInvalid || !execPrice;
