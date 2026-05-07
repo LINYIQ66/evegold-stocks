@@ -10,11 +10,10 @@ import { getStockPrices } from "@/functions/getStockPrices";
 const FEE_RATE = 0.001; // 0.1%
 
 export default function StockTradeInterface({ user, selectedSymbol, livePrice: livePriceProp, onTrade }) {
-  const [side, setSide] = useState("buy");       // "buy" | "sell"
-  const [orderType, setOrderType] = useState("market"); // "market" | "limit"
+  const [side, setSide] = useState("buy");
+  const [orderType, setOrderType] = useState("market");
   const [fetchedPrice, setFetchedPrice] = useState(null);
 
-  // If parent hasn't provided a price yet, fetch it ourselves
   useEffect(() => {
     setFetchedPrice(null);
     if (!livePriceProp) {
@@ -26,45 +25,83 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
   }, [selectedSymbol, livePriceProp]);
 
   const livePrice = livePriceProp || fetchedPrice;
-  // For buy: usdtAmount is how much USDT to spend
-  // For sell: sharesAmount is how many shares to sell
-  const [usdtAmount, setUsdtAmount] = useState("");
-  const [sharesAmount, setSharesAmount] = useState("");
+
+  // BUY inputs: amount to spend (USD/USDT) AND quantity (shares) — linked
+  const [spendAmount, setSpendAmount] = useState("");   // how much currency to pay
+  const [buyShares, setBuyShares] = useState("");        // how many shares to buy
+
+  // SELL inputs: shares to sell AND price per share (for limit; display only for market)
+  const [sellShares, setSellShares] = useState("");
   const [limitPrice, setLimitPrice] = useState("");
+
+  const [currency, setCurrency] = useState("USDT");
   const [result, setResult] = useState(null);
   const [isTrading, setIsTrading] = useState(false);
-
-  const [currency, setCurrency] = useState("USDT"); // "USDT" | "USD"
+  // track which input was last edited to avoid circular updates
+  const [lastBuyEdit, setLastBuyEdit] = useState("spend"); // "spend" | "shares"
 
   const usdtBalance = user?.wallet_balances?.usdt || 0;
   const usdBalance = user?.wallet_balances?.usd || 0;
   const stockBalance = user?.wallet_balances?.[selectedSymbol.toLowerCase()] || 0;
-
   const payBalance = currency === "USDT" ? usdtBalance : usdBalance;
 
-  const execPrice = orderType === "market" ? livePrice : parseFloat(limitPrice) || 0;
+  const execPrice = orderType === "market"
+    ? (livePrice || 0)
+    : (parseFloat(limitPrice) || 0);
 
-  // ---- BUY calculation ----
-  // User pays X USDT → receives shares
-  // totalCost = usdtAmount (what user pays, fee included)
-  // fee = usdtAmount * FEE_RATE
-  // sharesReceived = (usdtAmount - fee) / price
-  const calcBuy = () => {
-    const spent = parseFloat(usdtAmount) || 0;
-    if (spent <= 0 || execPrice <= 0) return null;
-    const fee = spent * FEE_RATE;
-    const netUsdt = spent - fee;
-    const sharesReceived = netUsdt / execPrice;
-    return { spent, fee, sharesReceived, execPrice };
+  // When spend amount changes, auto-compute shares
+  const handleSpendChange = (val) => {
+    setSpendAmount(val);
+    setLastBuyEdit("spend");
+    if (execPrice > 0 && val !== "") {
+      const spent = parseFloat(val) || 0;
+      const netSpent = spent * (1 - FEE_RATE);
+      setBuyShares((netSpent / execPrice).toFixed(6));
+    } else {
+      setBuyShares("");
+    }
   };
 
-  // ---- SELL calculation ----
-  // User sells X shares → receives USDT
-  // gross = shares * price
-  // fee = gross * FEE_RATE
-  // netUsdt = gross - fee
+  // When shares changes, auto-compute spend
+  const handleBuySharesChange = (val) => {
+    setBuyShares(val);
+    setLastBuyEdit("shares");
+    if (execPrice > 0 && val !== "") {
+      const shares = parseFloat(val) || 0;
+      // grossCost = shares * price; spendAmount = grossCost / (1 - FEE_RATE)
+      const spendNeeded = (shares * execPrice) / (1 - FEE_RATE);
+      setSpendAmount(spendNeeded.toFixed(2));
+    } else {
+      setSpendAmount("");
+    }
+  };
+
+  // When limit price changes, re-derive the non-edited field
+  const handleLimitPriceChange = (val) => {
+    setLimitPrice(val);
+    const price = parseFloat(val) || 0;
+    if (price <= 0) return;
+    if (lastBuyEdit === "spend" && spendAmount !== "") {
+      const spent = parseFloat(spendAmount) || 0;
+      setBuyShares(((spent * (1 - FEE_RATE)) / price).toFixed(6));
+    } else if (lastBuyEdit === "shares" && buyShares !== "") {
+      const shares = parseFloat(buyShares) || 0;
+      setSpendAmount(((shares * price) / (1 - FEE_RATE)).toFixed(2));
+    }
+  };
+
+  // ---- BUY calc ----
+  const calcBuy = () => {
+    const spent = parseFloat(spendAmount) || 0;
+    const shares = parseFloat(buyShares) || 0;
+    if (spent <= 0 || shares <= 0 || execPrice <= 0) return null;
+    const fee = spent * FEE_RATE;
+    return { spent, fee, sharesReceived: shares, execPrice };
+  };
+
+  // ---- SELL calc ----
   const calcSell = () => {
-    const shares = parseFloat(sharesAmount) || 0;
+    const shares = parseFloat(sellShares) || 0;
     if (shares <= 0 || execPrice <= 0) return null;
     const gross = shares * execPrice;
     const fee = gross * FEE_RATE;
@@ -74,10 +111,9 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
 
   const calc = side === "buy" ? calcBuy() : calcSell();
 
-  const isInsufficient = side === "buy"
-    ? (parseFloat(usdtAmount) || 0) > payBalance
-    : (parseFloat(sharesAmount) || 0) > stockBalance;
-
+  const isInsufficientBuy = side === "buy" && (parseFloat(spendAmount) || 0) > payBalance;
+  const isInsufficientSell = side === "sell" && (parseFloat(sellShares) || 0) > stockBalance;
+  const isInsufficient = isInsufficientBuy || isInsufficientSell;
   const isLimitPriceInvalid = orderType === "limit" && (parseFloat(limitPrice) || 0) <= 0;
   const isDisabled = !calc || isInsufficient || isTrading || isLimitPriceInvalid || !execPrice;
 
@@ -89,24 +125,22 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
     setResult(res);
     setIsTrading(false);
     if (res.success) {
-      setUsdtAmount("");
-      setSharesAmount("");
+      setSpendAmount(""); setBuyShares(""); setSellShares("");
       setTimeout(() => setResult(null), 4000);
     }
   };
 
   const setPercentageBuy = (pct) => {
-    setUsdtAmount((payBalance * pct / 100).toFixed(2));
+    handleSpendChange((payBalance * pct / 100).toFixed(2));
   };
 
   const setPercentageSell = (pct) => {
-    setSharesAmount(((stockBalance * pct / 100)).toFixed(6));
+    setSellShares(((stockBalance * pct / 100)).toFixed(6));
   };
 
   const switchSide = (newSide) => {
     setSide(newSide);
-    setUsdtAmount("");
-    setSharesAmount("");
+    setSpendAmount(""); setBuyShares(""); setSellShares("");
     setResult(null);
     setCurrency("USDT");
   };
@@ -153,7 +187,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
           {["market", "limit"].map(type => (
             <button
               key={type}
-              onClick={() => { setOrderType(type); setLimitPrice(""); }}
+              onClick={() => { setOrderType(type); setLimitPrice(""); setBuyShares(""); setSpendAmount(""); }}
               className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-all capitalize ${
                 orderType === type
                   ? "bg-blue-600 text-white border-blue-600"
@@ -165,110 +199,155 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
           ))}
         </div>
 
-        {/* Limit Price Input */}
+        {/* Limit Price Input (shown for both buy and sell) */}
         {orderType === "limit" && (
           <div className="space-y-1">
-            <Label className="text-sm text-slate-700">Limit Price (USDT)</Label>
+            <Label className="text-sm text-slate-700">
+              {side === "buy" ? "Limit Buy Price" : "Limit Sell Price"} (USD)
+            </Label>
             <Input
               type="number"
               placeholder={livePrice ? `e.g. ${livePrice.toFixed(2)}` : "Enter limit price"}
               value={limitPrice}
-              onChange={e => setLimitPrice(e.target.value)}
+              onChange={e => handleLimitPriceChange(e.target.value)}
               min="0"
             />
             <p className="text-xs text-slate-400">Current market: {livePrice ? `$${livePrice.toFixed(2)}` : "—"}</p>
           </div>
         )}
 
-        {/* Currency selector (buy side) */}
-        {side === "buy" && (
-          <div className="flex gap-2">
-            {["USDT", "USD"].map(c => (
-              <button
-                key={c}
-                onClick={() => { setCurrency(c); setUsdtAmount(""); }}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-all ${
-                  currency === c
-                    ? "bg-slate-800 text-white border-slate-800"
-                    : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
-                }`}
-              >
-                Pay with {c}
-              </button>
-            ))}
+        {/* Market price display (read-only) */}
+        {orderType === "market" && (
+          <div className="flex items-center justify-between px-3 py-2 bg-blue-50 rounded-lg border border-blue-100">
+            <span className="text-xs text-blue-600 font-medium">Execution Price</span>
+            <span className="text-sm font-bold text-blue-700">
+              {livePrice ? `$${livePrice.toFixed(2)}` : "—"}
+            </span>
           </div>
         )}
 
-        {/* BUY: input USDT/USD amount */}
+        {/* ===== BUY SECTION ===== */}
         {side === "buy" && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <Label className="text-slate-700">Amount to Spend ({currency})</Label>
-              <span className="text-slate-500">Balance: {payBalance.toFixed(2)} {currency}</span>
-            </div>
-            <Input
-              type="number"
-              placeholder="0.00"
-              value={usdtAmount}
-              onChange={e => setUsdtAmount(e.target.value)}
-              className="text-base"
-              min="0"
-            />
-            <div className="flex gap-1.5">
-              {[25, 50, 75, 100].map(pct => (
-                <Button key={pct} variant="outline" size="sm" onClick={() => setPercentageBuy(pct)}
-                  className="text-xs flex-1" disabled={payBalance <= 0}>
-                  {pct}%
-                </Button>
+          <>
+            {/* Currency selector */}
+            <div className="flex gap-2">
+              {["USDT", "USD"].map(c => (
+                <button
+                  key={c}
+                  onClick={() => { setCurrency(c); setSpendAmount(""); setBuyShares(""); }}
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-all ${
+                    currency === c
+                      ? "bg-slate-800 text-white border-slate-800"
+                      : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
+                  }`}
+                >
+                  Pay with {c}
+                </button>
               ))}
             </div>
-          </div>
-        )}
 
-        {/* Currency selector (sell side) */}
-        {side === "sell" && (
-          <div className="flex gap-2">
-            {["USDT", "USD"].map(c => (
-              <button
-                key={c}
-                onClick={() => setCurrency(c)}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-all ${
-                  currency === c
-                    ? "bg-slate-800 text-white border-slate-800"
-                    : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
-                }`}
-              >
-                Receive {c}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* SELL: input shares amount */}
-        {side === "sell" && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <Label className="text-slate-700">Shares to Sell ({selectedSymbol})</Label>
-              <span className="text-slate-500">Balance: {stockBalance.toFixed(6)} {selectedSymbol}</span>
+            {/* Spend Amount */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-sm">
+                <Label className="text-slate-700">Amount to Spend ({currency})</Label>
+                <span className="text-slate-500">Balance: {payBalance.toFixed(2)} {currency}</span>
+              </div>
+              <Input
+                type="number"
+                placeholder="0.00"
+                value={spendAmount}
+                onChange={e => handleSpendChange(e.target.value)}
+                className={`text-base ${isInsufficientBuy ? "border-red-400 focus-visible:ring-red-300" : ""}`}
+                min="0"
+              />
+              <div className="flex gap-1.5">
+                {[25, 50, 75, 100].map(pct => (
+                  <Button key={pct} variant="outline" size="sm" onClick={() => setPercentageBuy(pct)}
+                    className="text-xs flex-1" disabled={payBalance <= 0}>
+                    {pct}%
+                  </Button>
+                ))}
+              </div>
             </div>
-            <Input
-              type="number"
-              placeholder="0.000000"
-              value={sharesAmount}
-              onChange={e => setSharesAmount(e.target.value)}
-              className="text-base"
-              min="0"
-              step="0.000001"
-            />
-            <div className="flex gap-1.5">
-              {[25, 50, 75, 100].map(pct => (
-                <Button key={pct} variant="outline" size="sm" onClick={() => setPercentageSell(pct)}
-                  className="text-xs flex-1" disabled={stockBalance <= 0}>
-                  {pct}%
-                </Button>
+
+            {/* Quantity (Shares) */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-sm">
+                <Label className="text-slate-700">Quantity (Shares)</Label>
+                {execPrice > 0 && (
+                  <span className="text-xs text-slate-400">
+                    Max ≈ {((payBalance * (1 - FEE_RATE)) / execPrice).toFixed(6)} {selectedSymbol}
+                  </span>
+                )}
+              </div>
+              <Input
+                type="number"
+                placeholder="0.000000"
+                value={buyShares}
+                onChange={e => handleBuySharesChange(e.target.value)}
+                className="text-base"
+                min="0"
+                step="0.000001"
+              />
+            </div>
+          </>
+        )}
+
+        {/* ===== SELL SECTION ===== */}
+        {side === "sell" && (
+          <>
+            {/* Currency selector */}
+            <div className="flex gap-2">
+              {["USDT", "USD"].map(c => (
+                <button
+                  key={c}
+                  onClick={() => setCurrency(c)}
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-md border transition-all ${
+                    currency === c
+                      ? "bg-slate-800 text-white border-slate-800"
+                      : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
+                  }`}
+                >
+                  Receive {c}
+                </button>
               ))}
             </div>
-          </div>
+
+            {/* Shares to Sell */}
+            <div className="space-y-1">
+              <div className="flex justify-between text-sm">
+                <Label className="text-slate-700">Shares to Sell ({selectedSymbol})</Label>
+                <span className="text-slate-500">Balance: {stockBalance.toFixed(6)} {selectedSymbol}</span>
+              </div>
+              <Input
+                type="number"
+                placeholder="0.000000"
+                value={sellShares}
+                onChange={e => setSellShares(e.target.value)}
+                className={`text-base ${isInsufficientSell ? "border-red-400 focus-visible:ring-red-300" : ""}`}
+                min="0"
+                step="0.000001"
+              />
+              <div className="flex gap-1.5">
+                {[25, 50, 75, 100].map(pct => (
+                  <Button key={pct} variant="outline" size="sm" onClick={() => setPercentageSell(pct)}
+                    className="text-xs flex-1" disabled={stockBalance <= 0}>
+                    {pct}%
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Estimated proceeds */}
+            {execPrice > 0 && sellShares !== "" && parseFloat(sellShares) > 0 && (
+              <div className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg border border-slate-100">
+                <span className="text-xs text-slate-500">Estimated Proceeds</span>
+                <span className="text-sm font-bold text-green-600">
+                  ≈ ${((parseFloat(sellShares) * execPrice) * (1 - FEE_RATE)).toFixed(2)} {currency}
+                </span>
+              </div>
+            )}
+          </>
         )}
 
         {/* Order Summary */}
@@ -329,9 +408,9 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
         <AnimatePresence>
           {isInsufficient && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-            Insufficient {side === "buy" ? currency : selectedSymbol} balance
+              className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              Insufficient {side === "buy" ? `${currency} balance (max: ${payBalance.toFixed(2)})` : `${selectedSymbol} balance (max: ${stockBalance.toFixed(6)})`}
             </motion.div>
           )}
           {isLimitPriceInvalid && (
