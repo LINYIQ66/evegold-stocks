@@ -163,7 +163,7 @@ export default function USStocks() {
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
               US Stocks
             </h1>
-            <p className="text-slate-500 mt-1 text-sm">Tokenized US stocks via Binance · 0.1% fee</p>
+            <p className="text-slate-500 mt-1 text-sm">Tokenized US stocks · 0.1% fee</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge className="bg-green-100 text-green-800 text-xs">
@@ -232,7 +232,7 @@ export default function USStocks() {
               <div className="space-y-3 text-blue-100 text-sm">
                 <div className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                  <p>Real-time prices sourced via CoinMarketCap for tokenized US stocks</p>
+                  <p>Real-time prices for tokenized US stocks on EVE FINANCE</p>
                 </div>
                 <div className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
