@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User, Transaction, FundRequest, SystemSetting } from "@/entities/all";
 import { UploadFile } from "@/integrations/Core";
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { getMetalPrices } from "@/functions/getMetalPrices";
+import { getStockPrices } from "@/functions/getStockPrices";
 
 import BalanceCards from "../components/wallet/BalanceCards";
 import TransactionHistory from "../components/wallet/TransactionHistory";
@@ -30,8 +30,9 @@ export default function Wallet() {
   const [transactions, setTransactions] = useState([]);
   const [fundRequests, setFundRequests] = useState([]);
   const [systemSettings, setSystemSettings] = useState({});
-  const [prices, setPrices] = useState({}); // New state for metal prices
-  const [priceChanges, setPriceChanges] = useState({}); // New state for metal price changes
+  const [prices, setPrices] = useState({});
+  const [priceChanges, setPriceChanges] = useState({});
+  const [stockPrices, setStockPrices] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isDepositModalOpen, setDepositModalOpen] = useState(false);
   const [isEveInfoModalOpen, setEveInfoModalOpen] = useState(false);
@@ -45,11 +46,12 @@ export default function Wallet() {
     setIsLoading(true);
     try {
       const userData = await User.me();
-      const [userTransactions, allFundRequests, settingsData, priceData] = await Promise.all([
+      const [userTransactions, allFundRequests, settingsData, priceData, stockData] = await Promise.all([
           Transaction.filter({ created_by: userData.email }, "-created_date", 50),
-          FundRequest.list("-created_date", 50), // Changed from filter to list
+          FundRequest.list("-created_date", 50),
           SystemSetting.list(),
-          getMetalPrices() // Fetch real-time metal prices
+          getMetalPrices(),
+          getStockPrices({})
       ]);
 
       setUser(userData);
@@ -68,6 +70,9 @@ export default function Wallet() {
       if (priceData.data.success) {
         setPrices(priceData.data.prices);
         setPriceChanges(priceData.data.changes);
+      }
+      if (stockData?.data?.prices) {
+        setStockPrices(stockData.data.prices);
       }
 
     } catch (error) {
@@ -103,26 +108,26 @@ export default function Wallet() {
 
 
   const getTotalPortfolioValue = () => {
-    if (!user || Object.keys(prices).length === 0) return 0;
+    if (!user) return 0;
 
     const allBalances = {};
-
-    // Combine wallet and locked balances
     for (const asset in user.wallet_balances) {
-        allBalances[asset] = (allBalances[asset] || 0) + user.wallet_balances[asset];
+      allBalances[asset] = (allBalances[asset] || 0) + user.wallet_balances[asset];
     }
-    // Check if locked_balances exists before iterating
     if (user.locked_balances) {
-        for (const asset in user.locked_balances) {
-            allBalances[asset] = (allBalances[asset] || 0) + user.locked_balances[asset];
-        }
+      for (const asset in user.locked_balances) {
+        allBalances[asset] = (allBalances[asset] || 0) + user.locked_balances[asset];
+      }
     }
 
-
-    // Calculate total value using prices
-    return Object.entries(allBalances).reduce((total, [asset, balance]) => {
-      return total + (balance * (prices[asset] || 0));
-    }, 0);
+    let total = 0;
+    for (const [asset, balance] of Object.entries(allBalances)) {
+      const metalPrice = prices[asset] || 0;
+      const stockData = stockPrices[asset.toUpperCase()];
+      const stockPrice = stockData?.price || 0;
+      total += balance * (metalPrice || stockPrice);
+    }
+    return total;
   };
 
   const goldPriceChange = priceChanges.gold;
@@ -224,7 +229,7 @@ export default function Wallet() {
                   <div>
                     <p className="text-blue-100 mb-2">{t('wallet.active_assets')}</p>
                     <p className="text-2xl font-bold">
-                      {user?.wallet_balances ? (Object.values(user.wallet_balances).filter(balance => balance > 0).length + (user.locked_balances ? Object.values(user.locked_balances).filter(balance => balance > 0).length : 0)) : 0}
+                      {user?.wallet_balances ? Object.values(user.wallet_balances).filter(b => b > 0).length + (user.locked_balances ? Object.values(user.locked_balances).filter(b => b > 0).length : 0) : 0}
                     </p>
                   </div>
                 </div>
@@ -238,8 +243,9 @@ export default function Wallet() {
               <BalanceCards
                 user={user}
                 isLoading={isLoading}
-                prices={prices} // Pass real-time prices
-                priceChanges={priceChanges} // Pass real-time price changes
+                prices={prices}
+                priceChanges={priceChanges}
+                stockPrices={stockPrices}
                 onInfoClick={() => setEveInfoModalOpen(true)}
               />
             </div>
