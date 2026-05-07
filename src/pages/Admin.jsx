@@ -54,7 +54,7 @@ export default function Admin() {
     try {
       const [usersData, transactionsData, loansData, fundRequestsData, settingsData, productsData, redemptionsData, ticketsData] = await Promise.all([
         User.list("-created_date", 100),
-        Transaction.list("-created_date", 200),
+        Transaction.list("-created_date", 2000),
         Loan.list("-created_date", 100),
         FundRequest.list("-created_date", 100),
         SystemSetting.list(),
@@ -167,12 +167,13 @@ export default function Admin() {
                 // Create a transaction record for history
                 await Transaction.create({
                     transaction_type: "deposit",
-                    user_id: user.id,
                     user_email: request.user_email,
+                    to_asset: request.asset.toUpperCase(),
                     asset: request.asset.toUpperCase(),
-                    amount_usd: request.amount, // FIX: Use amount_usd instead of amount
+                    amount_usd: request.amount,
+                    fee_usd: 0,
                     status: "completed",
-                    description: "Admin approved fund deposit request"
+                    description: `Admin approved deposit: ${request.amount} ${request.asset.toUpperCase()} via ${request.method}`
                 });
             }
         }
@@ -193,12 +194,13 @@ export default function Admin() {
                 // Create a transaction record for history
                 await Transaction.create({
                     transaction_type: "withdrawal",
-                    user_id: user.id,
                     user_email: request.user_email,
+                    from_asset: request.asset.toUpperCase(),
                     asset: request.asset.toUpperCase(),
-                    amount_usd: request.amount, // FIX: Use amount_usd instead of amount
+                    amount_usd: request.amount,
+                    fee_usd: 0,
                     status: "completed",
-                    description: "Admin approved fund withdrawal request"
+                    description: `Admin approved withdrawal: ${request.amount} ${request.asset.toUpperCase()} via ${request.method}`
                 });
             }
         }
@@ -240,12 +242,13 @@ export default function Admin() {
       // Create transaction record
       await Transaction.create({
         transaction_type: "deposit",
-        amount_usd: amount, // FIX: Use amount_usd instead of amount
-        status: "completed",
-        user_id: userId,
         user_email: targetUser.email,
+        to_asset: asset.toUpperCase(),
         asset: asset.toUpperCase(),
-        description: `Admin manual ${balanceType} deposit: ${notes}`
+        amount_usd: amount,
+        fee_usd: 0,
+        status: "completed",
+        description: `Admin manual ${balanceType} credit: ${amount} ${asset.toUpperCase()}${notes ? ` — ${notes}` : ''}`
       });
 
       await AuditLog.create({
@@ -285,12 +288,13 @@ export default function Admin() {
       // Create transaction record
       await Transaction.create({
         transaction_type: "withdrawal",
-        amount_usd: amount, // FIX: Use amount_usd instead of amount
-        status: "completed",
-        user_id: userId,
         user_email: targetUser.email,
+        from_asset: asset.toUpperCase(),
         asset: asset.toUpperCase(),
-        description: `Admin manual ${balanceType} deduction: ${notes}`
+        amount_usd: amount,
+        fee_usd: 0,
+        status: "completed",
+        description: `Admin manual ${balanceType} debit: ${amount} ${asset.toUpperCase()}${notes ? ` — ${notes}` : ''}`
       });
 
       await AuditLog.create({

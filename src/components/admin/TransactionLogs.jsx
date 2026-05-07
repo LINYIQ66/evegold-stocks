@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,13 +36,15 @@ export default function TransactionLogs({ transactions, isLoading }) {
 
   const filteredTransactions = transactions.filter(transaction => {
     const transactionDate = new Date(transaction.created_date);
-    // Ensure both from and to dates are selected, and transactionDate falls within the range
-    const matchesDate = date.from && date.to && transactionDate >= date.from && transactionDate <= date.to;
+    // end of selected day (23:59:59)
+    const endOfDay = date.to ? new Date(new Date(date.to).setHours(23, 59, 59, 999)) : null;
+    const matchesDate = date.from && endOfDay && transactionDate >= date.from && transactionDate <= endOfDay;
 
     const matchesSearch = (transaction.created_by?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          transaction.user_email?.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          transaction.from_asset?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.to_asset?.toLowerCase().includes(searchTerm.toLowerCase());
+                         transaction.to_asset?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         transaction.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesType = typeFilter === "all" || transaction.transaction_type === typeFilter;
     const matchesStatus = statusFilter === "all" || transaction.status === statusFilter;
@@ -213,9 +214,10 @@ export default function TransactionLogs({ transactions, isLoading }) {
                 <TableHead>Details</TableHead>
                 <TableHead>Amount (USD)</TableHead>
                 <TableHead>Fee (USD)</TableHead>
-                <TableHead>EVE Rebate (EVE)</TableHead> {/* New column */}
+                <TableHead>EVE Rebate (EVE)</TableHead>
+                <TableHead>Notes</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead> {/* Reordered date */}
+                <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -258,9 +260,12 @@ export default function TransactionLogs({ transactions, isLoading }) {
                       ${transaction.fee_usd?.toFixed(4) || '0.0000'} {/* Changed to fixed 4 decimals */}
                     </TableCell>
                     
-                    {/* New Cell for EVE Rebate */}
                     <TableCell className="text-green-600 font-mono">
                       {transaction.eve_amount > 0 ? `+${transaction.eve_amount.toFixed(2)} EVE` : 'N/A'}
+                    </TableCell>
+
+                    <TableCell className="text-slate-500 text-xs max-w-[180px] truncate" title={transaction.description || ''}>
+                      {transaction.description || '—'}
                     </TableCell>
 
                     <TableCell>

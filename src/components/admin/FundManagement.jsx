@@ -31,7 +31,16 @@ export default function FundManagement({ users, onAddFunds, onDeductFunds, isLoa
     { value: "gold", label: "Gold" },
     { value: "silver", label: "Silver" },
     { value: "platinum", label: "Platinum" },
-    { value: "palladium", label: "Palladium" }
+    { value: "palladium", label: "Palladium" },
+    { value: "aapl", label: "AAPL (Apple)" },
+    { value: "tsla", label: "TSLA (Tesla)" },
+    { value: "nvda", label: "NVDA (Nvidia)" },
+    { value: "msft", label: "MSFT (Microsoft)" },
+    { value: "googl", label: "GOOGL (Google)" },
+    { value: "amzn", label: "AMZN (Amazon)" },
+    { value: "meta", label: "META (Meta)" },
+    { value: "nflx", label: "NFLX (Netflix)" },
+    { value: "eve", label: "EVE Token" }
   ];
 
   const filteredUsers = users.filter(user => 

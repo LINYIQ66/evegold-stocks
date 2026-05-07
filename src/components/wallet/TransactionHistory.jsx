@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,34 +15,25 @@ import { motion } from "framer-motion";
 export default function TransactionHistory({ transactions, isLoading }) {
   const getTransactionIcon = (type) => {
     switch (type) {
-      case 'swap':
-        return ArrowLeftRight;
-      case 'deposit':
-        return ArrowDownLeft;
-      case 'withdrawal':
-        return ArrowUpRight;
-      case 'loan':
-      case 'repayment':
-        return Banknote;
-      default:
-        return Clock;
+      case 'swap': return ArrowLeftRight;
+      case 'deposit': return ArrowDownLeft;
+      case 'withdrawal': return ArrowUpRight;
+      case 'loan': case 'repayment': return Banknote;
+      default: return Clock;
     }
   };
 
   const getTransactionColor = (type) => {
     switch (type) {
-      case 'swap':
-        return 'text-blue-600 bg-blue-100';
-      case 'deposit':
-        return 'text-green-600 bg-green-100';
-      case 'withdrawal':
-        return 'text-red-600 bg-red-100';
-      case 'loan':
-        return 'text-purple-600 bg-purple-100';
-      case 'repayment':
-        return 'text-orange-600 bg-orange-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
+      case 'swap': return 'text-blue-600 bg-blue-100';
+      case 'deposit': return 'text-green-600 bg-green-100';
+      case 'withdrawal': return 'text-red-600 bg-red-100';
+      case 'loan': return 'text-purple-600 bg-purple-100';
+      case 'repayment': return 'text-orange-600 bg-orange-100';
+      case 'staking': case 'unstaking': return 'text-indigo-600 bg-indigo-100';
+      case 'staking_reward': case 'eve_reward': return 'text-amber-600 bg-amber-100';
+      case 'physical_redemption': return 'text-pink-600 bg-pink-100';
+      default: return 'text-gray-600 bg-gray-100';
     }
   };
 
@@ -111,11 +101,17 @@ export default function TransactionHistory({ transactions, isLoading }) {
                   
                   <div className="flex-1">
                     <h4 className="font-semibold text-slate-900 capitalize">
-                      {transaction.transaction_type}
+                      {transaction.transaction_type.replace(/_/g, ' ')}
                       {transaction.from_asset && transaction.to_asset && 
                         ` ${transaction.from_asset.toUpperCase()} → ${transaction.to_asset.toUpperCase()}`
                       }
+                      {!transaction.from_asset && !transaction.to_asset && transaction.asset &&
+                        ` (${transaction.asset.toUpperCase()})`
+                      }
                     </h4>
+                    {transaction.description && (
+                      <p className="text-xs text-slate-400 truncate max-w-xs">{transaction.description}</p>
+                    )}
                     <p className="text-sm text-slate-600">
                       {format(new Date(transaction.created_date), 'MMM d, yyyy • h:mm a')}
                     </p>

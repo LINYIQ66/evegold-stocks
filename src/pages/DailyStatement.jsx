@@ -68,7 +68,7 @@ export default function DailyStatement() {
         // End of day in SGT (day, 23:59:59 SGT) is (day, 15:59:59 UTC)
         const sgEndDateUTC = new Date(Date.UTC(year, month, day, 23, 59, 59) - (8 * 60 * 60 * 1000));
 
-        const allTransactions = await Transaction.filter({ user_email: userData.email }, "-created_date", 1000);
+        const allTransactions = await Transaction.filter({ user_email: userData.email }, "-created_date", 2000);
         
         const dayTransactions = allTransactions.filter(tx => {
           const txDateUTC = new Date(tx.created_date); // created_date is already UTC
@@ -111,7 +111,7 @@ export default function DailyStatement() {
         case 'withdrawal': categories.withdrawals.transactions.push(tx); break;
         case 'loan': case 'repayment': categories.lending.transactions.push(tx); break;
         case 'staking': case 'unstaking': categories.staking.transactions.push(tx); break;
-        case 'staking_reward': categories.rewards.transactions.push(tx); break;
+        case 'staking_reward': case 'eve_reward': categories.rewards.transactions.push(tx); break;
         case 'physical_redemption': categories.physical.transactions.push(tx); break;
         default: categories.trading.transactions.push(tx);
       }
@@ -219,10 +219,12 @@ export default function DailyStatement() {
                   {category.transactions.map((tx) => (
                     <div key={tx.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-slate-900 capitalize">{tx.transaction_type.replace('_', ' ')}</span>
-                          {tx.from_asset && tx.to_asset && (<span className="text-sm text-slate-600">{tx.from_asset} → {tx.to_asset}</span>)}
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="font-medium text-slate-900 capitalize">{tx.transaction_type.replace(/_/g, ' ')}</span>
+                          {tx.from_asset && tx.to_asset && (<span className="text-sm text-slate-600">{tx.from_asset.toUpperCase()} → {tx.to_asset.toUpperCase()}</span>)}
+                          {!tx.from_asset && !tx.to_asset && tx.asset && (<span className="text-sm text-slate-600">({tx.asset.toUpperCase()})</span>)}
                         </div>
+                        {tx.description && <p className="text-xs text-slate-400 mb-0.5">{tx.description}</p>}
                         <p className="text-sm text-slate-500">{formatInSgTime(tx.created_date, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</p>
                       </div>
                       <div className="text-right">

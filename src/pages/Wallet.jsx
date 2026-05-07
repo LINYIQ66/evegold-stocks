@@ -47,7 +47,7 @@ export default function Wallet() {
     try {
       const userData = await User.me();
       const [userTransactions, allFundRequests, settingsData, priceData, stockData] = await Promise.all([
-          Transaction.filter({ created_by: userData.email }, "-created_date", 50),
+          Transaction.filter({ user_email: userData.email }, "-created_date", 500),
           FundRequest.list("-created_date", 50),
           SystemSetting.list(),
           getMetalPrices(),

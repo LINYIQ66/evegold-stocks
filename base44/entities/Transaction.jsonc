@@ -1,0 +1,110 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "swap",
+        "deposit",
+        "withdrawal",
+        "loan",
+        "repayment",
+        "liquidation",
+        "staking",
+        "unstaking",
+        "staking_reward",
+        "physical_redemption",
+        "eve_reward"
+      ],
+      "description": "Type of transaction"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user this transaction belongs to. If empty, defaults to creator."
+    },
+    "from_asset": {
+      "type": "string",
+      "description": "Source asset for swaps/withdrawals"
+    },
+    "to_asset": {
+      "type": "string",
+      "description": "Target asset for swaps/deposits"
+    },
+    "amount_usd": {
+      "type": "number",
+      "description": "Gross transaction amount in USD value"
+    },
+    "fee_usd": {
+      "type": "number",
+      "description": "Fee charged in USD value"
+    },
+    "exchange_rate": {
+      "type": "number",
+      "description": "Exchange rate at time of transaction"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "total_cost_gold": {
+      "type": "number",
+      "default": 0
+    },
+    "total_cost_silver": {
+      "type": "number",
+      "default": 0
+    },
+    "eve_amount": {
+      "type": "number",
+      "default": 0,
+      "description": "Amount of EVE tokens awarded"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description or notes for this transaction"
+    },
+    "asset": {
+      "type": "string",
+      "description": "Single asset involved (for deposits/withdrawals where from/to is the same)"
+    }
+  },
+  "required": [
+    "transaction_type",
+    "amount_usd"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
