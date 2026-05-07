@@ -10,6 +10,7 @@ import StockTradeInterface from "../components/usstocks/StockTradeInterface";
 import StockHoldings from "../components/usstocks/StockHoldings";
 import StockTradeHistory from "../components/usstocks/StockTradeHistory";
 import USStocksFooter from "../components/usstocks/USStocksFooter";
+import USStockPendingOrders from "../components/usstocks/USStockPendingOrders.jsx";
 
 const FEE_RATE = 0.001; // 0.1%
 
@@ -229,6 +230,12 @@ export default function USStocks() {
               onTrade={handleTrade}
             />
           </motion.div>
+          <USStockPendingOrders
+            transactions={transactions}
+            onRefresh={() => { refreshUser(); loadTransactions(); }}
+            livePrice={livePrice}
+          />
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
