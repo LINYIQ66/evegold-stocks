@@ -31,8 +31,14 @@ export default function USStocks() {
   const loadTransactions = async () => {
     try {
       const u = await User.me();
-      const txs = await Transaction.filter({ user_email: u.email }, "-created_date", 200);
-      setTransactions(txs);
+      const [byEmail, byCreator] = await Promise.all([
+        Transaction.filter({ user_email: u.email }, "-created_date", 200),
+        Transaction.filter({ created_by: u.email }, "-created_date", 200),
+      ]);
+      const txMap = new Map();
+      [...byEmail, ...byCreator].forEach(tx => txMap.set(tx.id, tx));
+      const merged = Array.from(txMap.values()).sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      setTransactions(merged);
     } catch {}
   };
 
