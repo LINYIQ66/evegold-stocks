@@ -170,7 +170,7 @@ const AppLayout = ({ children }) => {
     { title: t('sidebar.trading'), url: createPageUrl("Trading"), icon: ArrowLeftRight, roles: ['user', 'admin'] },
     { title: t('sidebar.physical'), url: createPageUrl("Physical"), icon: Package, roles: ['user', 'admin'] },
     { title: t('sidebar.loan'), url: createPageUrl("Lending"), icon: Banknote, roles: ['user', 'admin'] },
-    { title: "美股", url: createPageUrl("USStocks"), icon: BarChart2, roles: ['user', 'admin'] },
+    { title: t('sidebar.us_stocks'), url: createPageUrl("USStocks"), icon: BarChart2, roles: ['user', 'admin'] },
     { title: t('sidebar.staking'), url: createPageUrl("Staking"), icon: PiggyBank, roles: ['user', 'admin'] },
     { title: t('sidebar.account'), url: createPageUrl("Account"), icon: UserCheck, roles: ['user', 'admin'] },
     { title: t('sidebar.statement'), url: createPageUrl("DailyStatement"), icon: FileText, roles: ['user', 'admin'] },
