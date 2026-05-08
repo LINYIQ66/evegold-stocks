@@ -118,12 +118,14 @@ export default function Wallet() {
     if (!user) return 0;
 
     const allBalances = {};
-    for (const asset in user.wallet_balances) {
-      allBalances[asset] = (allBalances[asset] || 0) + user.wallet_balances[asset];
+    for (const [asset, val] of Object.entries(user.wallet_balances || {})) {
+      if (asset.startsWith("frozen_")) continue; // skip frozen keys to avoid double-counting
+      allBalances[asset] = (allBalances[asset] || 0) + val;
     }
     if (user.locked_balances) {
-      for (const asset in user.locked_balances) {
-        allBalances[asset] = (allBalances[asset] || 0) + user.locked_balances[asset];
+      for (const [asset, val] of Object.entries(user.locked_balances)) {
+        if (asset.startsWith("frozen_")) continue;
+        allBalances[asset] = (allBalances[asset] || 0) + val;
       }
     }
 
@@ -236,7 +238,7 @@ export default function Wallet() {
                   <div>
                     <p className="text-blue-100 mb-2">{t('wallet.active_assets')}</p>
                     <p className="text-2xl font-bold">
-                      {user?.wallet_balances ? Object.values(user.wallet_balances).filter(b => b > 0).length + (user.locked_balances ? Object.values(user.locked_balances).filter(b => b > 0).length : 0) : 0}
+                      {user?.wallet_balances ? Object.entries(user.wallet_balances).filter(([k, b]) => !k.startsWith("frozen_") && b > 0).length + (user.locked_balances ? Object.entries(user.locked_balances).filter(([k, b]) => !k.startsWith("frozen_") && b > 0).length : 0) : 0}
                     </p>
                   </div>
                 </div>
