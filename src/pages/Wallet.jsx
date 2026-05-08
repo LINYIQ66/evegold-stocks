@@ -51,7 +51,6 @@ export default function Wallet() {
           Transaction.filter({ user_email: userData.email }, "-created_date", 500),
           Transaction.filter({ created_by: userData.email }, "-created_date", 500),
           FundRequest.list("-created_date", 50),
-
           SystemSetting.list(),
           getMetalPrices(),
           getStockPrices({})
