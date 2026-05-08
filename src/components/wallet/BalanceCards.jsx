@@ -68,16 +68,50 @@ const US_STOCKS = [
   { symbol: "CRWV",   name: "CoreWeave" },
 ];
 
-export default function BalanceCards({ user, isLoading, prices, priceChanges, stockPrices, onInfoClick }) {
+export default function BalanceCards({ user, isLoading, prices, priceChanges, stockPrices, onInfoClick, transactions = [] }) {
   const [search, setSearch] = useState("");
   const [sortByValue, setSortByValue] = useState(false);
 
-  const getAvailableBalance = (symbol) => user?.wallet_balances?.[symbol.toLowerCase()] || 0;
+  // Compute frozen amounts from pending limit orders (covers both manual and API-created orders)
+  const pendingFrozen = useMemo(() => {
+    const frozen = {};
+    for (const tx of transactions) {
+      if (tx.status !== "pending" || tx.transaction_type !== "swap") continue;
+      let meta = {};
+      try { meta = JSON.parse(tx.description || "{}"); } catch {}
+      if (!meta.side || !meta.symbol) continue;
+      if (meta.side === "buy") {
+        const key = (meta.currency || "usdt").toLowerCase();
+        frozen[key] = (frozen[key] || 0) + (tx.amount_usd || 0);
+      } else {
+        const key = meta.symbol.toLowerCase();
+        frozen[key] = (frozen[key] || 0) + (meta.shares || 0);
+      }
+    }
+    return frozen;
+  }, [transactions]);
+
+  const getAvailableBalance = (symbol) => {
+    const key = symbol.toLowerCase();
+    const raw = user?.wallet_balances?.[key] || 0;
+    // If wallet already has frozen_key deducted (manual orders), don't double-subtract.
+    // Use whichever frozen amount is larger: what wallet says vs what pending txs say.
+    const walletFrozen = user?.wallet_balances?.[`frozen_${key}`] || 0;
+    const txFrozen = pendingFrozen[key] || 0;
+    // The actual available = raw - max(0, txFrozen - walletFrozen)
+    // If txFrozen > walletFrozen, the API created orders not yet reflected in wallet frozen keys
+    const extraFrozen = Math.max(0, txFrozen - walletFrozen);
+    return Math.max(0, raw - extraFrozen);
+  };
+
   // locked_balances = staking locks; frozen_* in wallet_balances = pending limit order freezes
   const getLockedBalance = (symbol) => {
     const key = symbol.toLowerCase();
     const staked = user?.locked_balances?.[key] || 0;
-    const frozen = user?.wallet_balances?.[`frozen_${key}`] || 0;
+    const walletFrozen = user?.wallet_balances?.[`frozen_${key}`] || 0;
+    const txFrozen = pendingFrozen[key] || 0;
+    // Use the larger of the two to avoid double counting
+    const frozen = Math.max(walletFrozen, txFrozen);
     return staked + frozen;
   };
 

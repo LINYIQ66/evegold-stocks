@@ -114,10 +114,34 @@ export default function Wallet() {
   const getTotalPortfolioValue = () => {
     if (!user) return 0;
 
+    // Compute pending-order frozen amounts from transactions (covers API-created orders)
+    const pendingFrozen = {};
+    for (const tx of transactions) {
+      if (tx.status !== "pending" || tx.transaction_type !== "swap") continue;
+      let meta = {};
+      try { meta = JSON.parse(tx.description || "{}"); } catch {}
+      if (!meta.side || !meta.symbol) continue;
+      if (meta.side === "buy") {
+        const key = (meta.currency || "usdt").toLowerCase();
+        pendingFrozen[key] = (pendingFrozen[key] || 0) + (tx.amount_usd || 0);
+      } else {
+        const key = meta.symbol.toLowerCase();
+        pendingFrozen[key] = (pendingFrozen[key] || 0) + (meta.shares || 0);
+      }
+    }
+
     const allBalances = {};
     for (const [asset, val] of Object.entries(user.wallet_balances || {})) {
-      if (asset.startsWith("frozen_")) continue; // skip frozen keys to avoid double-counting
-      allBalances[asset] = (allBalances[asset] || 0) + val;
+      if (asset.startsWith("frozen_")) continue; // skip frozen keys
+      const walletFrozen = user.wallet_balances[`frozen_${asset}`] || 0;
+      const txFrozen = pendingFrozen[asset] || 0;
+      const extraFrozen = Math.max(0, txFrozen - walletFrozen);
+      allBalances[asset] = (allBalances[asset] || 0) + Math.max(0, val - extraFrozen);
+      // Add the locked amount once (use max to avoid double counting)
+      const lockedAmount = Math.max(walletFrozen, txFrozen);
+      if (lockedAmount > 0) {
+        allBalances[asset] = (allBalances[asset] || 0) + lockedAmount;
+      }
     }
     if (user.locked_balances) {
       for (const [asset, val] of Object.entries(user.locked_balances)) {
@@ -253,6 +277,7 @@ export default function Wallet() {
                 priceChanges={priceChanges}
                 stockPrices={stockPrices}
                 onInfoClick={() => setEveInfoModalOpen(true)}
+                transactions={transactions}
               />
             </div>
 
