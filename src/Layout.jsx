@@ -38,6 +38,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { LanguageProvider, useLanguage } from "@/components/common/LanguageProvider";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
+import { canAccessPage } from "@/lib/accessControl";
 import { motion } from "framer-motion";
 
 const LanguageSwitcher = () => {
@@ -165,22 +166,20 @@ const AppLayout = ({ children }) => {
   }, [location.pathname]);
 
   const navigationItems = [
-    { title: t('sidebar.home'), url: createPageUrl("Home"), icon: Home, roles: ['public', 'user', 'admin'] },
-    { title: t('sidebar.wallet'), url: createPageUrl("Wallet"), icon: Wallet, roles: ['user', 'admin'] },
-    { title: t('sidebar.trading'), url: createPageUrl("Trading"), icon: ArrowLeftRight, roles: ['user', 'admin'] },
-    { title: t('sidebar.physical'), url: createPageUrl("Physical"), icon: Package, roles: ['user', 'admin'] },
-    { title: t('sidebar.loan'), url: createPageUrl("Lending"), icon: Banknote, roles: ['user', 'admin'] },
-    { title: t('sidebar.us_stocks'), url: createPageUrl("USStocks"), icon: BarChart2, roles: ['user', 'admin'] },
-    { title: t('sidebar.staking'), url: createPageUrl("Staking"), icon: PiggyBank, roles: ['user', 'admin'] },
-    { title: t('sidebar.account'), url: createPageUrl("Account"), icon: UserCheck, roles: ['user', 'admin'] },
-    { title: t('sidebar.statement'), url: createPageUrl("DailyStatement"), icon: FileText, roles: ['user', 'admin'] },
-    { title: t('sidebar.guide'), url: createPageUrl("Guide"), icon: BookOpen, roles: ['public', 'user', 'admin'] },
-    { title: t('sidebar.admin'), url: createPageUrl("Admin"), icon: Settings, roles: ['admin'] },
+    { title: t('sidebar.home'), url: createPageUrl("Home"), icon: Home, page: 'Home' },
+    { title: t('sidebar.wallet'), url: createPageUrl("Wallet"), icon: Wallet, page: 'Wallet' },
+    { title: t('sidebar.trading'), url: createPageUrl("Trading"), icon: ArrowLeftRight, page: 'Trading' },
+    { title: t('sidebar.physical'), url: createPageUrl("Physical"), icon: Package, page: 'Physical' },
+    { title: t('sidebar.loan'), url: createPageUrl("Lending"), icon: Banknote, page: 'Lending' },
+    { title: t('sidebar.us_stocks'), url: createPageUrl("USStocks"), icon: BarChart2, page: 'USStocks' },
+    { title: t('sidebar.staking'), url: createPageUrl("Staking"), icon: PiggyBank, page: 'Staking' },
+    { title: t('sidebar.account'), url: createPageUrl("Account"), icon: UserCheck, page: 'Account' },
+    { title: t('sidebar.statement'), url: createPageUrl("DailyStatement"), icon: FileText, page: 'DailyStatement' },
+    { title: t('sidebar.guide'), url: createPageUrl("Guide"), icon: BookOpen, page: 'Guide' },
+    { title: t('sidebar.admin'), url: createPageUrl("Admin"), icon: Settings, page: 'Admin' },
   ];
 
-  const visibleNavItems = user 
-    ? navigationItems.filter(item => item.roles.includes(user.role))
-    : navigationItems.filter(item => item.roles.includes('public'));
+  const visibleNavItems = navigationItems.filter(item => canAccessPage(user?.role, item.page));
 
   return (
     <SidebarProvider>

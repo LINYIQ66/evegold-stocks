@@ -1,0 +1,39 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "admin_email": {
+      "type": "string",
+      "description": "Email of the admin performing the action"
+    },
+    "action": {
+      "type": "string",
+      "description": "The action performed (e.g., 'approve_kyc', 'reject_kyc')"
+    },
+    "target_user_email": {
+      "type": "string",
+      "description": "Email of the user being affected"
+    },
+    "details": {
+      "type": "string",
+      "description": "Additional details, like rejection reasons"
+    }
+  },
+  "required": [
+    "admin_email",
+    "action",
+    "target_user_email"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "Stake",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "asset": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "apr": {
+      "type": "number",
+      "default": 4.5
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "unstaked"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "user_email",
+    "asset",
+    "amount",
+    "start_date"
+  ],
+  "rls": {
+    "write": {
+      "user_email": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

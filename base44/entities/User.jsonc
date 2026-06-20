@@ -1,0 +1,320 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "eve_sales",
+        "eve_finance",
+        "customer_admin",
+        "customer_buyer",
+        "customer_viewer",
+        "dealer"
+      ],
+      "default": "customer_viewer",
+      "description": "admin = Super Admin. Enterprise role for access control."
+    },
+    "company_id": {
+      "type": "string",
+      "description": "ID of the Company this user belongs to. Used for company-level data isolation."
+    },
+    "account_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "suspended",
+        "pending"
+      ],
+      "default": "pending",
+      "description": "Account activation status"
+    },
+    "allowed_modules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optional override: specific module keys this user can access beyond their role defaults."
+    },
+    "last_login_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of last login"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date"
+    },
+    "nationality": {
+      "type": "string"
+    },
+    "contact_number": {
+      "type": "string"
+    },
+    "residential_address": {
+      "type": "string"
+    },
+    "occupation": {
+      "type": "string"
+    },
+    "source_of_funds": {
+      "type": "string",
+      "enum": [
+        "Salary",
+        "Inheritance",
+        "Investment Income",
+        "Business Profit",
+        "Other"
+      ]
+    },
+    "kyc_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "not_started"
+    },
+    "kyc_documents": {
+      "type": "object",
+      "properties": {
+        "passport": {
+          "type": "string"
+        },
+        "ic": {
+          "type": "string"
+        },
+        "drivers_license": {
+          "type": "string"
+        },
+        "proof_of_address": {
+          "type": "string"
+        }
+      }
+    },
+    "kyc_notes": {
+      "type": "string",
+      "description": "Admin notes on KYC review"
+    },
+    "risk_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Admin-assigned risk tags"
+    },
+    "wallet_balances": {
+      "type": "object",
+      "properties": {
+        "usd": {
+          "type": "number",
+          "default": 10000
+        },
+        "sgd": {
+          "type": "number",
+          "default": 5000
+        },
+        "cnh": {
+          "type": "number",
+          "default": 0
+        },
+        "inr": {
+          "type": "number",
+          "default": 0
+        },
+        "myr": {
+          "type": "number",
+          "default": 0
+        },
+        "thb": {
+          "type": "number",
+          "default": 0
+        },
+        "vnd": {
+          "type": "number",
+          "default": 0
+        },
+        "idr": {
+          "type": "number",
+          "default": 0
+        },
+        "lak": {
+          "type": "number",
+          "default": 0
+        },
+        "eur": {
+          "type": "number",
+          "default": 0
+        },
+        "gbp": {
+          "type": "number",
+          "default": 0
+        },
+        "aud": {
+          "type": "number",
+          "default": 0
+        },
+        "nzd": {
+          "type": "number",
+          "default": 0
+        },
+        "jpy": {
+          "type": "number",
+          "default": 0
+        },
+        "hkd": {
+          "type": "number",
+          "default": 0
+        },
+        "twd": {
+          "type": "number",
+          "default": 0
+        },
+        "cad": {
+          "type": "number",
+          "default": 0
+        },
+        "aed": {
+          "type": "number",
+          "default": 0
+        },
+        "usdt": {
+          "type": "number",
+          "default": 10000
+        },
+        "gold": {
+          "type": "number",
+          "default": 5
+        },
+        "silver": {
+          "type": "number",
+          "default": 100
+        },
+        "platinum": {
+          "type": "number",
+          "default": 2
+        },
+        "palladium": {
+          "type": "number",
+          "default": 1
+        },
+        "eve": {
+          "type": "number",
+          "default": 0
+        }
+      }
+    },
+    "locked_balances": {
+      "type": "object",
+      "properties": {
+        "usd": {
+          "type": "number",
+          "default": 0
+        },
+        "sgd": {
+          "type": "number",
+          "default": 0
+        },
+        "cnh": {
+          "type": "number",
+          "default": 0
+        },
+        "inr": {
+          "type": "number",
+          "default": 0
+        },
+        "myr": {
+          "type": "number",
+          "default": 0
+        },
+        "thb": {
+          "type": "number",
+          "default": 0
+        },
+        "vnd": {
+          "type": "number",
+          "default": 0
+        },
+        "idr": {
+          "type": "number",
+          "default": 0
+        },
+        "lak": {
+          "type": "number",
+          "default": 0
+        },
+        "eur": {
+          "type": "number",
+          "default": 0
+        },
+        "gbp": {
+          "type": "number",
+          "default": 0
+        },
+        "aud": {
+          "type": "number",
+          "default": 0
+        },
+        "nzd": {
+          "type": "number",
+          "default": 0
+        },
+        "jpy": {
+          "type": "number",
+          "default": 0
+        },
+        "hkd": {
+          "type": "number",
+          "default": 0
+        },
+        "twd": {
+          "type": "number",
+          "default": 0
+        },
+        "cad": {
+          "type": "number",
+          "default": 0
+        },
+        "aed": {
+          "type": "number",
+          "default": 0
+        },
+        "usdt": {
+          "type": "number",
+          "default": 0
+        },
+        "gold": {
+          "type": "number",
+          "default": 0
+        },
+        "silver": {
+          "type": "number",
+          "default": 0
+        },
+        "platinum": {
+          "type": "number",
+          "default": 0
+        },
+        "palladium": {
+          "type": "number",
+          "default": 0
+        },
+        "eve": {
+          "type": "number",
+          "default": 0
+        }
+      }
+    }
+  },
+  "required": [
+    "date_of_birth",
+    "nationality",
+    "contact_number",
+    "residential_address",
+    "occupation",
+    "source_of_funds"
+  ]
+}

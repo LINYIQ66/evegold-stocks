@@ -1,0 +1,58 @@
+{
+  "name": "Loan",
+  "type": "object",
+  "properties": {
+    "collateral_asset": {
+      "type": "string",
+      "description": "Asset used as collateral"
+    },
+    "collateral_amount": {
+      "type": "number",
+      "description": "Amount of collateral"
+    },
+    "loan_asset": {
+      "type": "string",
+      "description": "Asset borrowed"
+    },
+    "loan_amount": {
+      "type": "number",
+      "description": "Amount borrowed"
+    },
+    "ltv_ratio": {
+      "type": "number",
+      "description": "Current loan-to-value ratio"
+    },
+    "interest_rate": {
+      "type": "number",
+      "description": "Annual interest rate"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "repaid",
+        "liquidated"
+      ],
+      "default": "active"
+    },
+    "liquidation_threshold": {
+      "type": "number",
+      "default": 85,
+      "description": "LTV threshold for liquidation"
+    }
+  },
+  "required": [
+    "collateral_asset",
+    "collateral_amount",
+    "loan_asset",
+    "loan_amount"
+  ],
+  "rls": {
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "FundRequest",
+  "type": "object",
+  "properties": {
+    "request_type": {
+      "type": "string",
+      "enum": [
+        "deposit",
+        "withdrawal"
+      ]
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "asset": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "bank_transfer",
+        "usdt_erc20",
+        "usdt_trc20",
+        "usdt_sol"
+      ]
+    },
+    "proof_of_payment_url": {
+      "type": "string"
+    },
+    "user_destination_details": {
+      "type": "object"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "admin_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_type",
+    "user_email",
+    "asset",
+    "amount",
+    "method"
+  ],
+  "rls": {
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

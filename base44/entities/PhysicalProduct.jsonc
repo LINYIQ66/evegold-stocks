@@ -1,0 +1,80 @@
+{
+  "name": "PhysicalProduct",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "stock_quantity": {
+      "type": "number",
+      "default": 0
+    },
+    "brand": {
+      "type": "string"
+    },
+    "base_price_gold": {
+      "type": "number",
+      "default": 0
+    },
+    "redemption_price_gold": {
+      "type": "number",
+      "default": 0
+    },
+    "base_price_silver": {
+      "type": "number",
+      "default": 0
+    },
+    "redemption_price_silver": {
+      "type": "number",
+      "default": 0
+    },
+    "details": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "type": "string"
+        },
+        "purity": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "packaging": {
+          "type": "string"
+        }
+      }
+    },
+    "highlights": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "stock_quantity"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
