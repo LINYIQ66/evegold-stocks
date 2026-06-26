@@ -176,16 +176,16 @@ export default function USStocks() {
         >
           <div>
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-              US Stocks
+              美股交易
             </h1>
-            <p className="text-slate-500 mt-1 text-sm">Tokenized US stocks · 0.1% fee</p>
+            <p className="text-slate-500 mt-1 text-sm">代币化美股 · 0.1% 手续费</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge className="bg-green-100 text-green-800 text-xs">
-              <Zap className="w-3 h-3 mr-1" /> Live Prices
+              <Zap className="w-3 h-3 mr-1" /> 实时报价
             </Badge>
             <Badge className="bg-blue-100 text-blue-800 text-xs">
-              <TrendingUp className="w-3 h-3 mr-1" /> 0.1% Fee
+              <TrendingUp className="w-3 h-3 mr-1" /> 0.1% 手续费
             </Badge>
           </div>
         </motion.div>

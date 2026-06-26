@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User, Transaction } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -144,17 +143,17 @@ export default function Trading() {
         >
           <div>
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-              Trading Center
+              交易中心
             </h1>
-            <p className="text-slate-600 mt-2">Trade precious metals with live market pricing</p>
+            <p className="text-slate-600 mt-2">以实时市场价格交易贵金属</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge className="bg-green-100 text-green-800">
               <Zap className="w-3 h-3 mr-1" />
-              Live Prices
+              实时报价
             </Badge>
             <Badge className="bg-blue-100 text-blue-800">
-              0.5% Fee
+              0.5% 手续费
             </Badge>
           </div>
         </motion.div>
@@ -211,27 +210,27 @@ export default function Trading() {
           >
             <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-lg flex-1 flex flex-col">
               <CardContent className="p-6 flex-1 flex flex-col">
-                <h3 className="text-lg font-bold mb-4">Trading Tips</h3>
+                <h3 className="text-lg font-bold mb-4">交易提示</h3>
                 <div className="space-y-3 text-blue-100 flex-1">
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">All metal prices are quoted per troy ounce (31.1 grams)</p>
+                    <p className="text-sm">所有贵金属价格按金衡盎司（31.1克）计价</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">Click on any metal above to view its price chart</p>
+                    <p className="text-sm">点击上方任意金属查看其价格走势图</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">Monitor price movements before making large trades</p>
+                    <p className="text-sm">大额交易前请先关注价格走势</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">Use percentage buttons for quick balance allocation</p>
+                    <p className="text-sm">使用百分比按钮快速分配余额</p>
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">All trades incur a 0.5% fee on the target asset</p>
+                    <p className="text-sm">所有交易对目标资产收取 0.5% 手续费</p>
                   </div>
                 </div>
               </CardContent>
@@ -248,7 +247,7 @@ export default function Trading() {
         >
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardHeader>
-              <CardTitle className="text-slate-900">Latest News & Updates</CardTitle>
+              <CardTitle className="text-slate-900">最新资讯与动态</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="w-full overflow-hidden rounded-b-lg">

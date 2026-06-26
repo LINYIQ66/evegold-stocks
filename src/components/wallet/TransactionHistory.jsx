@@ -54,10 +54,10 @@ export default function TransactionHistory({ transactions, isLoading }) {
     <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span className="text-slate-900">Transaction History</span>
-          <Badge variant="outline">
-            {transactions.length} transactions
-          </Badge>
+        <span className="text-slate-900">交易记录</span>
+        <Badge variant="outline">
+          {transactions.length} 笔交易
+        </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -79,8 +79,8 @@ export default function TransactionHistory({ transactions, isLoading }) {
           ) : transactions.length === 0 ? (
             <div className="text-center py-12">
               <Clock className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">No transactions yet</h3>
-              <p className="text-slate-600">Your transaction history will appear here</p>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">暂无交易记录</h3>
+              <p className="text-slate-600">您的交易记录将显示在此处</p>
             </div>
           ) : (
             transactions.map((transaction, index) => {

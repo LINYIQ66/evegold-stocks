@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User, Loan, Transaction } from "@/entities/all";
 import { Card, CardContent } from "@/components/ui/card";
@@ -199,16 +198,16 @@ export default function Lending() {
         >
           <div>
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-              Loan Center
+              借贷中心
             </h1>
-            <p className="text-slate-600 mt-2">Borrow against your precious metals collateral</p>
+            <p className="text-slate-600 mt-2">以您的贵金属作为抵押进行借款</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge className="bg-green-100 text-green-800">
-              Up to 80% LTV
+              最高 80% 抵押率
             </Badge>
             <Badge className="bg-blue-100 text-blue-800">
-              Competitive Rates
+              竞争性利率
             </Badge>
           </div>
         </motion.div>
@@ -224,7 +223,7 @@ export default function Lending() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100 mb-2">Total Collateral</p>
+                  <p className="text-green-100 mb-2">总抵押价值</p>
                   <p className="text-3xl font-bold">${getTotalCollateral().toFixed(2)}</p>
                 </div>
                 <Coins className="w-10 h-10 text-green-200" />
@@ -236,7 +235,7 @@ export default function Lending() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 mb-2">Total Borrowed</p>
+                  <p className="text-blue-100 mb-2">已借总额</p>
                   <p className="text-3xl font-bold">${getTotalBorrowed().toFixed(2)}</p>
                 </div>
                 <DollarSign className="w-10 h-10 text-blue-200" />
@@ -248,7 +247,7 @@ export default function Lending() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 mb-2">Active Loans</p>
+                  <p className="text-purple-100 mb-2">活跃贷款</p>
                   <p className="text-3xl font-bold">{loans.filter(l => l.status === "active").length}</p>
                 </div>
                 <Banknote className="w-10 h-10 text-purple-200" />
@@ -261,15 +260,15 @@ export default function Lending() {
           <TabsList className="grid w-full grid-cols-3 bg-white shadow-lg">
             <TabsTrigger value="calculator" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <Calculator className="w-4 h-4 mr-2" />
-              Loan Calculator
+              贷款计算器
             </TabsTrigger>
             <TabsTrigger value="active" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <Banknote className="w-4 h-4 mr-2" />
-              Active Loans
+              活跃贷款
             </TabsTrigger>
             <TabsTrigger value="collateral" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
               <Coins className="w-4 h-4 mr-2" />
-              Collateral
+              抵押资产
             </TabsTrigger>
           </TabsList>
 

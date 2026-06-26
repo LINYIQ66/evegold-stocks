@@ -299,7 +299,7 @@ export default function Wallet() {
                 <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-sm shadow-lg">
                     <TabsTrigger value="transactions">{t('wallet.transaction_history')}</TabsTrigger>
                     <TabsTrigger value="pending" className="relative">
-                      Pending Orders
+                      挂单
                       {transactions.filter(t => t.status === "pending" && t.transaction_type === "swap").length > 0 && (
                         <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 text-xs font-bold bg-yellow-500 text-white rounded-full">
                           {transactions.filter(t => t.status === "pending" && t.transaction_type === "swap").length}

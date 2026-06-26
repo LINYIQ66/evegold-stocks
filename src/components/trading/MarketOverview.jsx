@@ -7,7 +7,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
   const metals = [
     {
       symbol: "GOLD",
-      name: "Gold",
+      name: "黄金",
       price: prices.gold,
       change: priceChanges?.gold || 0,
       volume: "$2.4B",
@@ -15,7 +15,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
     },
     {
       symbol: "SILVER",
-      name: "Silver", 
+      name: "白银",
       price: prices.silver,
       change: priceChanges?.silver || 0,
       volume: "$890M",
@@ -23,7 +23,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
     },
     {
       symbol: "PLATINUM",
-      name: "Platinum",
+      name: "铂金",
       price: prices.platinum,
       change: priceChanges?.platinum || 0,
       volume: "$145M",
@@ -31,7 +31,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
     },
     {
       symbol: "PALLADIUM",
-      name: "Palladium",
+      name: "钯金",
       price: prices.palladium,
       change: priceChanges?.palladium || 0,
       volume: "$98M",
@@ -45,7 +45,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
         <CardHeader className="py-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Coins className="w-5 h-5 text-blue-600" />
-            Market Overview
+            市场概览
           </CardTitle>
         </CardHeader>
         <CardContent className="flex-1 p-3 space-y-3">
@@ -87,7 +87,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
               
               <div className="pt-2 mt-2 border-t border-slate-200">
                 <div className="flex justify-between text-xs">
-                  <span className="text-slate-600">24h Volume</span>
+                  <span className="text-slate-600">24小时成交量</span>
                   <span className="font-medium text-slate-900">{metal.volume}</span>
                 </div>
               </div>

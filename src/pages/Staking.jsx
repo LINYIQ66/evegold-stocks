@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User, Stake, Transaction } from "@/entities/all";
 import { Card, CardContent } from "@/components/ui/card";
@@ -131,9 +130,9 @@ export default function Staking() {
         >
           <div>
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-              Staking Center
+              质押中心
             </h1>
-            <p className="text-slate-600 mt-2">Earn passive rewards on your precious metals</p>
+            <p className="text-slate-600 mt-2">质押您的贵金属，赚取被动收益</p>
           </div>
         </motion.div>
 
@@ -147,7 +146,7 @@ export default function Staking() {
           <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-lg">
             <CardContent className="p-6 flex items-center justify-between">
               <div>
-                <p className="text-blue-100 mb-2">Total Staked Value</p>
+                <p className="text-blue-100 mb-2">总质押价值</p>
                 <p className="text-3xl font-bold">${totalStakedValue.toFixed(2)}</p>
               </div>
               <DollarSign className="w-10 h-10 text-blue-200" />
@@ -156,7 +155,7 @@ export default function Staking() {
           <Card className="bg-gradient-to-r from-green-600 to-emerald-600 text-white border-0 shadow-lg">
             <CardContent className="p-6 flex items-center justify-between">
               <div>
-                <p className="text-green-100 mb-2">Est. Annual Reward</p>
+                <p className="text-green-100 mb-2">预计年化收益</p>
                 <p className="text-3xl font-bold">${estimatedAnnualReward.toFixed(2)}</p>
               </div>
               <TrendingUp className="w-10 h-10 text-green-200" />
@@ -165,7 +164,7 @@ export default function Staking() {
           <Card className="bg-gradient-to-r from-purple-600 to-violet-600 text-white border-0 shadow-lg">
             <CardContent className="p-6 flex items-center justify-between">
               <div>
-                <p className="text-purple-100 mb-2">Staking APR</p>
+                <p className="text-purple-100 mb-2">质押年化收益率</p>
                 <p className="text-3xl font-bold">4.5%</p>
               </div>
               <PiggyBank className="w-10 h-10 text-purple-200" />

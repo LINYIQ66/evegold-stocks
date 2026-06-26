@@ -218,7 +218,7 @@ const AppLayout = ({ children }) => {
                 <h2 className="font-bold text-xl bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
                   EVE FINANCE
                 </h2>
-                <p className="text-xs text-slate-500 font-medium">Premium Exchange</p>
+                <p className="text-xs text-slate-500 font-medium">高端交易平台</p>
               </div>
             </div>
           </SidebarHeader>
@@ -232,7 +232,7 @@ const AppLayout = ({ children }) => {
 
             <SidebarGroup className="mt-auto pt-4">
                <SidebarGroupLabel className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 py-3">
-                 Language
+                 语言
                </SidebarGroupLabel>
                <SidebarGroupContent className="px-3">
                  <LanguageSwitcher />
@@ -248,7 +248,7 @@ const AppLayout = ({ children }) => {
                   <div className="px-4 py-3 space-y-3">
                     <div className="flex items-center gap-3 text-sm">
                       <Shield className="w-4 h-4 text-green-500" />
-                      <span className="text-slate-600">{t('sidebar.bank_grade_security')}</span>
+                      <span className="text-slate-600">银行级安全</span>
                     </div>
                     <div className="text-xs text-slate-500">
                       {t('sidebar.security_desc')}
@@ -267,11 +267,11 @@ const AppLayout = ({ children }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-slate-900 text-sm truncate">{user.full_name || "Guest"}</p>
-                  <p className="text-xs text-slate-500 truncate">{user.kyc_status === 'approved' ? 'Verified Account' : 'Not Verified'}</p>
+                  <p className="text-xs text-slate-500 truncate">{user.kyc_status === 'approved' ? '已认证账户' : '未认证'}</p>
                 </div>
               </div>
               <div className="mt-3 pt-3 border-t border-slate-200/50 text-center">
-                <p className="text-xs text-slate-400">© 2004 EVE FINANCE. All rights reserved.</p>
+                <p className="text-xs text-slate-400">© 2004 EVE FINANCE. 保留所有权利。</p>
               </div>
             </SidebarFooter>
           )}

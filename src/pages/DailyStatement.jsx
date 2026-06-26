@@ -95,13 +95,13 @@ export default function DailyStatement() {
 
   const categorizeTransactions = () => {
     const categories = {
-      trading: { name: "Trading & Swaps", icon: ArrowLeftRight, color: "text-blue-600 bg-blue-50", transactions: [] },
-      deposits: { name: "Deposits", icon: ArrowDownLeft, color: "text-green-600 bg-green-50", transactions: [] },
-      withdrawals: { name: "Withdrawals", icon: ArrowUpRight, color: "text-red-600 bg-red-50", transactions: [] },
-      lending: { name: "Loans & Repayments", icon: Banknote, color: "text-purple-600 bg-purple-50", transactions: [] },
-      staking: { name: "Staking Activities", icon: PiggyBank, color: "text-indigo-600 bg-indigo-50", transactions: [] },
-      rewards: { name: "Rewards & Earnings", icon: Award, color: "text-yellow-600 bg-yellow-50", transactions: [] },
-      physical: { name: "Physical Redemptions", icon: Package, color: "text-orange-600 bg-orange-50", transactions: [] }
+      trading: { name: "交易与兑换", icon: ArrowLeftRight, color: "text-blue-600 bg-blue-50", transactions: [] },
+      deposits: { name: "存款", icon: ArrowDownLeft, color: "text-green-600 bg-green-50", transactions: [] },
+      withdrawals: { name: "取款", icon: ArrowUpRight, color: "text-red-600 bg-red-50", transactions: [] },
+      lending: { name: "贷款与还款", icon: Banknote, color: "text-purple-600 bg-purple-50", transactions: [] },
+      staking: { name: "质押活动", icon: PiggyBank, color: "text-indigo-600 bg-indigo-50", transactions: [] },
+      rewards: { name: "奖励与收益", icon: Award, color: "text-yellow-600 bg-yellow-50", transactions: [] },
+      physical: { name: "实物兑换", icon: Package, color: "text-orange-600 bg-orange-50", transactions: [] }
     };
 
     transactions.forEach(tx => {
@@ -157,8 +157,8 @@ export default function DailyStatement() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
         <Card className="w-full max-w-md"><CardContent className="p-8 text-center">
             <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Please Log In</h3>
-            <p className="text-slate-600">You need to be logged in to view your daily statements.</p>
+            <h3 className="text-lg font-semibold mb-2">请登录</h3>
+            <p className="text-slate-600">您需要登录才能查看每日账单。</p>
         </CardContent></Card>
       </div>
     );
@@ -169,7 +169,7 @@ export default function DailyStatement() {
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">Daily Statement</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">每日账单</h1>
             <p className="text-slate-600 mt-1">{currentSgTime}</p>
           </div>
           <div className="flex items-center gap-3">
@@ -180,7 +180,7 @@ export default function DailyStatement() {
               </Button></PopoverTrigger>
               <PopoverContent className="w-auto p-0"><Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} disabled={(date) => date > subDays(new Date(), 1)} /></PopoverContent>
             </Popover>
-            <Button onClick={exportStatement} variant="outline" className="gap-2"><Download className="w-4 h-4" />Export</Button>
+            <Button onClick={exportStatement} variant="outline" className="gap-2"><Download className="w-4 h-4" />导出</Button>
           </div>
         </motion.div>
 
@@ -189,8 +189,8 @@ export default function DailyStatement() {
             <Card className="bg-yellow-50 border-yellow-200"><CardContent className="p-4"><div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-yellow-600" />
               <div>
-                <p className="font-semibold text-yellow-800">Statement Not Yet Available</p>
-                <p className="text-sm text-yellow-700">Daily statements are available from 10:00 SGT the next day.</p>
+                <p className="font-semibold text-yellow-800">账单尚未生成</p>
+                <p className="text-sm text-yellow-700">每日账单于次日新加坡时间 10:00 后可查看。</p>
               </div>
             </div></CardContent></Card>
           </motion.div>
@@ -199,10 +199,10 @@ export default function DailyStatement() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
           <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 shadow-xl"><CardContent className="p-6">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-              <div className="text-center"><p className="text-blue-100 mb-1 text-sm">Transactions</p><p className="text-2xl font-bold">{summary.totalTransactions}</p></div>
-              <div className="text-center"><p className="text-blue-100 mb-1 text-sm">Total Value</p><p className="text-2xl font-bold">${summary.totalValue.toFixed(2)}</p></div>
-              <div className="text-center"><p className="text-blue-100 mb-1 text-sm">Total Fees</p><p className="text-2xl font-bold">${summary.totalFees.toFixed(2)}</p></div>
-              <div className="text-center"><p className="text-blue-100 mb-1 text-sm">Net P&L</p><p className={`text-2xl font-bold ${summary.netGainLoss >= 0 ? 'text-green-200' : 'text-red-200'}`}>${summary.netGainLoss.toFixed(2)}</p></div>
+              <div className="text-center"><p className="text-blue-100 mb-1 text-sm">交易笔数</p><p className="text-2xl font-bold">{summary.totalTransactions}</p></div>
+              <div className="text-center"><p className="text-blue-100 mb-1 text-sm">总价值</p><p className="text-2xl font-bold">${summary.totalValue.toFixed(2)}</p></div>
+              <div className="text-center"><p className="text-blue-100 mb-1 text-sm">总手续费</p><p className="text-2xl font-bold">${summary.totalFees.toFixed(2)}</p></div>
+              <div className="text-center"><p className="text-blue-100 mb-1 text-sm">净盈亏</p><p className={`text-2xl font-bold ${summary.netGainLoss >= 0 ? 'text-green-200' : 'text-red-200'}`}>${summary.netGainLoss.toFixed(2)}</p></div>
             </div>
           </CardContent></Card>
         </motion.div>
@@ -214,7 +214,7 @@ export default function DailyStatement() {
               <motion.div key={key} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + index * 0.1 }}>
                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg"><CardHeader><CardTitle className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${category.color}`}><category.icon className="w-5 h-5" /></div>
-                  <div><span className="text-slate-900">{category.name}</span><Badge className="ml-3 bg-slate-100 text-slate-700">{category.transactions.length} transactions</Badge></div>
+                  <div><span className="text-slate-900">{category.name}</span><Badge className="ml-3 bg-slate-100 text-slate-700">{category.transactions.length} 笔交易</Badge></div>
                 </CardTitle></CardHeader><CardContent><div className="space-y-3">
                   {category.transactions.map((tx) => (
                     <div key={tx.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
@@ -229,7 +229,7 @@ export default function DailyStatement() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-slate-900">${tx.amount_usd?.toFixed(2) || '0.00'}</p>
-                        {tx.fee_usd > 0 && (<p className="text-xs text-red-600">Fee: ${tx.fee_usd.toFixed(2)}</p>)}
+                        {tx.fee_usd > 0 && (<p className="text-xs text-red-600">手续费：${tx.fee_usd.toFixed(2)}</p>)}
                       </div>
                     </div>
                   ))}
@@ -242,8 +242,8 @@ export default function DailyStatement() {
         {transactions.length === 0 && !isLoading && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
             <FileText className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">No Transactions</h3>
-            <p className="text-slate-600">No transactions found for {format(selectedDate, 'MMMM d, yyyy')}</p>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">暂无交易记录</h3>
+            <p className="text-slate-600">{format(selectedDate, 'yyyy年MM月d日')} 无交易记录</p>
           </motion.div>
         )}
       </div>

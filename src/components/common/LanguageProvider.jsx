@@ -941,12 +941,12 @@ export const translations = {
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  // 从localStorage读取保存的语言设置，默认为英文
+  // 从localStorage读取保存的语言设置，默认为中文
   const [language, setLanguage] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('eve-finance-language') || 'en';
+      return localStorage.getItem('eve-finance-language') || 'zh';
     }
-    return 'en';
+    return 'zh';
   });
 
   // 当语言改变时，保存到localStorage

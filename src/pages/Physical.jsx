@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { User, PhysicalProduct, PhysicalRedemption, Transaction } from "@/entities/all";
 import { Card } from "@/components/ui/card";
@@ -63,7 +62,7 @@ export default function Physical() {
         const totalCost = redemptionPrice * quantity;
 
         if (userBalance < totalCost) {
-            setRedemptionResult({ success: false, message: `Insufficient ${costAsset.toUpperCase()} balance.` });
+            setRedemptionResult({ success: false, message: `${costAsset.toUpperCase()} 余额不足。` });
             setIsProcessing(false);
             return;
         }
@@ -103,11 +102,11 @@ export default function Physical() {
                 description: `Redeemed ${quantity} x ${selectedProduct.name}`
             });
 
-            setRedemptionResult({ success: true, message: "Redemption successful! Your order is being processed." });
+            setRedemptionResult({ success: true, message: "兑换成功！您的订单正在处理中。" });
             loadData(); // Refresh data
         } catch (error) {
             console.error("Redemption error:", error);
-            setRedemptionResult({ success: false, message: "An error occurred during redemption. Please try again." });
+            setRedemptionResult({ success: false, message: "兑换过程中出现错误，请重试。" });
         } finally {
             setIsProcessing(false);
         }
@@ -123,23 +122,23 @@ export default function Physical() {
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-                                Physical Assets
+                                实物资产
                             </h1>
-                            <p className="text-slate-600 mt-2">Redeem your digital assets for real, tangible products.</p>
+                            <p className="text-slate-600 mt-2">将您的数字资产兑换为真实有形的产品。</p>
                         </div>
                         <Card className="p-4 bg-white/50 backdrop-blur-sm">
                             <div className="flex items-center gap-6">
                                 <div className="flex items-center gap-3">
                                     <Coins className="w-6 h-6 text-yellow-500" />
                                     <div>
-                                        <p className="text-sm text-slate-600">Your GOLD Balance</p>
+                                        <p className="text-sm text-slate-600">黄金余额</p>
                                         <p className="font-bold text-lg text-slate-900">{goldBalance.toFixed(4)}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <Coins className="w-6 h-6 text-slate-400" />
                                     <div>
-                                        <p className="text-sm text-slate-600">Your SILVER Balance</p>
+                                        <p className="text-sm text-slate-600">白银余额</p>
                                         <p className="font-bold text-lg text-slate-900">{silverBalance.toFixed(4)}</p>
                                     </div>
                                 </div>
@@ -167,9 +166,9 @@ export default function Physical() {
                         {!redemptionResult ? (
                             <>
                                 <DialogHeader>
-                                    <DialogTitle>Confirm Redemption</DialogTitle>
+                                    <DialogTitle>确认兑换</DialogTitle>
                                     <DialogDescription>
-                                        You are about to redeem your GOLD for a physical item. Please review the details below.
+                                        您即将使用黄金/白银兑换实物商品，请确认以下详情。
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="space-y-4 py-4">
@@ -181,7 +180,7 @@ export default function Physical() {
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <label htmlFor="quantity" className="font-medium">Quantity</label>
+                                        <label htmlFor="quantity" className="font-medium">数量</label>
                                         <select
                                             id="quantity"
                                             value={quantity}
@@ -195,24 +194,24 @@ export default function Physical() {
                                         </select>
                                     </div>
                                     <div className="p-4 border rounded-lg space-y-2">
-                                        <div className="flex justify-between"><span className="text-slate-600">Price per item:</span><span className="font-mono">{( (selectedProduct.redemption_price_gold > 0 ? selectedProduct.redemption_price_gold : selectedProduct.redemption_price_silver) || 0).toFixed(2)} {(selectedProduct.redemption_price_gold > 0 ? 'GOLD' : 'SILVER')}</span></div>
-                                        <div className="flex justify-between font-bold text-lg border-t pt-2"><span className="text-slate-800">Total Cost:</span><span className="font-mono text-blue-600">{ ( ((selectedProduct.redemption_price_gold > 0 ? selectedProduct.redemption_price_gold : selectedProduct.redemption_price_silver) || 0) * quantity).toFixed(4)} {(selectedProduct.redemption_price_gold > 0 ? 'GOLD' : 'SILVER')}</span></div>
+                                        <div className="flex justify-between"><span className="text-slate-600">单价：</span><span className="font-mono">{( (selectedProduct.redemption_price_gold > 0 ? selectedProduct.redemption_price_gold : selectedProduct.redemption_price_silver) || 0).toFixed(2)} {(selectedProduct.redemption_price_gold > 0 ? 'GOLD' : 'SILVER')}</span></div>
+                                        <div className="flex justify-between font-bold text-lg border-t pt-2"><span className="text-slate-800">总费用：</span><span className="font-mono text-blue-600">{ ( ((selectedProduct.redemption_price_gold > 0 ? selectedProduct.redemption_price_gold : selectedProduct.redemption_price_silver) || 0) * quantity).toFixed(4)} {(selectedProduct.redemption_price_gold > 0 ? 'GOLD' : 'SILVER')}</span></div>
                                     </div>
-                                    <p className="text-xs text-slate-500">Delivery to your registered address: <br/><strong>{user?.residential_address || "Address not found"}</strong></p>
+                                    <p className="text-xs text-slate-500">配送至您的注册地址：<br/><strong>{user?.residential_address || "未找到地址"}</strong></p>
                                 </div>
                                 <DialogFooter>
-                                    <Button variant="outline" onClick={() => setIsModalOpen(false)} disabled={isProcessing}>Cancel</Button>
+                                    <Button variant="outline" onClick={() => setIsModalOpen(false)} disabled={isProcessing}>取消</Button>
                                     <Button onClick={handleConfirmRedemption} disabled={isProcessing || ( (selectedProduct.redemption_price_gold > 0 ? goldBalance : silverBalance) < (((selectedProduct.redemption_price_gold > 0 ? selectedProduct.redemption_price_gold : selectedProduct.redemption_price_silver) || 0) * quantity))}>
-                                        {isProcessing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</> : 'Confirm & Redeem'}
+                                        {isProcessing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> 处理中...</> : '确认兑换'}
                                     </Button>
                                 </DialogFooter>
                             </>
                         ) : (
                             <div className="py-8 text-center">
                                 {redemptionResult.success ? <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" /> : <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />}
-                                <h3 className="text-xl font-bold mb-2">{redemptionResult.success ? "Success!" : "Failed"}</h3>
+                                <h3 className="text-xl font-bold mb-2">{redemptionResult.success ? "兑换成功！" : "兑换失败"}</h3>
                                 <p className="text-slate-600 mb-6">{redemptionResult.message}</p>
-                                <Button onClick={() => setIsModalOpen(false)}>Close</Button>
+                                <Button onClick={() => setIsModalOpen(false)}>关闭</Button>
                             </div>
                         )}
                     </DialogContent>
@@ -240,14 +239,14 @@ const ProductCard = ({ product, onRedeemClick, goldBalance, silverBalance }) => 
                     <div className="flex-1">
                         <div className="flex justify-between items-start">
                              <Badge className="bg-yellow-400 text-yellow-900 mb-2">{product.brand}</Badge>
-                             <Badge variant={inStock ? "secondary" : "destructive"} className="bg-green-100 text-green-800">{inStock ? `${product.stock_quantity} in stock` : 'Out of Stock'}</Badge>
+                             <Badge variant={inStock ? "secondary" : "destructive"} className="bg-green-100 text-green-800">{inStock ? `库存 ${product.stock_quantity}` : '缺货'}</Badge>
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900">{product.name}</h2>
                         <div className="grid grid-cols-2 gap-4 my-4 text-sm">
-                            <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-green-600"/><span>Purity: {product.details.purity}</span></div>
-                            <div className="flex items-center gap-2"><Package className="w-4 h-4 text-slate-600"/><span>Weight: {product.details.weight}</span></div>
-                            <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-slate-600"/><span>Origin: {product.details.origin}</span></div>
-                            <div className="flex items-center gap-2"><Package className="w-4 h-4 text-slate-600"/><span>Packaging: {product.details.packaging}</span></div>
+                            <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-green-600"/><span>纯度：{product.details.purity}</span></div>
+                            <div className="flex items-center gap-2"><Package className="w-4 h-4 text-slate-600"/><span>重量：{product.details.weight}</span></div>
+                            <div className="flex items-center gap-2"><Truck className="w-4 h-4 text-slate-600"/><span>产地：{product.details.origin}</span></div>
+                            <div className="flex items-center gap-2"><Package className="w-4 h-4 text-slate-600"/><span>包装：{product.details.packaging}</span></div>
                         </div>
                         <div className="p-4 bg-slate-100 rounded-lg space-y-2">
                              {product.highlights.map((h, i) => <p key={i} className="text-xs text-slate-700">&#x2022; {h}</p>)}
@@ -255,15 +254,15 @@ const ProductCard = ({ product, onRedeemClick, goldBalance, silverBalance }) => 
                     </div>
                     <div className="flex flex-col md:flex-row items-center justify-between mt-6 pt-6 border-t">
                         <div className="mb-4 md:mb-0">
-                             <p className="text-sm text-slate-600">Redemption Price</p>
+                             <p className="text-sm text-slate-600">兑换价格</p>
                              <p className="text-2xl font-bold text-blue-600 flex items-center gap-2">
                                 <Coins className={`w-6 h-6 ${isGoldProduct ? 'text-yellow-500' : 'text-slate-400'}`}/>
                                 {cost.toFixed(2)} {currency}
                              </p>
-                             <p className="text-xs text-slate-500">Includes 5% admin & delivery fee</p>
+                             <p className="text-xs text-slate-500">含 5% 管理及配送费</p>
                         </div>
                         <Button size="lg" onClick={() => onRedeemClick(product)} disabled={!canAfford || !inStock}>
-                            { !inStock ? 'Out of Stock' : (!canAfford ? 'Insufficient Balance' : 'Redeem Now')}
+                            { !inStock ? '缺货' : (!canAfford ? '余额不足' : '立即兑换')}
                         </Button>
                     </div>
                 </div>

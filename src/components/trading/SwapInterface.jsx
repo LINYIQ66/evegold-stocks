@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -116,16 +115,16 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-slate-900">
           <ArrowLeftRight className="w-6 h-6 text-blue-600" />
-          Swap Assets
+          资产兑换
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* From Asset */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-slate-700">From</label>
+            <label className="text-sm font-medium text-slate-700">从</label>
             <span className="text-sm text-slate-500">
-              Balance: {fromBalance.toFixed(2)} {fromAsset}
+              余额：{fromBalance.toFixed(2)} {fromAsset}
             </span>
           </div>
           
@@ -195,9 +194,9 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
         {/* To Asset */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-slate-700">To</label>
+            <label className="text-sm font-medium text-slate-700">至</label>
             <span className="text-sm text-slate-500">
-              Balance: {getBalance(toAsset).toFixed(2)} {toAsset}
+              余额：{getBalance(toAsset).toFixed(2)} {toAsset}
             </span>
           </div>
           
@@ -234,15 +233,15 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
             className="p-4 bg-slate-50 rounded-lg space-y-2"
           >
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Exchange Rate</span>
+              <span className="text-slate-600">汇率</span>
               <span className="font-medium">{calculation.displayFromUnit} = {calculation.displayExchangeRate.toFixed(6)} {toAsset}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Fee (0.5%)</span>
+              <span className="text-slate-600">手续费 (0.5%)</span>
               <span className="font-medium text-red-600">-{calculation.fee.toFixed(6)} {toAsset}</span>
             </div>
             <div className="flex justify-between text-sm border-t pt-2">
-              <span className="text-slate-600">You'll receive</span>
+              <span className="text-slate-600">您将收到</span>
               <span className="font-bold text-slate-900">{calculation.netAmount.toFixed(6)} {toAsset}</span>
             </div>
           </motion.div>
@@ -258,7 +257,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
               className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg"
             >
               <AlertCircle className="w-4 h-4" />
-              Insufficient {fromAsset} balance
+              {fromAsset} 余额不足
             </motion.div>
           )}
           {fromAsset === toAsset && (
@@ -269,7 +268,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
               className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg"
             >
               <AlertCircle className="w-4 h-4" />
-              Cannot swap between the same assets.
+              不能在相同资产之间兑换。
             </motion.div>
           )}
           {parseFloat(amount) <= 0 && amount !== "" && (
@@ -280,7 +279,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
               className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg"
             >
               <AlertCircle className="w-4 h-4" />
-              Please enter a positive amount to swap.
+              请输入正数金额进行兑换。
             </motion.div>
           )}
           {!calculation && amount !== "" && parseFloat(amount) > 0 && (prices[fromAsset.toLowerCase()] === undefined || prices[toAsset.toLowerCase()] === undefined) && (
@@ -291,7 +290,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
               className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg"
             >
               <AlertCircle className="w-4 h-4" />
-              Could not get real-time prices for selected assets.
+              无法获取所选资产的实时价格。
             </motion.div>
           )}
         </AnimatePresence>
@@ -312,12 +311,12 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
               {swapResult.success ? (
                 <>
                   <CheckCircle className="w-4 h-4" />
-                  Swap successful! Received {swapResult.netAmount.toFixed(6)} {toAsset}
+                  兑换成功！收到 {swapResult.netAmount.toFixed(6)} {toAsset}
                 </>
               ) : (
                 <>
                   <AlertCircle className="w-4 h-4" />
-                  Swap failed: {swapResult.error || "Unknown error."}
+                  兑换失败：{swapResult.error || "未知错误。"}
                 </>
               )}
             </motion.div>
@@ -333,12 +332,12 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
           {isSwapping || isLoading ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-              Processing Swap...
+              正在处理兑换...
             </div>
           ) : (
             <>
               <ArrowLeftRight className="w-5 h-5 mr-2" />
-              Execute Swap
+              执行兑换
             </>
           )}
         </Button>
