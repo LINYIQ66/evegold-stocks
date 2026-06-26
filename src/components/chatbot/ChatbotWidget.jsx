@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { agentSDK } from "@/agents";
 import { getDailyAgentName } from "@/functions/getDailyAgentName";
@@ -35,7 +34,7 @@ export default function ChatbotWidget() {
             const createConversation = async () => {
                 try {
                     const newConversation = await agentSDK.createConversation({
-                        agent_name: "supportAgent",
+                        agent_name: "platformGuideAgent",
                         metadata: {
                             name: `Chat with ${agentName}`,
                             description: "Customer support conversation"
