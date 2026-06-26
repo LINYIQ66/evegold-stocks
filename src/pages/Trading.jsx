@@ -72,7 +72,7 @@ export default function Trading() {
 
       // Calculate amounts and values
       const grossAmountToAsset = amount * exchangeRate;
-      const feeInToAsset = grossAmountToAsset * 0.005; // 0.5% fee
+      const feeInToAsset = grossAmountToAsset * 0.02; // 2% fee
       const netAmountToAsset = grossAmountToAsset - feeInToAsset;
       
       const transactionValueUSD = amount * fromPrice;
@@ -153,7 +153,7 @@ export default function Trading() {
               实时报价
             </Badge>
             <Badge className="bg-blue-100 text-blue-800">
-              0.5% 手续费
+              2% 手续费
             </Badge>
           </div>
         </motion.div>
@@ -230,7 +230,7 @@ export default function Trading() {
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">所有交易对目标资产收取 0.5% 手续费</p>
+                    <p className="text-sm">所有交易对目标资产收取 2% 手续费</p>
                   </div>
                 </div>
               </CardContent>

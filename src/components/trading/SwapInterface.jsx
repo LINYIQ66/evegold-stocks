@@ -56,7 +56,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
 
     const exchangeRate = fromPrice / toPrice;
     const grossAmount = parseFloat(amount) * exchangeRate;
-    const fee = grossAmount * 0.005; // 0.5% fee
+    const fee = grossAmount * 0.02; // 2% fee
     const netAmount = grossAmount - fee;
     
     // For display purposes, show exchange rate for small currencies in 1000 units
@@ -237,7 +237,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
               <span className="font-medium">{calculation.displayFromUnit} = {calculation.displayExchangeRate.toFixed(6)} {toAsset}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600">手续费 (0.5%)</span>
+              <span className="text-slate-600">手续费 (2%)</span>
               <span className="font-medium text-red-600">-{calculation.fee.toFixed(6)} {toAsset}</span>
             </div>
             <div className="flex justify-between text-sm border-t pt-2">
