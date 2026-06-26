@@ -42,6 +42,21 @@
       "format": "date-time",
       "description": "Timestamp of last login"
     },
+    "stock_watchlist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "symbol": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "User's custom stock watchlist (added via Alpaca search)"
+    },
     "date_of_birth": {
       "type": "string",
       "format": "date"

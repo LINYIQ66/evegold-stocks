@@ -212,6 +212,7 @@ export default function USStocks() {
               selectedSymbol={selectedSymbol}
               onPriceUpdate={setLivePrice}
               onAllPricesUpdate={setAllPrices}
+              user={user}
             />
           </motion.div>
         </div>

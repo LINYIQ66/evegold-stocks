@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, RefreshCw, Star, X } from "lucide-react";
 import { getStockPrices } from "@/functions/getStockPrices";
 import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
+import { User } from "@/entities/all";
 import StockSearch from "./StockSearch";
 
 // Default stock list — dynamically updated from backend
@@ -32,32 +33,52 @@ const DEFAULT_STOCKS = [
 
 export { DEFAULT_STOCKS as US_STOCKS };
 
-export default function StockMarketOverview({ onStockClick, selectedSymbol, onPriceUpdate, onAllPricesUpdate }) {
+export default function StockMarketOverview({ onStockClick, selectedSymbol, onPriceUpdate, onAllPricesUpdate, user }) {
   const [prices, setPrices] = useState({});
   const [loading, setLoading] = useState(true);
   const [addedStocks, setAddedStocks] = useState([]);
   const intervalRef = useRef(null);
 
-  // Load added stocks from localStorage on mount
+  // Load added stocks from user profile (fallback to localStorage for guests)
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('addedStocks') || '[]');
-      setAddedStocks(stored);
-    } catch (e) {
-      setAddedStocks([]);
+    if (user?.stock_watchlist) {
+      setAddedStocks(user.stock_watchlist);
+    } else {
+      try {
+        const stored = JSON.parse(localStorage.getItem('addedStocks') || '[]');
+        setAddedStocks(stored);
+      } catch (e) {
+        setAddedStocks([]);
+      }
     }
-  }, []);
+  }, [user]);
 
-  const handleAddStock = (stock) => {
+  const handleAddStock = async (stock) => {
     const updated = [...addedStocks, { symbol: stock.symbol, name: stock.name }];
     setAddedStocks(updated);
-    localStorage.setItem('addedStocks', JSON.stringify(updated));
+    if (user) {
+      try {
+        await User.updateMyUserData({ stock_watchlist: updated });
+      } catch (e) {
+        // Fallback to localStorage if update fails
+      }
+    } else {
+      localStorage.setItem('addedStocks', JSON.stringify(updated));
+    }
   };
 
-  const handleRemoveStock = (symbol) => {
+  const handleRemoveStock = async (symbol) => {
     const updated = addedStocks.filter(s => s.symbol !== symbol);
     setAddedStocks(updated);
-    localStorage.setItem('addedStocks', JSON.stringify(updated));
+    if (user) {
+      try {
+        await User.updateMyUserData({ stock_watchlist: updated });
+      } catch (e) {
+        // Fallback to localStorage if update fails
+      }
+    } else {
+      localStorage.setItem('addedStocks', JSON.stringify(updated));
+    }
   };
 
   // Combined stock list: defaults + user-added (deduped)
