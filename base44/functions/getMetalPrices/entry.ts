@@ -1,20 +1,37 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-// ETF → spot metal multipliers (each ETF share represents a fraction of a troy ounce)
-const METAL_ETFS = {
-  gold:     { symbol: 'GLD',  multiplier: 10  }, // 1 share ≈ 1/10 oz
-  silver:   { symbol: 'SLV',  multiplier: 1   }, // 1 share ≈ 1 oz
-  platinum: { symbol: 'PPLT', multiplier: 100 }, // 1 share ≈ 1/100 oz
-  palladium:{ symbol: 'PALL', multiplier: 100 }, // 1 share ≈ 1/100 oz
+// Primary: MetalPriceAPI for spot metal prices
+const getMetalPricesFromAPI = async (apiKey) => {
+  const symbols = 'XAU,XAG,XPT,XPD';
+  const url = `https://api.metalpriceapi.com/v1/latest?api_key=${apiKey}&base=USD&currencies=${symbols}`;
+  
+  const response = await fetch(url);
+  const data = await response.json();
+  
+  if (!data.success) {
+    throw new Error('MetalPriceAPI returned error: ' + JSON.stringify(data));
+  }
+  
+  return {
+    gold: 1 / data.rates.XAU,
+    silver: 1 / data.rates.XAG,
+    platinum: 1 / data.rates.XPT,
+    palladium: 1 / data.rates.XPD,
+  };
 };
 
-// Fetch metal spot prices + 24h change from Alpaca ETF proxies
+// Fallback: Alpaca ETF proxies for metal prices
+const METAL_ETFS = {
+  gold:     { symbol: 'GLD',  multiplier: 10  },
+  silver:   { symbol: 'SLV',  multiplier: 1   },
+  platinum: { symbol: 'PPLT', multiplier: 100 },
+  palladium:{ symbol: 'PALL', multiplier: 100 },
+};
+
 const getMetalPricesFromAlpaca = async () => {
   const apiKey = Deno.env.get('ALPACA_API_KEY');
   const secretKey = Deno.env.get('ALPACA_SECRET_KEY');
-  if (!apiKey || !secretKey) {
-    throw new Error('Alpaca API keys not configured');
-  }
+  if (!apiKey || !secretKey) throw new Error('Alpaca API keys not configured');
 
   const etfSymbols = Object.values(METAL_ETFS).map(m => m.symbol).join(',');
   const headers = {
@@ -22,23 +39,17 @@ const getMetalPricesFromAlpaca = async () => {
     'APCA-API-SECRET-KEY': secretKey,
   };
 
-  // Latest trades for current price
   const tradeRes = await fetch(
     `https://data.alpaca.markets/v2/stocks/trades/latest?symbols=${encodeURIComponent(etfSymbols)}`,
     { headers }
   );
-  if (!tradeRes.ok) {
-    const errText = await tradeRes.text();
-    throw new Error(`Alpaca trades error: ${tradeRes.status} ${errText}`);
-  }
+  if (!tradeRes.ok) throw new Error('Alpaca trades error');
   const tradeData = await tradeRes.json();
 
-  // Snapshots for 24h change (prev daily close)
   const snapRes = await fetch(
     `https://data.alpaca.markets/v2/stocks/snapshots?symbols=${encodeURIComponent(etfSymbols)}`,
     { headers }
   );
-  // Alpaca snapshots: symbols are at the root level (not nested under "snapshots")
   const snapData = snapRes.ok ? await snapRes.json() : {};
 
   const prices = {};
@@ -47,23 +58,15 @@ const getMetalPricesFromAlpaca = async () => {
   for (const [metal, cfg] of Object.entries(METAL_ETFS)) {
     const trade = tradeData.trades?.[cfg.symbol];
     if (!trade || !trade.p) continue;
+    prices[metal] = trade.p * cfg.multiplier;
 
-    const spotPrice = trade.p * cfg.multiplier;
-    prices[metal] = spotPrice;
-
-    // 24h change from previous daily close (Alpaca uses camelCase keys)
-    const snap = snapData[cfg.symbol];
-    const prevClose = snap?.prevDailyBar?.c;
+    const prevClose = snapData[cfg.symbol]?.prevDailyBar?.c;
     if (prevClose && prevClose > 0) {
       const prevSpot = prevClose * cfg.multiplier;
-      changes[metal] = ((spotPrice - prevSpot) / prevSpot) * 100;
+      changes[metal] = ((prices[metal] - prevSpot) / prevSpot) * 100;
     } else {
       changes[metal] = 0;
     }
-  }
-
-  if (!prices.gold && !prices.silver && !prices.platinum && !prices.palladium) {
-    throw new Error('No metal prices returned from Alpaca');
   }
 
   return { prices, changes };
@@ -71,7 +74,6 @@ const getMetalPricesFromAlpaca = async () => {
 
 const getForexRatesFromExchangeRateAPI = async (apiKey) => {
   const url = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`;
-  
   const response = await fetch(url);
   const data = await response.json();
   
@@ -80,8 +82,6 @@ const getForexRatesFromExchangeRateAPI = async (apiKey) => {
   }
   
   const rates = data.conversion_rates;
-  
-  // Return the price of 1 unit of each currency in USD (inverted rates)
   return {
     sgd: 1 / (rates.SGD || 1.35),
     cnh: 1 / (rates.CNY || 7.25),
@@ -111,27 +111,38 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
+    const metalApiKey = Deno.env.get('METALPRICEAPI_KEY');
     const exchangeRateApiKey = Deno.env.get('EXCHANGERATE_API_KEY');
 
     if (!exchangeRateApiKey) {
       return Response.json({ success: false, error: 'API keys not configured' }, { status: 500 });
     }
 
-    const [metalData, forexRates] = await Promise.all([
-      getMetalPricesFromAlpaca(),
-      getForexRatesFromExchangeRateAPI(exchangeRateApiKey)
-    ]);
+    // Try MetalPriceAPI first, fall back to Alpaca ETFs
+    let metalPrices;
+    let metalChanges = { gold: 0, silver: 0, platinum: 0, palladium: 0 };
 
-    // Combine all prices, ensuring they are all valued in USD
+    try {
+      if (!metalApiKey) throw new Error('No MetalPriceAPI key');
+      metalPrices = await getMetalPricesFromAPI(metalApiKey);
+    } catch (e) {
+      console.log('MetalPriceAPI failed, trying Alpaca fallback:', e.message);
+      const alpacaData = await getMetalPricesFromAlpaca();
+      metalPrices = alpacaData.prices;
+      metalChanges = alpacaData.changes;
+    }
+
+    const forexRates = await getForexRatesFromExchangeRateAPI(exchangeRateApiKey);
+
     const currentPrices = {
       usd: 1.00,
       usdt: 1.00,
       ...forexRates,
-      ...metalData.prices
+      ...metalPrices
     };
 
     const priceChanges = {
-      ...metalData.changes,
+      ...metalChanges,
       sgd: 0, cnh: 0, inr: 0, myr: 0, thb: 0, vnd: 0, idr: 0, lak: 0,
       eur: 0, gbp: 0, aud: 0, nzd: 0, jpy: 0, hkd: 0, twd: 0, cad: 0, aed: 0,
     };
@@ -140,43 +151,20 @@ Deno.serve(async (req) => {
       success: true,
       prices: currentPrices,
       changes: priceChanges,
-      _debug: metalData.debugSnap,
       timestamp: new Date().toISOString()
-    }, {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
     });
 
   } catch (error) {
     console.error('Error fetching prices:', error);
     
-    // Return fallback prices in case of API failure
     const fallbackPrices = {
-      usd: 1.00,
-      sgd: 1 / 1.35,
-      cnh: 1 / 7.25,
-      inr: 1 / 83.50,
-      myr: 1 / 4.70,
-      thb: 1 / 36.50,
-      vnd: 1 / 24500,
-      idr: 1 / 16200,
-      lak: 1 / 21700,
-      eur: 1 / 0.92,
-      gbp: 1 / 0.79,
-      aud: 1 / 1.50,
-      nzd: 1 / 1.62,
-      jpy: 1 / 155,
-      hkd: 1 / 7.82,
-      twd: 1 / 32.25,
-      cad: 1 / 1.37,
-      aed: 1 / 3.67,
-      usdt: 1.00,
-      gold: 2024.50,
-      silver: 24.85,
-      platinum: 1045.30,
-      palladium: 1825.75
+      usd: 1.00, usdt: 1.00,
+      sgd: 1/1.35, cnh: 1/7.25, inr: 1/83.50, myr: 1/4.70,
+      thb: 1/36.50, vnd: 1/24500, idr: 1/16200, lak: 1/21700,
+      eur: 1/0.92, gbp: 1/0.79, aud: 1/1.50, nzd: 1/1.62,
+      jpy: 1/155, hkd: 1/7.82, twd: 1/32.25, cad: 1/1.37, aed: 1/3.67,
+      gold: 2024.50, silver: 24.85, platinum: 1045.30, palladium: 1825.75
     };
-
     const zeroChanges = Object.keys(fallbackPrices).reduce((acc, key) => ({...acc, [key]: 0}), {});
 
     return Response.json({
@@ -185,9 +173,6 @@ Deno.serve(async (req) => {
       changes: zeroChanges,
       timestamp: new Date().toISOString(),
       fallback: true
-    }, {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
     });
   }
 });
