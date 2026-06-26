@@ -3,7 +3,7 @@ import { FundRequest, SystemSetting, Transaction, PhysicalRedemption, SupportTic
 import { base44 } from "@/api/base44Client";
 import { UploadFile } from "@/integrations/Core";
 import { Button } from "@/components/ui/button";
-import { UserCheck, LogIn, LogOut, User as UserIcon, Activity, FileText, Package, LifeBuoy, Shield, Zap, Star } from "lucide-react"; // Added LifeBuoy, Shield, Zap, Star. Removed TrendingUp as per outline.
+import { UserCheck, LogIn, LogOut, User as UserIcon, Activity, FileText, Package, LifeBuoy, Shield, Zap, Star, TrendingUp } from "lucide-react"; // Added LifeBuoy, Shield, Zap, Star. Removed TrendingUp as per outline.
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -18,6 +18,7 @@ import ActivityFeed from "../components/account/ActivityFeed";
 import StatementGenerator from "../components/account/StatementGenerator";
 import MyPhysicalInventory from "../components/account/MyPhysicalInventory";
 import SupportTickets from "../components/account/SupportTickets"; // New Import
+import InterestHistory from "../components/wallet/InterestHistory";
 import LiquidGlassLoginCard from '../components/account/LiquidGlassLoginCard'; // Import the new card
 import { useLanguage } from "@/components/common/LanguageProvider";
 
@@ -373,6 +374,7 @@ export default function Account() {
                 <TabsTrigger value="funds" className="data-[state=active]:bg-purple-100 data-[state=active]:text-purple-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-purple-50"><UserIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />资金</TabsTrigger>
                 <TabsTrigger value="activity" className="data-[state=active]:bg-orange-100 data-[state=active]:text-orange-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-orange-50"><Activity className="w-3 h-3 md:w-4 md:h-4 mr-1" />活动记录</TabsTrigger>
                 <TabsTrigger value="statements" className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-amber-50"><FileText className="w-3 h-3 md:w-4 md:h-4 mr-1" />账单</TabsTrigger>
+                <TabsTrigger value="interest" className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-amber-50"><TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-1" />利息记录</TabsTrigger>
                 <TabsTrigger value="support" className="data-[state=active]:bg-red-100 data-[state=active]:text-red-700 data-[state=inactive]:bg-slate-100 data-[state=inactive]:text-slate-600 text-xs md:text-sm px-3 md:px-4 py-2 rounded-lg transition-all hover:bg-red-50"><LifeBuoy className="w-3 h-3 md:w-4 md:h-4 mr-1" />客服支持</TabsTrigger>
             </TabsList>
 
@@ -416,6 +418,10 @@ export default function Account() {
 
             <TabsContent value="statements">
                 <StatementGenerator user={user} />
+            </TabsContent>
+
+            <TabsContent value="interest">
+                <InterestHistory transactions={transactions} isLoading={isLoading} />
             </TabsContent>
             
             <TabsContent value="support">
