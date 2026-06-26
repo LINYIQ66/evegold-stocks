@@ -15,7 +15,8 @@
         "unstaking",
         "staking_reward",
         "physical_redemption",
-        "eve_reward"
+        "eve_reward",
+        "interest"
       ],
       "description": "Type of transaction"
     },

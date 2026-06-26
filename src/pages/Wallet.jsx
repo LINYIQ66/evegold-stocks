@@ -24,6 +24,7 @@ import DepositModal from "../components/wallet/DepositModal";
 import EveTokenInfoModal from "../components/wallet/EveTokenInfoModal";
 import FundRequestList from "../components/wallet/FundRequestList";
 import PendingOrdersList from "../components/wallet/PendingOrdersList";
+import InterestHistory from "../components/wallet/InterestHistory";
 import { useLanguage } from "@/components/common/LanguageProvider";
 
 
@@ -295,7 +296,7 @@ export default function Wallet() {
             className="mt-8"
           >
             <Tabs defaultValue="transactions" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm shadow-lg">
+                <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-sm shadow-lg">
                     <TabsTrigger value="transactions">{t('wallet.transaction_history')}</TabsTrigger>
                     <TabsTrigger value="pending" className="relative">
                       Pending Orders
@@ -306,6 +307,7 @@ export default function Wallet() {
                       )}
                     </TabsTrigger>
                     <TabsTrigger value="requests">{t('wallet.requests_title')}</TabsTrigger>
+                    <TabsTrigger value="interest">利息记录</TabsTrigger>
                 </TabsList>
                 <TabsContent value="transactions">
                     <TransactionHistory transactions={transactions} isLoading={isLoading} />
@@ -315,6 +317,9 @@ export default function Wallet() {
                 </TabsContent>
                 <TabsContent value="requests">
                     <FundRequestList requests={fundRequests} isLoading={isLoading} />
+                </TabsContent>
+                <TabsContent value="interest">
+                    <InterestHistory transactions={transactions} isLoading={isLoading} />
                 </TabsContent>
             </Tabs>
           </motion.div>

@@ -31,7 +31,7 @@ export default function TransactionHistory({ transactions, isLoading }) {
       case 'loan': return 'text-purple-600 bg-purple-100';
       case 'repayment': return 'text-orange-600 bg-orange-100';
       case 'staking': case 'unstaking': return 'text-indigo-600 bg-indigo-100';
-      case 'staking_reward': case 'eve_reward': return 'text-amber-600 bg-amber-100';
+      case 'staking_reward': case 'eve_reward': case 'interest': return 'text-amber-600 bg-amber-100';
       case 'physical_redemption': return 'text-pink-600 bg-pink-100';
       default: return 'text-gray-600 bg-gray-100';
     }
