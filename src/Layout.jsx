@@ -17,7 +17,8 @@ import {
   Languages,
   ChevronDown,
   BarChart2,
-  LogIn
+  LogIn,
+  Code2
 } from "lucide-react";
 import {
   Sidebar,
@@ -194,6 +195,7 @@ const AppLayout = ({ children }) => {
     { title: t('sidebar.account'), url: createPageUrl("Account"), icon: UserCheck, page: 'Account' },
     { title: t('sidebar.statement'), url: createPageUrl("DailyStatement"), icon: FileText, page: 'DailyStatement' },
     { title: t('sidebar.guide'), url: createPageUrl("Guide"), icon: BookOpen, page: 'Guide' },
+    { title: t('sidebar.api_docs'), url: createPageUrl("ApiDocs"), icon: Code2, page: 'ApiDocs' },
     { title: t('sidebar.admin'), url: createPageUrl("Admin"), icon: Settings, page: 'Admin' },
   ];
 

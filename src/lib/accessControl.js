@@ -41,10 +41,10 @@ const ROLE_PAGE_ACCESS = {
   customer_buyer: ['Home', 'Wallet', 'Trading', 'USStocks', 'Physical', 'Lending', 'Staking', 'Account', 'DailyStatement', 'Guide'],
   customer_viewer: ['Home', 'Wallet', 'Account', 'Guide'],
   dealer: ['Home', 'Wallet', 'Trading', 'USStocks', 'Physical', 'Account', 'Guide'],
-  user: ['Home', 'Wallet', 'Trading', 'USStocks', 'Physical', 'Lending', 'Staking', 'Account', 'DailyStatement', 'Guide'], // Legacy
+  user: ['Home', 'Wallet', 'Trading', 'USStocks', 'Physical', 'Lending', 'Staking', 'Account', 'DailyStatement', 'Guide', 'ApiDocs'], // Legacy
 };
 
-export const PUBLIC_PAGES = ['Home', 'Guide'];
+export const PUBLIC_PAGES = ['Home', 'Guide', 'ApiDocs'];
 
 /**
  * Check if a role can access a specific page
