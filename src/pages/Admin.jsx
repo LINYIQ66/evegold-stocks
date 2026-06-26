@@ -123,13 +123,13 @@ export default function Admin() {
 
       await SendEmail({
           to: targetUser.email,
-          subject: `Your EVE METAL KYC Status Update: ${status.toUpperCase()}`,
+          subject: `Your EVE FINANCE KYC Status Update: ${status.toUpperCase()}`,
           body: `
               <p>Hello ${targetUser.full_name},</p>
               <p>Your KYC application status has been updated to: <strong>${status.toUpperCase()}</strong>.</p>
               ${status === 'rejected' ? `<p><strong>Reason:</strong> ${notes}</p><p>Please review the feedback and resubmit your documents on the KYC page.</p>` : ''}
               ${status === 'approved' ? `<p>You can now access all trading and lending features on the platform.</p>` : ''}
-              <p>Thank you,<br/>The EVE METAL Team</p>
+              <p>Thank you,<br/>The EVE FINANCE Team</p>
           `
       });
 
@@ -214,7 +214,7 @@ export default function Admin() {
 
         await SendEmail({
             to: request.user_email,
-            subject: `Your EVE METAL Fund Request Update: ${status.toUpperCase()}`,
+            subject: `Your EVE FINANCE Fund Request Update: ${status.toUpperCase()}`,
             body: `<p>Your fund request (${request.request_type} of ${request.amount} ${request.asset}) has been ${status}.</p>`
         });
 

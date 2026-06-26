@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ export default function Account() { // Renamed from KYCApproved
           <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
           <h2 className="text-3xl font-bold text-slate-900 mb-4">You're Verified!</h2>
           <p className="text-xl text-slate-600 mb-8 max-w-lg mx-auto">
-            Your account is fully approved. You can now access all features of the EVE METAL platform.
+            Your account is fully approved. You can now access all features of the EVE FINANCE platform.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to={createPageUrl("Trading")}>

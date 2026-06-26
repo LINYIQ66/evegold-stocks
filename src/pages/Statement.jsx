@@ -11,7 +11,7 @@ const StatementView = ({ user, transactions, startDate, endDate }) => (
         <div className="flex justify-between items-start pb-6 border-b">
             <div>
                 <h1 className="text-3xl font-bold text-slate-900">Account Statement</h1>
-                <p className="text-slate-600">EVE METAL</p>
+                <p className="text-slate-600">EVE FINANCE</p>
             </div>
             <div className="text-right">
                 <p className="font-semibold">{user?.full_name}</p>

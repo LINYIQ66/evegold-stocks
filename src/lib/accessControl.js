@@ -1,5 +1,5 @@
 /**
- * Enterprise Access Control for EVE Metal
+ * Enterprise Access Control for EVE FINANCE
  * 
  * Role hierarchy:
  * - admin (Super Admin): Full platform access
