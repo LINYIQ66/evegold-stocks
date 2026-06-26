@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
+import { TrendingUp, TrendingDown, RefreshCw, Star, X } from "lucide-react";
 import { getStockPrices } from "@/functions/getStockPrices";
+import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
+import StockSearch from "./StockSearch";
 
 // Default stock list — dynamically updated from backend
 const DEFAULT_STOCKS = [
@@ -33,20 +35,66 @@ export { DEFAULT_STOCKS as US_STOCKS };
 export default function StockMarketOverview({ onStockClick, selectedSymbol, onPriceUpdate, onAllPricesUpdate }) {
   const [prices, setPrices] = useState({});
   const [loading, setLoading] = useState(true);
+  const [addedStocks, setAddedStocks] = useState([]);
   const intervalRef = useRef(null);
+
+  // Load added stocks from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('addedStocks') || '[]');
+      setAddedStocks(stored);
+    } catch (e) {
+      setAddedStocks([]);
+    }
+  }, []);
+
+  const handleAddStock = (stock) => {
+    const updated = [...addedStocks, { symbol: stock.symbol, name: stock.name }];
+    setAddedStocks(updated);
+    localStorage.setItem('addedStocks', JSON.stringify(updated));
+  };
+
+  const handleRemoveStock = (symbol) => {
+    const updated = addedStocks.filter(s => s.symbol !== symbol);
+    setAddedStocks(updated);
+    localStorage.setItem('addedStocks', JSON.stringify(updated));
+  };
+
+  // Combined stock list: defaults + user-added (deduped)
+  const allStocks = [
+    ...DEFAULT_STOCKS,
+    ...addedStocks.filter(s => !DEFAULT_STOCKS.some(d => d.symbol === s.symbol)),
+  ];
 
   const loadPrices = async () => {
     try {
+      // Fetch CMC prices for default stocks
       const res = await getStockPrices({});
-      if (res?.data?.prices) {
-        setPrices(res.data.prices);
-        setLoading(false);
-        if (onPriceUpdate && selectedSymbol && res.data.prices[selectedSymbol]) {
-          onPriceUpdate(res.data.prices[selectedSymbol].price);
+      let mergedPrices = { ...(res?.data?.prices || {}) };
+
+      // Fetch Alpaca prices for user-added stocks
+      const addedSymbols = addedStocks
+        .filter(s => !DEFAULT_STOCKS.some(d => d.symbol === s.symbol))
+        .map(s => s.symbol);
+
+      if (addedSymbols.length > 0) {
+        try {
+          const alpacaRes = await getAlpacaPrices({ symbols: addedSymbols.join(',') });
+          if (alpacaRes?.data?.prices) {
+            mergedPrices = { ...mergedPrices, ...alpacaRes.data.prices };
+          }
+        } catch (e) {
+          // Alpaca fetch failed, continue with CMC prices only
         }
-        if (onAllPricesUpdate) {
-          onAllPricesUpdate(res.data.prices);
-        }
+      }
+
+      setPrices(mergedPrices);
+      setLoading(false);
+      if (onPriceUpdate && selectedSymbol && mergedPrices[selectedSymbol]) {
+        onPriceUpdate(mergedPrices[selectedSymbol].price);
+      }
+      if (onAllPricesUpdate) {
+        onAllPricesUpdate(mergedPrices);
       }
     } catch (e) {
       setLoading(false);
@@ -55,9 +103,9 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
 
   useEffect(() => {
     loadPrices();
-    intervalRef.current = setInterval(loadPrices, 30000); // every 30s (API rate limits)
+    intervalRef.current = setInterval(loadPrices, 30000);
     return () => clearInterval(intervalRef.current);
-  }, []);
+  }, [addedStocks]);
 
   // Notify parent when selected symbol changes
   useEffect(() => {
@@ -76,8 +124,12 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto p-2 min-h-0">
+        <div className="mb-2">
+          <StockSearch onAdd={handleAddStock} addedSymbols={allStocks.map(s => s.symbol)} />
+        </div>
         <div className="space-y-0.5">
-          {DEFAULT_STOCKS.map((stock) => {
+          {allStocks.map((stock) => {
+            const isCustom = !DEFAULT_STOCKS.some(d => d.symbol === stock.symbol);
             const data = prices[stock.symbol];
             const isPositive = data ? data.change >= 0 : true;
             const isSelected = selectedSymbol === stock.symbol;
@@ -92,10 +144,15 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
                     : "hover:bg-slate-50"
                 }`}
               >
-                <div className="min-w-0">
-                  <p className={`font-semibold text-sm leading-tight ${isSelected ? "text-white" : "text-slate-900"}`}>
-                    {stock.symbol}
-                  </p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1">
+                    <p className={`font-semibold text-sm leading-tight ${isSelected ? "text-white" : "text-slate-900"}`}>
+                      {stock.symbol}
+                    </p>
+                    {isCustom && (
+                      <Star className={`w-3 h-3 flex-shrink-0 ${isSelected ? "text-yellow-300" : "text-yellow-500"}`} fill="currentColor" />
+                    )}
+                  </div>
                   <p className={`text-xs truncate leading-tight ${isSelected ? "text-blue-100" : "text-slate-400"}`}>
                     {data?.name || stock.name}
                   </p>
@@ -119,6 +176,17 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
                     </p>
                   )}
                 </div>
+                {isCustom && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleRemoveStock(stock.symbol); }}
+                    className={`ml-1 p-1 rounded transition-colors flex-shrink-0 ${
+                      isSelected ? "text-white/70 hover:text-white hover:bg-white/20" : "text-slate-400 hover:text-red-500 hover:bg-red-50"
+                    }`}
+                    title="移除"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             );
           })}
