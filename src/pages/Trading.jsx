@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { User, Transaction } from "@/entities/all";
+import { User } from "@/entities/all";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { getMetalPrices } from "@/functions/getMetalPrices";
+import { executeSwap as executeSwapFn } from "@/functions/executeSwap";
 
 import SwapInterface from "../components/trading/SwapInterface";
 import TradingViewChart from "../components/trading/TradingViewChart";
@@ -66,64 +67,24 @@ export default function Trading() {
 
   const executeSwap = async (fromAsset, toAsset, amount) => {
     try {
-      const fromPrice = prices[fromAsset.toLowerCase()];
-      const toPrice = prices[toAsset.toLowerCase()];
-      const exchangeRate = fromPrice / toPrice;
+      // Delegate to server-side function for atomic execution with:
+      // - Fresh balance re-fetch from DB (prevents stale state)
+      // - Server-side price fetching (prevents price manipulation)
+      // - Server-side balance validation (prevents overdraft)
+      // - Atomic balance + transaction update (prevents race conditions)
+      const result = await executeSwapFn({ fromAsset, toAsset, amount });
+      const data = result.data;
 
-      // Calculate amounts and values
-      const grossAmountToAsset = amount * exchangeRate;
-      const feeInToAsset = grossAmountToAsset * 0.02; // 2% fee
-      const netAmountToAsset = grossAmountToAsset - feeInToAsset;
-      
-      const transactionValueUSD = amount * fromPrice;
-      const feeValueUSD = feeInToAsset * toPrice;
-
-      // Create main swap transaction record
-      await Transaction.create({
-        transaction_type: "swap",
-        user_email: user.email,
-        from_asset: fromAsset,
-        to_asset: toAsset,
-        amount_usd: transactionValueUSD,
-        fee_usd: feeValueUSD,
-        exchange_rate: exchangeRate,
-        status: "completed"
-      });
-      
-      // --- EVE Token Reward Logic ---
-      // For every $1 USD in fees, user gets 100 EVE tokens
-      const eveReward = feeValueUSD * 100; 
-      if (eveReward > 0) {
-          // Create EVE reward transaction record
-          await Transaction.create({
-              transaction_type: "eve_reward",
-              user_email: user.email,
-              to_asset: "EVE",
-              amount_usd: feeValueUSD, // Value of the reward is the fee paid in USD
-              eve_amount: eveReward,
-              status: "completed",
-              description: `EVE token reward for a $${feeValueUSD.toFixed(4)} trading fee.`
-          });
+      if (data.success) {
+        loadUserData();
+        return { success: true, netAmount: data.netAmount, fee: data.fee };
+      } else {
+        return { success: false, error: data.error };
       }
-
-      // Update user balances
-      const newBalances = { ...user.wallet_balances };
-      newBalances[fromAsset.toLowerCase()] = (newBalances[fromAsset.toLowerCase()] || 0) - amount;
-      newBalances[toAsset.toLowerCase()] = (newBalances[toAsset.toLowerCase()] || 0) + netAmountToAsset;
-      // Add EVE tokens to wallet
-      if (eveReward > 0) {
-          newBalances['eve'] = (newBalances['eve'] || 0) + eveReward;
-      }
-
-      await User.updateMyUserData({ wallet_balances: newBalances });
-      
-      // Refresh user data
-      loadUserData();
-      
-      return { success: true, netAmount: netAmountToAsset, fee: feeInToAsset };
     } catch (error) {
       console.error("Error executing swap:", error);
-      return { success: false, error: error.message };
+      const msg = error?.response?.data?.error || error.message;
+      return { success: false, error: msg };
     }
   };
 

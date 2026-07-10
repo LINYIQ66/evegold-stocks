@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { User, Transaction } from "@/entities/all";
+import { User } from "@/entities/all";
 import { getUserTransactions } from "@/functions/getUserTransactions";
+import { executeStockTrade } from "@/functions/executeStockTrade";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Zap } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,8 +13,6 @@ import StockHoldings from "../components/usstocks/StockHoldings";
 import StockTradeHistory from "../components/usstocks/StockTradeHistory";
 import USStocksFooter from "../components/usstocks/USStocksFooter";
 import USStockPendingOrders from "../components/usstocks/USStockPendingOrders.jsx";
-
-const FEE_RATE = 0.001; // 0.1%
 
 export default function USStocks() {
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
@@ -57,110 +56,32 @@ export default function USStocks() {
     try {
       if (!user) return { success: false, error: "Please log in to trade." };
 
-      // Limit orders: freeze funds and record as pending
-      if (orderType === "limit") {
-        const newBalances = { ...(user.wallet_balances || {}) };
-        const stockKey = symbol.toLowerCase();
-        const currencyKey = currency.toLowerCase();
+      // Delegate to server-side function for atomic execution with:
+      // - Fresh balance re-fetch from DB (prevents stale state)
+      // - Server-side price fetching for market orders (prevents price manipulation)
+      // - Server-side balance validation (prevents overdraft)
+      // - Atomic balance + transaction update (prevents race conditions)
+      const result = await executeStockTrade({
+        side,
+        symbol,
+        currency,
+        orderType,
+        spendAmount: side === "buy" ? calc.spent : undefined,
+        shares: side === "buy" ? calc.sharesReceived : calc.shares,
+        limitPrice: orderType === "limit" ? calc.execPrice : undefined,
+      });
+      const data = result.data;
 
-        if (side === "buy") {
-          // Freeze the USDT/USD to spend
-          const newCurrBal = (newBalances[currencyKey] || 0) - calc.spent;
-          if (newCurrBal < -1e-9) return { success: false, error: `Insufficient ${currency} balance.` };
-          newBalances[currencyKey] = Math.max(0, newCurrBal);
-          // Track frozen amount
-          const frozenKey = `frozen_${currencyKey}`;
-          newBalances[frozenKey] = (newBalances[frozenKey] || 0) + calc.spent;
-        } else {
-          // Freeze the shares to sell
-          const newShares = (newBalances[stockKey] || 0) - calc.shares;
-          if (newShares < -1e-9) return { success: false, error: `Insufficient ${symbol} balance.` };
-          newBalances[stockKey] = Math.max(0, newShares);
-          const frozenKey = `frozen_${stockKey}`;
-          newBalances[frozenKey] = (newBalances[frozenKey] || 0) + calc.shares;
-        }
-
-        await Transaction.create({
-          transaction_type: "swap",
-          user_email: user.email,
-          from_asset: side === "buy" ? currency : symbol,
-          to_asset: side === "buy" ? symbol : currency,
-          amount_usd: side === "buy" ? calc.spent : calc.gross,
-          fee_usd: 0,
-          exchange_rate: calc.execPrice,
-          status: "pending",
-          description: JSON.stringify({
-            limitPrice: calc.execPrice,
-            side,
-            shares: side === "buy" ? calc.sharesReceived : calc.shares,
-            currency,
-            symbol,
-          }),
-        });
-
-        await User.updateMyUserData({ wallet_balances: newBalances });
+      if (data.success) {
         await refreshUser();
         loadTransactions();
-        return { success: true, message: `Limit ${side} order placed @ $${calc.execPrice.toFixed(2)}. Funds frozen, awaiting execution.` };
-      }
-
-      // Market orders: execute immediately
-      const newBalances = { ...(user.wallet_balances || {}) };
-      const stockKey = symbol.toLowerCase();
-      const currencyKey = currency.toLowerCase();
-
-      if (side === "buy") {
-        const newCurrBal = (newBalances[currencyKey] || 0) - calc.spent;
-        if (newCurrBal < 0) return { success: false, error: `Insufficient ${currency} balance.` };
-        newBalances[currencyKey] = newCurrBal;
-        newBalances[stockKey] = (newBalances[stockKey] || 0) + calc.sharesReceived;
+        return { success: true, message: data.message };
       } else {
-        const newShares = (newBalances[stockKey] || 0) - calc.shares;
-        if (newShares < 0) return { success: false, error: `Insufficient ${symbol} balance.` };
-        newBalances[stockKey] = newShares;
-        newBalances[currencyKey] = (newBalances[currencyKey] || 0) + calc.netUsdt;
+        return { success: false, error: data.error };
       }
-
-      // EVE reward: 100 EVE per $1 fee
-      const feeUsd = calc.fee;
-      const eveReward = feeUsd * 100;
-      if (eveReward > 0) {
-        newBalances.eve = (newBalances.eve || 0) + eveReward;
-      }
-
-      await Transaction.create({
-        transaction_type: "swap",
-        user_email: user.email,
-        from_asset: side === "buy" ? currency : symbol,
-        to_asset: side === "buy" ? symbol : currency,
-        amount_usd: side === "buy" ? calc.spent : calc.gross,
-        fee_usd: feeUsd,
-        exchange_rate: calc.execPrice,
-        status: "completed",
-      });
-
-      if (eveReward > 0) {
-        await Transaction.create({
-          transaction_type: "eve_reward",
-          user_email: user.email,
-          to_asset: "EVE",
-          amount_usd: feeUsd,
-          eve_amount: eveReward,
-          status: "completed",
-        });
-      }
-
-      await User.updateMyUserData({ wallet_balances: newBalances });
-      await refreshUser();
-      loadTransactions();
-
-      const received = side === "buy"
-        ? `${calc.sharesReceived.toFixed(6)} ${symbol}`
-        : `$${calc.netUsdt.toFixed(2)} ${currency}`;
-
-      return { success: true, message: `${side === "buy" ? "Bought" : "Sold"} successfully! Received ${received}` };
     } catch (error) {
-      return { success: false, error: error.message };
+      const msg = error?.response?.data?.error || error.message;
+      return { success: false, error: msg };
     }
   };
 
