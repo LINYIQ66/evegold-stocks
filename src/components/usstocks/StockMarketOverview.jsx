@@ -93,14 +93,25 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
       const res = await getStockPrices({});
       let mergedPrices = { ...(res?.data?.prices || {}) };
 
-      // Fetch Alpaca prices for user-added stocks
+      // Fetch Alpaca prices for user-added stocks AND user-held stocks not in CMC list
       const addedSymbols = addedStocks
         .filter(s => !DEFAULT_STOCKS.some(d => d.symbol === s.symbol))
         .map(s => s.symbol);
 
-      if (addedSymbols.length > 0) {
+      // Also include stocks the user holds but aren't in the default CMC list
+      const KNOWN_NON_STOCKS = new Set(["usd", "usdt", "gold", "silver", "platinum", "palladium", "eve"]);
+      const heldCustomStocks = Object.keys(user?.wallet_balances || {})
+        .filter(k => !k.startsWith("frozen_"))
+        .filter(k => !KNOWN_NON_STOCKS.has(k.toLowerCase()))
+        .filter(k => (user.wallet_balances[k] || 0) > 0)
+        .filter(k => !DEFAULT_STOCKS.some(d => d.symbol === k.toUpperCase()))
+        .map(k => k.toUpperCase());
+
+      const allAlpacaSymbols = [...new Set([...addedSymbols, ...heldCustomStocks])];
+
+      if (allAlpacaSymbols.length > 0) {
         try {
-          const alpacaRes = await getAlpacaPrices({ symbols: addedSymbols.join(',') });
+          const alpacaRes = await getAlpacaPrices({ symbols: allAlpacaSymbols.join(',') });
           if (alpacaRes?.data?.prices) {
             mergedPrices = { ...mergedPrices, ...alpacaRes.data.prices };
           }
