@@ -15,6 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { getMetalPrices } from "@/functions/getMetalPrices";
 import { getStockPrices } from "@/functions/getStockPrices";
+import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
 import { getUserTransactions } from "@/functions/getUserTransactions";
 
 import BalanceCards from "../components/wallet/BalanceCards";
@@ -76,9 +77,29 @@ export default function Wallet() {
         setPrices(priceData.data.prices);
         setPriceChanges(priceData.data.changes);
       }
+      // Merge default CMC stock prices with Alpaca prices for custom symbols (SPCX, PDD, etc.)
+      let mergedStockPrices = {};
       if (stockData?.data?.prices) {
-        setStockPrices(stockData.data.prices);
+        mergedStockPrices = { ...stockData.data.prices };
       }
+      // Find user-held stocks not covered by getStockPrices (custom Alpaca symbols)
+      const KNOWN_NON_STOCKS = new Set(["usd", "usdt", "gold", "silver", "platinum", "palladium", "eve"]);
+      const missingStocks = Object.keys(userData.wallet_balances || {})
+        .filter(k => !k.startsWith("frozen_"))
+        .filter(k => !KNOWN_NON_STOCKS.has(k.toLowerCase()))
+        .filter(k => (userData.wallet_balances[k] || 0) > 0)
+        .filter(k => !mergedStockPrices[k.toUpperCase()]);
+      if (missingStocks.length > 0) {
+        try {
+          const alpacaResult = await getAlpacaPrices({ symbols: missingStocks.join(",") });
+          if (alpacaResult?.data?.prices) {
+            mergedStockPrices = { ...mergedStockPrices, ...alpacaResult.data.prices };
+          }
+        } catch (e) {
+          console.error("Error fetching Alpaca prices for custom stocks:", e);
+        }
+      }
+      setStockPrices(mergedStockPrices);
 
     } catch (error) {
       console.error("Error loading wallet data:", error);
