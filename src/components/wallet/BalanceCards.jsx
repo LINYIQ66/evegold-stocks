@@ -72,7 +72,7 @@ const US_STOCKS = [
 
 export default function BalanceCards({ user, isLoading, prices, priceChanges, stockPrices, onInfoClick, transactions = [] }) {
   const [search, setSearch] = useState("");
-  const [sortByValue, setSortByValue] = useState(false);
+  const [sortByValue, setSortByValue] = useState(true);
 
   // Compute frozen amounts from pending limit orders (covers both manual and API-created orders)
   const pendingFrozen = useMemo(() => {
