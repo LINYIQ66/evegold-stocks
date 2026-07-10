@@ -230,6 +230,9 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
                       {eveBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     <p className="text-sm text-violet-200">Total Tokens Held</p>
+                    <p className="text-lg font-semibold text-yellow-300 mt-1">
+                      ≈ ${(eveBalance * 0.01).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
                   </div>
                   <div className="flex flex-col items-center gap-3">
                     <Badge className="bg-yellow-400 text-yellow-900 font-semibold px-3 py-1">REWARD</Badge>

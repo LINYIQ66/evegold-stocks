@@ -174,6 +174,10 @@ export default function Wallet() {
 
     let total = 0;
     for (const [asset, balance] of Object.entries(allBalances)) {
+      if (asset.toLowerCase() === "eve") {
+        total += balance * 0.01;
+        continue;
+      }
       const metalPrice = prices[asset] || 0;
       const stockData = stockPrices[asset.toUpperCase()];
       const stockPrice = stockData?.price || 0;
