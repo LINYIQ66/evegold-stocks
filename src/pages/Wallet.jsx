@@ -83,7 +83,11 @@ export default function Wallet() {
         mergedStockPrices = { ...stockData.data.prices };
       }
       // Find user-held stocks not covered by getStockPrices (custom Alpaca symbols)
-      const KNOWN_NON_STOCKS = new Set(["usd", "usdt", "gold", "silver", "platinum", "palladium", "eve"]);
+      const KNOWN_NON_STOCKS = new Set([
+        "usd", "usdt", "gold", "silver", "platinum", "palladium", "eve",
+        "eur", "gbp", "aud", "nzd", "jpy", "hkd", "twd", "cad", "aed",
+        "sgd", "cnh", "inr", "myr", "thb", "vnd", "idr", "lak"
+      ]);
       const missingStocks = Object.keys(userData.wallet_balances || {})
         .filter(k => !k.startsWith("frozen_"))
         .filter(k => !KNOWN_NON_STOCKS.has(k.toLowerCase()))
