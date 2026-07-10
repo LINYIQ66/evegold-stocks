@@ -134,6 +134,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
       return { ...asset, avail, locked, total, price, change, usdValue: total * price, isStock: false };
     });
 
+    const knownSymbols = new Set([...FIAT_AND_METAL_ASSETS.map(a => a.symbol.toUpperCase()), ...US_STOCKS.map(s => s.symbol.toUpperCase())]);
     const stocks = US_STOCKS.map(stock => {
       const avail = getAvailableBalance(stock.symbol);
       const locked = getLockedBalance(stock.symbol);
@@ -151,7 +152,31 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
       };
     });
 
-    return [...fiatMetals, ...stocks];
+    // Dynamically include any user-held stock not in the predefined US_STOCKS list
+    const customStocks = Object.keys(user?.wallet_balances || {})
+      .filter(k => !k.startsWith("frozen_"))
+      .filter(k => !knownSymbols.has(k.toUpperCase()))
+      .filter(k => (user.wallet_balances[k] || 0) > 0)
+      .map(symbol => {
+        const sym = symbol.toUpperCase();
+        const avail = getAvailableBalance(sym);
+        const locked = getLockedBalance(sym);
+        const total = avail + locked;
+        const priceData = stockPrices?.[sym];
+        const price = priceData?.price || 0;
+        const change = priceData?.change || 0;
+        return {
+          symbol: sym,
+          name: priceData?.name || sym,
+          icon: BarChart2,
+          color: "from-blue-500 to-indigo-600",
+          avail, locked, total, price, change,
+          usdValue: total * price,
+          isStock: true
+        };
+      });
+
+    return [...fiatMetals, ...stocks, ...customStocks];
   }, [user, prices, priceChanges, stockPrices]);
 
   const filteredAssets = useMemo(() => {
