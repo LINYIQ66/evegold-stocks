@@ -134,7 +134,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
       return { ...asset, avail, locked, total, price, change, usdValue: total * price, isStock: false };
     });
 
-    const knownSymbols = new Set([...FIAT_AND_METAL_ASSETS.map(a => a.symbol.toUpperCase()), ...US_STOCKS.map(s => s.symbol.toUpperCase())]);
+    const knownSymbols = new Set([...FIAT_AND_METAL_ASSETS.map(a => a.symbol.toUpperCase()), ...US_STOCKS.map(s => s.symbol.toUpperCase()), "EVE"]);
     const stocks = US_STOCKS.map(stock => {
       const avail = getAvailableBalance(stock.symbol);
       const locked = getLockedBalance(stock.symbol);
@@ -180,11 +180,12 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
   }, [user, prices, priceChanges, stockPrices]);
 
   const filteredAssets = useMemo(() => {
-    let list = allAssets.filter(a => a.total > 0 || !search); // when no search, show all; when searching, still show zero ones if matching
-
+    let list;
     if (search) {
       const q = search.toLowerCase();
       list = allAssets.filter(a => a.symbol.toLowerCase().includes(q) || a.name.toLowerCase().includes(q));
+    } else {
+      list = allAssets.filter(a => a.total > 0);
     }
 
     if (sortByValue) {
