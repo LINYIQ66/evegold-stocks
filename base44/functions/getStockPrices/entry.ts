@@ -25,9 +25,14 @@ Deno.serve(async (req) => {
       { symbol: "BABA",   id: 39486, name: "Alibaba" },
       { symbol: "OPENAI", id: 39485, name: "OpenAI" },
       { symbol: "CRWV",   id: 39497, name: "CoreWeave" },
+      // Custom stocks not on CMC — fetched from Alpaca as fallback
+      { symbol: "SPCX",   id: null,  name: "SPCX", alpaca: true },
     ];
 
-    const ids = STOCKS.map(s => s.id).join(",");
+    const cmcStocks = STOCKS.filter(s => !s.alpaca);
+    const alpacaStocks = STOCKS.filter(s => s.alpaca);
+
+    const ids = cmcStocks.map(s => s.id).join(",");
     const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${ids}&convert=USD`;
 
     const res = await fetch(url, {
@@ -44,7 +49,7 @@ Deno.serve(async (req) => {
     }
 
     const prices = {};
-    for (const stock of STOCKS) {
+    for (const stock of cmcStocks) {
       const entry = json.data?.[String(stock.id)];
       if (entry?.quote?.USD?.price > 0) {
         prices[stock.symbol] = {
@@ -52,6 +57,37 @@ Deno.serve(async (req) => {
           change: entry.quote.USD.percent_change_24h || 0,
           name: stock.name,
         };
+      }
+    }
+
+    // Fetch Alpaca prices for custom stocks not on CMC
+    if (alpacaStocks.length > 0) {
+      const alpacaSymbols = alpacaStocks.map(s => s.symbol).join(",");
+      try {
+        const alpacaRes = await fetch(
+          `https://data.alpaca.markets/v2/stocks/trades/latest?symbols=${encodeURIComponent(alpacaSymbols)}`,
+          {
+            headers: {
+              'APCA-API-KEY-ID': Deno.env.get("ALPACA_API_KEY"),
+              'APCA-API-SECRET-KEY': Deno.env.get("ALPACA_SECRET_KEY"),
+            }
+          }
+        );
+        if (alpacaRes.ok) {
+          const alpacaData = await alpacaRes.json();
+          for (const stock of alpacaStocks) {
+            const trade = alpacaData.trades?.[stock.symbol];
+            if (trade?.p > 0) {
+              prices[stock.symbol] = {
+                price: trade.p,
+                change: 0,
+                name: stock.name,
+              };
+            }
+          }
+        }
+      } catch (e) {
+        // Alpaca fetch failed — skip these symbols
       }
     }
 
