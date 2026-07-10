@@ -64,6 +64,8 @@ const US_STOCKS = [
   { symbol: "ORCL",   name: "Oracle" },
   { symbol: "COIN",   name: "Coinbase" },
   { symbol: "BABA",   name: "Alibaba" },
+  { symbol: "PDD",    name: "PDD Holdings" },
+  { symbol: "SPCX",   name: "SPACEX" },
   { symbol: "OPENAI", name: "OpenAI" },
   { symbol: "CRWV",   name: "CoreWeave" },
 ];
