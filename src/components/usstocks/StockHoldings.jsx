@@ -21,6 +21,9 @@ const DISPLAY_NAMES = {
 };
 
 const CURRENCIES = new Set(["usdt", "usd", "eve"]);
+// Metals are priced via getMetalPrices (spot price API), not getStockPrices — exclude from stock holdings
+const METALS = new Set(["gold", "silver", "platinum", "palladium"]);
+const NON_STOCK_ASSETS = new Set([...CURRENCIES, ...METALS]);
 
 // Calculate average cost basis per symbol from completed buy transactions
 function calcCostBasis(transactions = []) {
@@ -34,9 +37,9 @@ function calcCostBasis(transactions = []) {
     if (!tx.from_asset || !tx.to_asset) continue;
     const toKey = tx.to_asset.toLowerCase();
     const fromKey = tx.from_asset.toLowerCase();
-    // Identify stock transactions by checking currency vs non-currency assets
-    const isBuy = !CURRENCIES.has(toKey) && CURRENCIES.has(fromKey);
-    const isSell = !CURRENCIES.has(fromKey) && CURRENCIES.has(toKey);
+    // Identify stock transactions: from currency to non-currency-non-metal = buy; reverse = sell
+    const isBuy = !NON_STOCK_ASSETS.has(toKey) && CURRENCIES.has(fromKey);
+    const isSell = !NON_STOCK_ASSETS.has(fromKey) && CURRENCIES.has(toKey);
 
     if (isBuy) {
       // buying stock: amount_usd = gross spent, net shares = gross*(1-fee)/price
@@ -72,7 +75,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
   // Dynamically build stock keys from balances — includes custom-added stocks
   const stockKeys = [...new Set([
     ...Object.keys(balances).filter(k =>
-      !CURRENCIES.has(k) && !k.startsWith("frozen_") && (balances[k] || 0) > 0
+      !NON_STOCK_ASSETS.has(k) && !k.startsWith("frozen_") && (balances[k] || 0) > 0
     ),
     ...Object.keys(balances)
       .filter(k => k.startsWith("frozen_") && (balances[k] || 0) > 0)
