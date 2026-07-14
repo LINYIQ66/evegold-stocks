@@ -29,6 +29,8 @@ const DEFAULT_STOCKS = [
   { symbol: "BABA",   name: "Alibaba" },
   { symbol: "OPENAI", name: "OpenAI" },
   { symbol: "CRWV",   name: "CoreWeave" },
+  { symbol: "SPCX",   name: "SpaceX" },
+  { symbol: "SKHY",   name: "SK Hynix" },
 ];
 
 export { DEFAULT_STOCKS as US_STOCKS };

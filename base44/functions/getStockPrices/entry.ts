@@ -27,6 +27,7 @@ Deno.serve(async (req) => {
       { symbol: "CRWV",   id: 39497, name: "CoreWeave" },
       // Custom stocks not on CMC — fetched from Alpaca as fallback
       { symbol: "SPCX",   id: null,  name: "SPCX", alpaca: true },
+      { symbol: "SKHY",   id: null,  name: "SK Hynix", alpaca: true },
     ];
 
     const cmcStocks = STOCKS.filter(s => !s.alpaca);
