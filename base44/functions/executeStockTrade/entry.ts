@@ -10,6 +10,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 const FEE_RATE = 0.001; // 0.1%
 const SPREAD = 0.003;   // 0.3% bid/ask spread — anti-arbitrage: buy at ask (higher), sell at bid (lower)
+const BLOCKED_SYMBOLS = new Set(["SKHYV"]); // Deprecated tickers — not allowed for trading
 
 const DEFAULT_STOCKS = [
   { symbol: "AAPL",   id: 39491 },
@@ -87,6 +88,9 @@ Deno.serve(async (req) => {
     }
     if (orderType !== 'market' && orderType !== 'limit') {
       return Response.json({ success: false, error: 'Invalid order type' }, { status: 400 });
+    }
+    if (BLOCKED_SYMBOLS.has(symbol.toUpperCase())) {
+      return Response.json({ success: false, error: `${symbol} is not available for trading. Please use SKHY instead.` }, { status: 400 });
     }
 
     const stockKey = symbol.toLowerCase();

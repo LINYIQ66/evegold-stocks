@@ -6,6 +6,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const FEE_RATE = 0.001;
 const SPREAD = 0.003;   // 0.3% bid/ask spread — anti-arbitrage
+const BLOCKED_SYMBOLS = new Set(["SKHYV"]); // Deprecated tickers — skip execution
 
 const STOCKS = [
   { symbol: "AAPL",   id: 39491 },
@@ -129,6 +130,7 @@ Deno.serve(async (req) => {
       if (!orderInfo.limitPrice || !orderInfo.side || !orderInfo.symbol) continue;
 
       const { limitPrice, side, shares, currency, symbol } = orderInfo;
+      if (BLOCKED_SYMBOLS.has(symbol.toUpperCase())) continue;
       const marketPrice = prices[symbol];
       if (!marketPrice) continue;
 
