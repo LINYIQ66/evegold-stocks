@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getStockPrices } from "@/functions/getStockPrices";
 
 const FEE_RATE = 0.001; // 0.1%
+const SPREAD = 0.003;   // 0.3% bid/ask spread
 
 export default function StockTradeInterface({ user, selectedSymbol, livePrice: livePriceProp, onTrade }) {
   const [side, setSide] = useState("buy");
@@ -46,9 +47,13 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
   // Available = actual balance (frozen funds are already deducted when limit order is placed)
   const payBalance = currency === "USDT" ? usdtBalance : usdBalance;
 
-  const execPrice = orderType === "market"
+  const midPrice = orderType === "market"
     ? (livePrice || 0)
     : (parseFloat(limitPrice) || 0);
+  // Buy at ask (higher), sell at bid (lower) — prevents price-spread arbitrage
+  const execPrice = side === "buy"
+    ? midPrice * (1 + SPREAD)
+    : midPrice * (1 - SPREAD);
 
   // When spend amount changes, auto-compute shares
   const handleSpendChange = (val) => {
@@ -154,11 +159,17 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
           <span>交易 {selectedSymbol}</span>
           <div className="text-right">
             {livePrice ? (
-              <span className="text-xl font-bold text-slate-900">${livePrice.toFixed(2)}</span>
+              <>
+                <span className="text-xl font-bold text-slate-900">${livePrice.toFixed(2)}</span>
+                <div className="flex gap-2 justify-end mt-0.5">
+                  <span className="text-xs text-green-600">买 ${(livePrice * (1 - SPREAD)).toFixed(2)}</span>
+                  <span className="text-xs text-red-600">卖 ${(livePrice * (1 + SPREAD)).toFixed(2)}</span>
+                </div>
+              </>
             ) : (
               <span className="text-sm text-slate-400 animate-pulse">行情加载中...</span>
             )}
-            <p className="text-xs text-slate-400 font-normal">市场价格</p>
+            <p className="text-xs text-slate-400 font-normal">市场价格 · 含0.3%点差</p>
           </div>
         </CardTitle>
       </CardHeader>
@@ -221,9 +232,9 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
         {/* Market price display (read-only) */}
         {orderType === "market" && (
           <div className="flex items-center justify-between px-3 py-2 bg-blue-50 rounded-lg border border-blue-100">
-            <span className="text-xs text-blue-600 font-medium">成交价格</span>
+            <span className="text-xs text-blue-600 font-medium">{side === "buy" ? "买入价(Ask)" : "卖出价(Bid)"}</span>
             <span className="text-sm font-bold text-blue-700">
-              {livePrice ? `$${livePrice.toFixed(2)}` : "—"}
+              {execPrice > 0 ? `$${execPrice.toFixed(2)}` : "—"}
             </span>
           </div>
         )}
@@ -465,7 +476,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
           {orderType === "limit"
             ? "限价单将在市价触达目标价格时自动成交"
             : "市价单按当前市场价格立即成交"}
-          {" · "}所有交易收取 0.1% 手续费
+          {" · "}手续费 0.1% · 点差 0.3%（买入按Ask价，卖出按Bid价）
         </p>
       </CardContent>
     </Card>

@@ -9,6 +9,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 const FEE_RATE = 0.001; // 0.1%
+const SPREAD = 0.003;   // 0.3% bid/ask spread — anti-arbitrage: buy at ask (higher), sell at bid (lower)
 
 const DEFAULT_STOCKS = [
   { symbol: "AAPL",   id: 39491 },
@@ -222,8 +223,9 @@ Deno.serve(async (req) => {
         }, { status: 400 });
       }
 
+      const askPrice = marketPrice * (1 + SPREAD);  // buy at ask
       const fee = spent * FEE_RATE;
-      const sharesReceived = (spent - fee) / marketPrice;
+      const sharesReceived = (spent - fee) / askPrice;
 
       currentBalances[currencyKey] = newCurrBal;
       currentBalances[stockKey] = (currentBalances[stockKey] || 0) + sharesReceived;
@@ -244,7 +246,7 @@ Deno.serve(async (req) => {
         to_asset: symbol,
         amount_usd: spent,
         fee_usd: fee,
-        exchange_rate: marketPrice,
+        exchange_rate: askPrice,
         status: "completed",
       });
 
@@ -263,7 +265,7 @@ Deno.serve(async (req) => {
         success: true,
         message: `Bought successfully! Received ${sharesReceived.toFixed(6)} ${symbol}`,
         sharesReceived,
-        execPrice: marketPrice,
+        execPrice: askPrice,
         newBalances: currentBalances,
       });
 
@@ -282,7 +284,8 @@ Deno.serve(async (req) => {
         }, { status: 400 });
       }
 
-      const gross = sharesVal * marketPrice;
+      const bidPrice = marketPrice * (1 - SPREAD);  // sell at bid
+      const gross = sharesVal * bidPrice;
       const fee = gross * FEE_RATE;
       const netUsdt = gross - fee;
 
@@ -305,7 +308,7 @@ Deno.serve(async (req) => {
         to_asset: currency,
         amount_usd: gross,
         fee_usd: fee,
-        exchange_rate: marketPrice,
+        exchange_rate: bidPrice,
         status: "completed",
       });
 
@@ -324,7 +327,7 @@ Deno.serve(async (req) => {
         success: true,
         message: `Sold successfully! Received $${netUsdt.toFixed(2)} ${currency}`,
         netUsdt,
-        execPrice: marketPrice,
+        execPrice: bidPrice,
         newBalances: currentBalances,
       });
     }

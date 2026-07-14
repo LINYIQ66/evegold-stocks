@@ -5,6 +5,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const FEE_RATE = 0.001;
+const SPREAD = 0.003;   // 0.3% bid/ask spread — anti-arbitrage
 
 const STOCKS = [
   { symbol: "AAPL",   id: 39491 },
@@ -151,8 +152,9 @@ Deno.serve(async (req) => {
       if (side === "buy") {
         // Funds were frozen: spent = tx.amount_usd
         const spent = tx.amount_usd;
+        const askPrice = marketPrice * (1 + SPREAD);  // buy at ask
         const fee = spent * FEE_RATE;
-        const sharesReceived = (spent * (1 - FEE_RATE)) / marketPrice;
+        const sharesReceived = (spent * (1 - FEE_RATE)) / askPrice;
         const eveReward = fee * 100;
 
         // Unfreeze and apply
@@ -164,11 +166,11 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.Transaction.update(tx.id, {
           status: "completed",
           fee_usd: fee,
-          exchange_rate: marketPrice,
+          exchange_rate: askPrice,
           description: JSON.stringify({
             ...orderInfo,
             executedAt: new Date().toISOString(),
-            executedPrice: marketPrice,
+            executedPrice: askPrice,
             sharesReceived,
           }),
         });
@@ -185,7 +187,8 @@ Deno.serve(async (req) => {
         }
       } else {
         // Shares were frozen: shares = orderInfo.shares
-        const gross = shares * marketPrice;
+        const bidPrice = marketPrice * (1 - SPREAD);  // sell at bid
+        const gross = shares * bidPrice;
         const fee = gross * FEE_RATE;
         const netUsdt = gross - fee;
         const eveReward = fee * 100;
@@ -199,11 +202,11 @@ Deno.serve(async (req) => {
           status: "completed",
           fee_usd: fee,
           amount_usd: gross,
-          exchange_rate: marketPrice,
+          exchange_rate: bidPrice,
           description: JSON.stringify({
             ...orderInfo,
             executedAt: new Date().toISOString(),
-            executedPrice: marketPrice,
+            executedPrice: bidPrice,
             netUsdt,
           }),
         });
