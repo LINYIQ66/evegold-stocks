@@ -4,7 +4,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 let assetsCache = null;
 let assetsCacheTime = 0;
 const CACHE_TTL = 3600000; // 1 hour
-const BLOCKED_SYMBOLS = new Set(["SKHYV"]); // Deprecated tickers — hidden from search
+const BLOCKED_SYMBOLS = new Set(["SKHYV", "GOLD", "SILVER", "PLATINUM", "PALLADIUM"]); // Deprecated tickers + metal-colliding symbols — hidden from search
 
 Deno.serve(async (req) => {
   try {

@@ -10,7 +10,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 const FEE_RATE = 0.001; // 0.1%
 const SPREAD = 0.003;   // 0.3% bid/ask spread — anti-arbitrage: buy at ask (higher), sell at bid (lower)
-const BLOCKED_SYMBOLS = new Set(["SKHYV"]); // Deprecated tickers — not allowed for trading
+const BLOCKED_SYMBOLS = new Set(["SKHYV", "GOLD", "SILVER", "PLATINUM", "PALLADIUM"]); // Deprecated tickers + symbols colliding with metal wallet keys — not allowed for stock trading
 
 const DEFAULT_STOCKS = [
   { symbol: "AAPL",   id: 39491 },

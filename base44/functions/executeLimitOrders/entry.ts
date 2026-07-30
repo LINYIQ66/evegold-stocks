@@ -6,7 +6,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const FEE_RATE = 0.001;
 const SPREAD = 0.003;   // 0.3% bid/ask spread — anti-arbitrage
-const BLOCKED_SYMBOLS = new Set(["SKHYV"]); // Deprecated tickers — skip execution
+const BLOCKED_SYMBOLS = new Set(["SKHYV", "GOLD", "SILVER", "PLATINUM", "PALLADIUM"]); // Deprecated tickers + metal-colliding symbols — skip execution
 
 const STOCKS = [
   { symbol: "AAPL",   id: 39491 },
