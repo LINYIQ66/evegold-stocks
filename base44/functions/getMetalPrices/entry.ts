@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
       thb: 1/36.50, vnd: 1/24500, idr: 1/16200, lak: 1/21700,
       eur: 1/0.92, gbp: 1/0.79, aud: 1/1.50, nzd: 1/1.62,
       jpy: 1/155, hkd: 1/7.82, twd: 1/32.25, cad: 1/1.37, aed: 1/3.67,
-      gold: 2024.50, silver: 24.85, platinum: 1045.30, palladium: 1825.75
+      gold: 4080.00, silver: 58.00, platinum: 1615.00, palladium: 1271.00
     };
     const zeroChanges = Object.keys(fallbackPrices).reduce((acc, key) => ({...acc, [key]: 0}), {});
 
