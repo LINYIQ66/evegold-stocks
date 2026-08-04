@@ -98,22 +98,28 @@ Deno.serve(async (req) => {
       return Response.json({ message: "No pending limit orders.", executed: 0 });
     }
 
-    // Fetch current market prices for default stocks
-    const prices = await fetchPrices();
+    // Fetch current market prices for default stocks (CMC), tolerating failure
+    let prices = {};
+    try {
+      prices = await fetchPrices();
+    } catch (e) {
+      // CMC failed — fall back to Alpaca for all symbols below
+    }
 
-    // Fetch Alpaca prices for any custom (non-default) stock symbols in pending orders
-    const defaultSymbols = new Set(STOCKS.map(s => s.symbol));
-    const customSymbols = new Set();
+    // Collect all symbols in pending orders; fetch via Alpaca any that are custom or missing a CMC price
+    const symbolsNeedingPrice = new Set();
     for (const tx of pendingTxs) {
       let orderInfo;
       try { orderInfo = JSON.parse(tx.description || "{}"); } catch { continue; }
-      if (orderInfo.symbol && !defaultSymbols.has(orderInfo.symbol)) {
-        customSymbols.add(orderInfo.symbol);
+      if (orderInfo.symbol && !prices[orderInfo.symbol]) {
+        symbolsNeedingPrice.add(orderInfo.symbol);
       }
     }
-    if (customSymbols.size > 0) {
-      const alpacaPrices = await fetchAlpacaPrices([...customSymbols]);
-      Object.assign(prices, alpacaPrices);
+    if (symbolsNeedingPrice.size > 0) {
+      const alpacaPrices = await fetchAlpacaPrices([...symbolsNeedingPrice]);
+      for (const [sym, price] of Object.entries(alpacaPrices)) {
+        if (!prices[sym]) prices[sym] = price;
+      }
     }
 
     let executed = 0;
