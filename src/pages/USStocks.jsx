@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User } from "@/entities/all";
+import { User, Transaction } from "@/entities/all";
 import { getUserTransactions } from "@/functions/getUserTransactions";
 import { executeStockTrade } from "@/functions/executeStockTrade";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +38,14 @@ export default function USStocks() {
   useEffect(() => {
     refreshUser();
     loadTransactions();
+
+    const unsubscribe = Transaction.subscribe((event) => {
+      if (event.type === "update" && event.data?.status === "completed") {
+        refreshUser();
+        loadTransactions();
+      }
+    });
+    return unsubscribe;
   }, []);
 
   // Keep the selected quote when it is already present, avoiding a loading flash.
@@ -73,7 +81,10 @@ export default function USStocks() {
       const data = result.data;
 
       if (data.success) {
-        await refreshUser();
+        if (data.newBalances) {
+          setUser(current => current ? { ...current, wallet_balances: data.newBalances } : current);
+        }
+        refreshUser();
         loadTransactions();
         return { success: true, message: data.message };
       } else {
