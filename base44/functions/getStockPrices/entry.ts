@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
       const alpacaSymbols = alpacaStocks.map(s => s.symbol).join(",");
       try {
         const alpacaRes = await fetch(
-          `https://data.alpaca.markets/v2/stocks/trades/latest?symbols=${encodeURIComponent(alpacaSymbols)}`,
+          `https://data.alpaca.markets/v2/stocks/snapshots?symbols=${encodeURIComponent(alpacaSymbols)}`,
           {
             headers: {
               'APCA-API-KEY-ID': Deno.env.get("ALPACA_API_KEY"),
@@ -83,12 +83,15 @@ Deno.serve(async (req) => {
         );
         if (alpacaRes.ok) {
           const alpacaData = await alpacaRes.json();
+          const snapshots = alpacaData.snapshots || alpacaData;
           for (const stock of alpacaStocks) {
-            const trade = alpacaData.trades?.[stock.symbol];
-            if (trade?.p > 0) {
+            const snapshot = snapshots[stock.symbol];
+            const currentPrice = snapshot?.latestTrade?.p || snapshot?.dailyBar?.c;
+            const previousClose = snapshot?.prevDailyBar?.c;
+            if (currentPrice > 0) {
               prices[stock.symbol] = {
-                price: trade.p,
-                change: 0,
+                price: currentPrice,
+                change: previousClose > 0 ? ((currentPrice - previousClose) / previousClose) * 100 : 0,
                 name: stock.name,
               };
             }
