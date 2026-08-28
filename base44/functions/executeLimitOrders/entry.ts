@@ -140,10 +140,13 @@ Deno.serve(async (req) => {
       const marketPrice = prices[symbol];
       if (!marketPrice) continue;
 
-      // Check execution condition
+      // Check execution condition against the ACTUAL fill price (incl. spread),
+      // guaranteeing the fill is never worse than the customer's limit price
+      const askPrice = marketPrice * (1 + SPREAD);  // buy fills at ask
+      const bidPrice = marketPrice * (1 - SPREAD);  // sell fills at bid
       const shouldExecute = side === "buy"
-        ? marketPrice <= limitPrice   // Buy: market <= limit price (got a bargain)
-        : marketPrice >= limitPrice;  // Sell: market >= limit price (price target hit)
+        ? askPrice <= limitPrice   // Buy: fill price (ask) <= limit — pays no more than limit
+        : bidPrice >= limitPrice;  // Sell: fill price (bid) >= limit — receives no less than limit
 
       if (!shouldExecute) continue;
 
