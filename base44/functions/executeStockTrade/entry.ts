@@ -36,36 +36,44 @@ const DEFAULT_STOCKS = [
 ];
 
 // Fetch live stock price server-side
-async function fetchStockPrice(symbol) {
-  const defaultStock = DEFAULT_STOCKS.find(s => s.symbol === symbol);
-  if (defaultStock) {
-    // CMC for default tokenized stocks
-    const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${defaultStock.id}&convert=USD`;
-    const res = await fetch(url, {
-      headers: {
-        "X-CMC_PRO_API_KEY": Deno.env.get("CMC_API_KEY"),
-        "Accept": "application/json",
-      }
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error('CMC API error');
-    const entry = json.data?.[String(defaultStock.id)];
-    const price = entry?.quote?.USD?.price || 0;
-    if (price <= 0) throw new Error(`No price for ${symbol}`);
-    return price;
-  }
-  // Alpaca for custom stocks (SPCX, PDD, etc.)
+async function fetchAlpacaPrice(symbol) {
   const apiKey = Deno.env.get('ALPACA_API_KEY');
   const secretKey = Deno.env.get('ALPACA_SECRET_KEY');
   const res = await fetch(
     `https://data.alpaca.markets/v2/stocks/trades/latest?symbols=${encodeURIComponent(symbol)}`,
     { headers: { 'APCA-API-KEY-ID': apiKey, 'APCA-API-SECRET-KEY': secretKey } }
   );
-  if (!res.ok) throw new Error(`Alpaca API error for ${symbol}`);
+  if (!res.ok) throw new Error(`Market price unavailable for ${symbol}`);
   const data = await res.json();
   const price = data.trades?.[symbol]?.p || 0;
   if (price <= 0) throw new Error(`No price for ${symbol}`);
   return price;
+}
+
+async function fetchStockPrice(symbol) {
+  const normalizedSymbol = symbol.toUpperCase();
+  const defaultStock = DEFAULT_STOCKS.find(s => s.symbol === normalizedSymbol);
+
+  if (defaultStock) {
+    try {
+      const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${defaultStock.id}&convert=USD`;
+      const res = await fetch(url, {
+        headers: {
+          "X-CMC_PRO_API_KEY": Deno.env.get("CMC_API_KEY"),
+          "Accept": "application/json",
+        }
+      });
+      if (!res.ok) throw new Error('CMC unavailable');
+      const json = await res.json();
+      const price = json.data?.[String(defaultStock.id)]?.quote?.USD?.price || 0;
+      if (price <= 0) throw new Error('CMC price unavailable');
+      return price;
+    } catch (error) {
+      return await fetchAlpacaPrice(normalizedSymbol);
+    }
+  }
+
+  return await fetchAlpacaPrice(normalizedSymbol);
 }
 
 Deno.serve(async (req) => {
