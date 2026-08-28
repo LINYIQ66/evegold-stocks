@@ -6,6 +6,7 @@ import { getStockPrices } from "@/functions/getStockPrices";
 import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
 import { User } from "@/entities/all";
 import StockSearch from "./StockSearch";
+import StockQuoteMetrics from "./StockQuoteMetrics";
 
 // Default stock list — dynamically updated from backend
 const DEFAULT_STOCKS = [
@@ -161,7 +162,7 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
         <div className="mb-2">
           <StockSearch onAdd={handleAddStock} addedSymbols={allStocks.map(s => s.symbol)} />
         </div>
-        <div className="space-y-0.5">
+        <div className="space-y-2">
           {allStocks.map((stock) => {
             const isCustom = !DEFAULT_STOCKS.some(d => d.symbol === stock.symbol);
             const data = prices[stock.symbol];
@@ -172,55 +173,60 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
               <div
                 key={stock.symbol}
                 onClick={() => onStockClick(stock.symbol)}
-                className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 ${
+                className={`px-3 py-3 rounded-lg cursor-pointer transition-all duration-150 ${
                   isSelected
                     ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow"
-                    : "hover:bg-slate-50"
+                    : "bg-white hover:bg-slate-50 border border-slate-100"
                 }`}
               >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1">
-                    <p className={`font-semibold text-sm leading-tight ${isSelected ? "text-white" : "text-slate-900"}`}>
-                      {stock.symbol}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1">
+                      <p className={`font-semibold text-sm leading-tight ${isSelected ? "text-white" : "text-slate-900"}`}>
+                        {stock.symbol}
+                      </p>
+                      {isCustom && (
+                        <Star className={`w-3 h-3 flex-shrink-0 ${isSelected ? "text-yellow-300" : "text-yellow-500"}`} fill="currentColor" />
+                      )}
+                    </div>
+                    <p className={`text-xs truncate mt-0.5 ${isSelected ? "text-blue-100" : "text-slate-400"}`}>
+                      {data?.name || stock.name}
                     </p>
+                  </div>
+                  <div className="flex items-start gap-1 flex-shrink-0">
+                    <div className="text-right">
+                      {data?.price ? (
+                        <>
+                          <p className={`font-bold text-base leading-tight ${isSelected ? "text-white" : "text-slate-900"}`}>
+                            ${data.price.toFixed(2)}
+                          </p>
+                          <div className={`flex items-center gap-0.5 justify-end text-xs font-semibold mt-1 ${
+                            isSelected ? "text-blue-100" : isPositive ? "text-green-600" : "text-red-500"
+                          }`}>
+                            {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                            {data.change >= 0 ? "+" : ""}{data.change.toFixed(2)}%
+                          </div>
+                        </>
+                      ) : (
+                        <p className={`text-xs ${loading ? "text-slate-400 animate-pulse" : "text-slate-400"}`}>
+                          {loading ? "Loading..." : "—"}
+                        </p>
+                      )}
+                    </div>
                     {isCustom && (
-                      <Star className={`w-3 h-3 flex-shrink-0 ${isSelected ? "text-yellow-300" : "text-yellow-500"}`} fill="currentColor" />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleRemoveStock(stock.symbol); }}
+                        className={`p-1 rounded transition-colors ${
+                          isSelected ? "text-white/70 hover:text-white hover:bg-white/20" : "text-slate-400 hover:text-red-500 hover:bg-red-50"
+                        }`}
+                        title="移除"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     )}
                   </div>
-                  <p className={`text-xs truncate leading-tight ${isSelected ? "text-blue-100" : "text-slate-400"}`}>
-                    {data?.name || stock.name}
-                  </p>
                 </div>
-                <div className="text-right ml-2 flex-shrink-0">
-                  {data?.price ? (
-                    <>
-                      <p className={`font-semibold text-sm leading-tight ${isSelected ? "text-white" : "text-slate-900"}`}>
-                        ${data.price.toFixed(2)}
-                      </p>
-                      <div className={`flex items-center gap-0.5 justify-end text-xs font-medium leading-tight ${
-                        isSelected ? "text-blue-100" : isPositive ? "text-green-600" : "text-red-500"
-                      }`}>
-                        {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                        {data.change >= 0 ? "+" : ""}{data.change.toFixed(2)}%
-                      </div>
-                    </>
-                  ) : (
-                    <p className={`text-xs ${loading ? "text-slate-400 animate-pulse" : "text-slate-400"}`}>
-                      {loading ? "Loading..." : "—"}
-                    </p>
-                  )}
-                </div>
-                {isCustom && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleRemoveStock(stock.symbol); }}
-                    className={`ml-1 p-1 rounded transition-colors flex-shrink-0 ${
-                      isSelected ? "text-white/70 hover:text-white hover:bg-white/20" : "text-slate-400 hover:text-red-500 hover:bg-red-50"
-                    }`}
-                    title="移除"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                {data?.price && <StockQuoteMetrics data={data} isSelected={isSelected} />}
               </div>
             );
           })}

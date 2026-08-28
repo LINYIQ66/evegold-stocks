@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     ];
 
     const cmcStocks = STOCKS.filter(s => !s.alpaca);
-    let alpacaStocks = STOCKS.filter(s => s.alpaca);
+    let alpacaStocks = [...STOCKS];
 
     const prices = {};
 
@@ -64,8 +64,7 @@ Deno.serve(async (req) => {
         }
       }
     } catch (e) {
-      // CMC unavailable (e.g. rate limit) — fetch all default stocks from Alpaca instead
-      alpacaStocks = [...alpacaStocks, ...cmcStocks];
+      // Alpaca snapshots below provide the complete fallback quote set.
     }
 
     // Fetch Alpaca prices for custom stocks (and any CMC fallbacks)
@@ -93,6 +92,15 @@ Deno.serve(async (req) => {
                 price: currentPrice,
                 change: previousClose > 0 ? ((currentPrice - previousClose) / previousClose) * 100 : 0,
                 name: stock.name,
+                bid: snapshot?.latestQuote?.bp || null,
+                ask: snapshot?.latestQuote?.ap || null,
+                high: snapshot?.dailyBar?.h || null,
+                low: snapshot?.dailyBar?.l || null,
+                volume: snapshot?.dailyBar?.v || null,
+                vwap: snapshot?.dailyBar?.vw || null,
+                turnover: snapshot?.dailyBar?.v && snapshot?.dailyBar?.vw
+                  ? snapshot.dailyBar.v * snapshot.dailyBar.vw
+                  : null,
               };
             }
           }

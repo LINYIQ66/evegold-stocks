@@ -17,9 +17,8 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("ALPACA_API_KEY");
     const secretKey = Deno.env.get("ALPACA_SECRET_KEY");
 
-    // Get latest trades (last traded price — more accurate than bid/ask mid)
-    const tradeRes = await fetch(
-      `https://data.alpaca.markets/v2/stocks/trades/latest?symbols=${encodeURIComponent(symbols)}`,
+    const snapshotRes = await fetch(
+      `https://data.alpaca.markets/v2/stocks/snapshots?symbols=${encodeURIComponent(symbols)}`,
       {
         headers: {
           'APCA-API-KEY-ID': apiKey,
@@ -28,50 +27,34 @@ Deno.serve(async (req) => {
       }
     );
 
-    if (!tradeRes.ok) {
-      const errText = await tradeRes.text();
-      return Response.json({ error: `Alpaca trades error: ${tradeRes.status} ${errText}` }, { status: 502 });
+    if (!snapshotRes.ok) {
+      const errText = await snapshotRes.text();
+      return Response.json({ error: `Alpaca snapshots error: ${snapshotRes.status} ${errText}` }, { status: 502 });
     }
 
-    const tradeData = await tradeRes.json();
+    const snapshotData = await snapshotRes.json();
+    const snapshots = snapshotData.snapshots || snapshotData;
     const prices = {};
 
-    for (const [symbol, trade] of Object.entries(tradeData.trades || {})) {
-      const price = trade.p || 0;
+    for (const [symbol, snapshot] of Object.entries(snapshots)) {
+      const price = snapshot?.latestTrade?.p || snapshot?.dailyBar?.c || 0;
+      const previousClose = snapshot?.prevDailyBar?.c;
       if (price > 0) {
         prices[symbol] = {
           price,
-          change: 0,
+          change: previousClose > 0 ? ((price - previousClose) / previousClose) * 100 : 0,
           name: symbol,
+          bid: snapshot?.latestQuote?.bp || null,
+          ask: snapshot?.latestQuote?.ap || null,
+          high: snapshot?.dailyBar?.h || null,
+          low: snapshot?.dailyBar?.l || null,
+          volume: snapshot?.dailyBar?.v || null,
+          vwap: snapshot?.dailyBar?.vw || null,
+          turnover: snapshot?.dailyBar?.v && snapshot?.dailyBar?.vw
+            ? snapshot.dailyBar.v * snapshot.dailyBar.vw
+            : null,
         };
       }
-    }
-
-    // Get snapshots for 24h change (best effort)
-    try {
-      const snapRes = await fetch(
-        `https://data.alpaca.markets/v2/stocks/snapshots?symbols=${encodeURIComponent(symbols)}`,
-        {
-          headers: {
-            'APCA-API-KEY-ID': apiKey,
-            'APCA-API-SECRET-KEY': secretKey,
-          }
-        }
-      );
-
-      if (snapRes.ok) {
-        const snapData = await snapRes.json();
-        for (const [symbol, snap] of Object.entries(snapData.snapshots || {})) {
-          if (prices[symbol] && snap.daily_bar) {
-            const prevClose = snap.prev_daily_bar?.c || snap.daily_bar.o;
-            if (prevClose > 0) {
-              prices[symbol].change = ((prices[symbol].price - prevClose) / prevClose) * 100;
-            }
-          }
-        }
-      }
-    } catch (e) {
-      // Snapshots not available, prices from trades are sufficient
     }
 
     return Response.json({ prices, timestamp: Date.now() });
