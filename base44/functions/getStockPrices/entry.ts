@@ -31,37 +31,44 @@ Deno.serve(async (req) => {
     ];
 
     const cmcStocks = STOCKS.filter(s => !s.alpaca);
-    const alpacaStocks = STOCKS.filter(s => s.alpaca);
-
-    const ids = cmcStocks.map(s => s.id).join(",");
-    const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${ids}&convert=USD`;
-
-    const res = await fetch(url, {
-      headers: {
-        "X-CMC_PRO_API_KEY": Deno.env.get("CMC_API_KEY"),
-        "Accept": "application/json",
-      }
-    });
-
-    const json = await res.json();
-
-    if (!res.ok || json.status?.error_code) {
-      return Response.json({ error: json.status?.error_message || "CMC API error" }, { status: 500 });
-    }
+    let alpacaStocks = STOCKS.filter(s => s.alpaca);
 
     const prices = {};
-    for (const stock of cmcStocks) {
-      const entry = json.data?.[String(stock.id)];
-      if (entry?.quote?.USD?.price > 0) {
-        prices[stock.symbol] = {
-          price: entry.quote.USD.price,
-          change: entry.quote.USD.percent_change_24h || 0,
-          name: stock.name,
-        };
+
+    // Try CMC first for default stocks; on failure fall back to Alpaca for them
+    try {
+      const ids = cmcStocks.map(s => s.id).join(",");
+      const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${ids}&convert=USD`;
+
+      const res = await fetch(url, {
+        headers: {
+          "X-CMC_PRO_API_KEY": Deno.env.get("CMC_API_KEY"),
+          "Accept": "application/json",
+        }
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || json.status?.error_code) {
+        throw new Error(json.status?.error_message || "CMC API error");
       }
+
+      for (const stock of cmcStocks) {
+        const entry = json.data?.[String(stock.id)];
+        if (entry?.quote?.USD?.price > 0) {
+          prices[stock.symbol] = {
+            price: entry.quote.USD.price,
+            change: entry.quote.USD.percent_change_24h || 0,
+            name: stock.name,
+          };
+        }
+      }
+    } catch (e) {
+      // CMC unavailable (e.g. rate limit) — fetch all default stocks from Alpaca instead
+      alpacaStocks = [...alpacaStocks, ...cmcStocks];
     }
 
-    // Fetch Alpaca prices for custom stocks not on CMC
+    // Fetch Alpaca prices for custom stocks (and any CMC fallbacks)
     if (alpacaStocks.length > 0) {
       const alpacaSymbols = alpacaStocks.map(s => s.symbol).join(",");
       try {
