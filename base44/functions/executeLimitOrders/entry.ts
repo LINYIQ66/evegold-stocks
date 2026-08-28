@@ -2,7 +2,8 @@
 // BUY limit: executes when market price <= limit price
 // SELL limit: executes when market price >= limit price
 
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.44';
+import { secrets } from 'base44:runtime';
 
 const FEE_RATE = 0.001;
 const SPREAD = 0.003;   // 0.3% bid/ask spread — anti-arbitrage
@@ -36,7 +37,7 @@ async function fetchPrices() {
   const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${ids}&convert=USD`;
   const res = await fetch(url, {
     headers: {
-      "X-CMC_PRO_API_KEY": Deno.env.get("CMC_API_KEY"),
+      "X-CMC_PRO_API_KEY": secrets.get("CMC_API_KEY"),
       "Accept": "application/json",
     }
   });
@@ -54,8 +55,8 @@ async function fetchPrices() {
 
 // Fetch prices for custom (non-default) stock symbols via Alpaca
 async function fetchAlpacaPrices(symbols) {
-  const apiKey = Deno.env.get("ALPACA_API_KEY");
-  const secretKey = Deno.env.get("ALPACA_SECRET_KEY");
+  const apiKey = secrets.get("ALPACA_API_KEY");
+  const secretKey = secrets.get("ALPACA_SECRET_KEY");
   const symStr = symbols.join(",");
   const prices = {};
 
@@ -84,9 +85,13 @@ async function fetchAlpacaPrices(symbols) {
   return prices;
 }
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+    if (!user || user.role !== "admin") {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Fetch all pending swap transactions
     const pendingTxs = await base44.asServiceRole.entities.Transaction.filter({
@@ -98,29 +103,22 @@ Deno.serve(async (req) => {
       return Response.json({ message: "No pending limit orders.", executed: 0 });
     }
 
-    // Fetch current market prices for default stocks (CMC), tolerating failure
-    let prices = {};
-    try {
-      prices = await fetchPrices();
-    } catch (e) {
-      // CMC failed — fall back to Alpaca for all symbols below
-    }
-
-    // Collect all symbols in pending orders; fetch via Alpaca any that are custom or missing a CMC price
-    const symbolsNeedingPrice = new Set();
+    // Always fetch Alpaca for every pending symbol and CMC in parallel.
+    // Alpaca is authoritative for execution; CMC remains a fallback cross-check.
+    const pendingSymbols = new Set();
     for (const tx of pendingTxs) {
       let orderInfo;
       try { orderInfo = JSON.parse(tx.description || "{}"); } catch { continue; }
-      if (orderInfo.symbol && !prices[orderInfo.symbol]) {
-        symbolsNeedingPrice.add(orderInfo.symbol);
-      }
+      if (orderInfo.symbol) pendingSymbols.add(String(orderInfo.symbol).toUpperCase());
     }
-    if (symbolsNeedingPrice.size > 0) {
-      const alpacaPrices = await fetchAlpacaPrices([...symbolsNeedingPrice]);
-      for (const [sym, price] of Object.entries(alpacaPrices)) {
-        if (!prices[sym]) prices[sym] = price;
-      }
-    }
+
+    const [cmcResult, alpacaResult] = await Promise.allSettled([
+      fetchPrices(),
+      fetchAlpacaPrices([...pendingSymbols]),
+    ]);
+    const cmcPrices = cmcResult.status === "fulfilled" ? cmcResult.value : {};
+    const alpacaPrices = alpacaResult.status === "fulfilled" ? alpacaResult.value : {};
+    const prices = { ...cmcPrices, ...alpacaPrices };
 
     let executed = 0;
     let errors = [];
@@ -136,8 +134,9 @@ Deno.serve(async (req) => {
       if (!orderInfo.limitPrice || !orderInfo.side || !orderInfo.symbol) continue;
 
       const { limitPrice, side, shares, currency, symbol } = orderInfo;
-      if (BLOCKED_SYMBOLS.has(symbol.toUpperCase())) continue;
-      const marketPrice = prices[symbol];
+      const normalizedSymbol = String(symbol).toUpperCase();
+      if (BLOCKED_SYMBOLS.has(normalizedSymbol)) continue;
+      const marketPrice = prices[normalizedSymbol];
       if (!marketPrice) continue;
 
       // Check execution condition against the ACTUAL fill price (incl. spread),
@@ -155,7 +154,7 @@ Deno.serve(async (req) => {
       if (!users.length) continue;
       const userRecord = users[0];
       const newBalances = { ...(userRecord.wallet_balances || {}) };
-      const stockKey = symbol.toLowerCase();
+      const stockKey = normalizedSymbol.toLowerCase();
       const currencyKey = (currency || "USDT").toLowerCase();
       const frozenCurrKey = `frozen_${currencyKey}`;
       const frozenStockKey = `frozen_${stockKey}`;
@@ -246,4 +245,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}
