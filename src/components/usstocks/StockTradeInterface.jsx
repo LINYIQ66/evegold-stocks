@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, CheckCircle, TrendingUp, TrendingDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getStockPrices } from "@/functions/getStockPrices";
+import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
 
 const FEE_RATE = 0.001; // 0.1%
 const SPREAD = 0.003;   // 0.3% bid/ask spread
@@ -18,7 +18,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
   useEffect(() => {
     setFetchedPrice(null);
     if (!livePriceProp) {
-      getStockPrices({}).then(res => {
+      getAlpacaPrices({ symbols: selectedSymbol }).then(res => {
         const p = res?.data?.prices?.[selectedSymbol]?.price;
         if (p) setFetchedPrice(p);
       }).catch(() => {});
@@ -50,10 +50,13 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
   const midPrice = orderType === "market"
     ? (livePrice || 0)
     : (parseFloat(limitPrice) || 0);
-  // Buy at ask (higher), sell at bid (lower) — prevents price-spread arbitrage
-  const execPrice = side === "buy"
-    ? midPrice * (1 + SPREAD)
-    : midPrice * (1 - SPREAD);
+  // Market orders include the spread; a limit price is already the customer's
+  // maximum buy price or minimum sell price and must not be adjusted again.
+  const execPrice = orderType === "limit"
+    ? midPrice
+    : side === "buy"
+      ? midPrice * (1 + SPREAD)
+      : midPrice * (1 - SPREAD);
 
   // When spend amount changes, auto-compute shares
   const handleSpendChange = (val) => {
@@ -162,8 +165,8 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
               <>
                 <span className="text-xl font-bold text-slate-900">${livePrice.toFixed(2)}</span>
                 <div className="flex gap-2 justify-end mt-0.5">
-                  <span className="text-xs text-green-600">买 ${(livePrice * (1 - SPREAD)).toFixed(2)}</span>
-                  <span className="text-xs text-red-600">卖 ${(livePrice * (1 + SPREAD)).toFixed(2)}</span>
+                  <span className="text-xs text-green-600">买 ${(livePrice * (1 + SPREAD)).toFixed(2)}</span>
+                  <span className="text-xs text-red-600">卖 ${(livePrice * (1 - SPREAD)).toFixed(2)}</span>
                 </div>
               </>
             ) : (

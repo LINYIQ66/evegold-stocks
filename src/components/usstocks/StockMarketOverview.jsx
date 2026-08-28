@@ -91,49 +91,38 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
   ];
 
   const loadPrices = async () => {
-    try {
-      // Fetch CMC prices for default stocks
-      const res = await getStockPrices({});
-      let mergedPrices = { ...(res?.data?.prices || {}) };
+    setLoading(true);
 
-      // Fetch Alpaca prices for user-added stocks AND user-held stocks not in CMC list
-      const addedSymbols = addedStocks
-        .filter(s => !DEFAULT_STOCKS.some(d => d.symbol === s.symbol))
-        .map(s => s.symbol);
+    const addedSymbols = addedStocks
+      .filter(s => !DEFAULT_STOCKS.some(d => d.symbol === s.symbol))
+      .map(s => s.symbol);
+    const KNOWN_NON_STOCKS = new Set(["usd", "usdt", "gold", "silver", "platinum", "palladium", "eve"]);
+    const heldCustomStocks = Object.keys(user?.wallet_balances || {})
+      .filter(k => !k.startsWith("frozen_"))
+      .filter(k => !KNOWN_NON_STOCKS.has(k.toLowerCase()))
+      .filter(k => (user.wallet_balances[k] || 0) > 0)
+      .filter(k => !DEFAULT_STOCKS.some(d => d.symbol === k.toUpperCase()))
+      .map(k => k.toUpperCase());
+    const customSymbols = [...new Set([...addedSymbols, ...heldCustomStocks])];
 
-      // Also include stocks the user holds but aren't in the default CMC list
-      const KNOWN_NON_STOCKS = new Set(["usd", "usdt", "gold", "silver", "platinum", "palladium", "eve"]);
-      const heldCustomStocks = Object.keys(user?.wallet_balances || {})
-        .filter(k => !k.startsWith("frozen_"))
-        .filter(k => !KNOWN_NON_STOCKS.has(k.toLowerCase()))
-        .filter(k => (user.wallet_balances[k] || 0) > 0)
-        .filter(k => !DEFAULT_STOCKS.some(d => d.symbol === k.toUpperCase()))
-        .map(k => k.toUpperCase());
-
-      const allAlpacaSymbols = [...new Set([...addedSymbols, ...heldCustomStocks])];
-
-      if (allAlpacaSymbols.length > 0) {
-        try {
-          const alpacaRes = await getAlpacaPrices({ symbols: allAlpacaSymbols.join(',') });
-          if (alpacaRes?.data?.prices) {
-            mergedPrices = { ...mergedPrices, ...alpacaRes.data.prices };
-          }
-        } catch (e) {
-          // Alpaca fetch failed, continue with CMC prices only
-        }
+    const publish = (updates) => {
+      if (!updates || Object.keys(updates).length === 0) return;
+      setPrices(previous => ({ ...previous, ...updates }));
+      if (onPriceUpdate && updates[selectedSymbol]) {
+        onPriceUpdate(updates[selectedSymbol].price);
       }
+      if (onAllPricesUpdate) onAllPricesUpdate(updates);
+    };
 
-      setPrices(mergedPrices);
-      setLoading(false);
-      if (onPriceUpdate && selectedSymbol && mergedPrices[selectedSymbol]) {
-        onPriceUpdate(mergedPrices[selectedSymbol].price);
-      }
-      if (onAllPricesUpdate) {
-        onAllPricesUpdate(mergedPrices);
-      }
-    } catch (e) {
-      setLoading(false);
-    }
+    const defaultRequest = getStockPrices({})
+      .then(res => publish(res?.data?.prices || {}));
+    const customRequest = customSymbols.length > 0
+      ? getAlpacaPrices({ symbols: customSymbols.join(',') })
+          .then(res => publish(res?.data?.prices || {}))
+      : Promise.resolve();
+
+    await Promise.allSettled([defaultRequest, customRequest]);
+    setLoading(false);
   };
 
   useEffect(() => {

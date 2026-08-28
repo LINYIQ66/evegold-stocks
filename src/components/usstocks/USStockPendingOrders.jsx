@@ -310,7 +310,7 @@ export default function USStockPendingOrders({ transactions = [], onRefresh, liv
                                   </p>
                                 )}
                                 <p className="text-xs text-slate-400 mt-1">
-                                  {isBuy ? "市价 ≤ 限价时触发成交。" : "市价 ≥ 限价时触发成交。"} 冻结金额不变。
+                                  {isBuy ? "Ask 价 ≤ 限价时成交。" : "Bid 价 ≥ 限价时成交。"} 冻结金额不变。
                                 </p>
                               </div>
                               <div className="flex gap-1.5 flex-shrink-0">

@@ -40,10 +40,10 @@ export default function USStocks() {
     loadTransactions();
   }, []);
 
-  // Reset livePrice when symbol changes
+  // Keep the selected quote when it is already present, avoiding a loading flash.
   useEffect(() => {
-    setLivePrice(null);
-  }, [selectedSymbol]);
+    setLivePrice(allPrices[selectedSymbol]?.price || null);
+  }, [selectedSymbol, allPrices]);
 
   /**
    * handleTrade is called with the already-computed calc object from StockTradeInterface.
@@ -132,7 +132,7 @@ export default function USStocks() {
               onStockClick={setSelectedSymbol}
               selectedSymbol={selectedSymbol}
               onPriceUpdate={setLivePrice}
-              onAllPricesUpdate={setAllPrices}
+              onAllPricesUpdate={(updates) => setAllPrices(previous => ({ ...previous, ...updates }))}
               user={user}
             />
           </motion.div>
