@@ -1,0 +1,44 @@
+{
+  "name": "\u6bcf\u65e5\u5229\u606f\u53d1\u653e (12:00 \u5317\u4eac\u65f6\u95f4)",
+  "description": "\u6bcf\u65e5\u5317\u4eac\u65f6\u95f412:00\uff08UTC 04:00\uff09\u81ea\u52a8\u8ba1\u7b97\u5e76\u53d1\u653eUSD/USDT\u53ef\u7528\u4f59\u989d\u76844%\u5e74\u5316\u65e5\u5229\u606f",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 4 * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "12_00",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "payDailyInterest",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "payDailyInterest"
+  }
+}
