@@ -7,7 +7,9 @@
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-const FEE_RATE = 0.02; // 2% for precious metals
+const METALS = new Set(['gold', 'silver', 'platinum', 'palladium']);
+const METAL_FEE_RATE = 0.005;
+const CURRENCY_FEE_RATE = 0.02;
 
 // Fetch metal prices from MetalPriceAPI (with Alpaca fallback)
 async function fetchMetalPrices() {
@@ -97,14 +99,17 @@ Deno.serve(async (req) => {
     if (!fromAsset || !toAsset || !amount) {
       return Response.json({ success: false, error: 'Missing parameters' }, { status: 400 });
     }
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount) || numAmount <= 0) {
+    const numAmount = Number(amount);
+    if (!Number.isFinite(numAmount) || numAmount <= 0) {
       return Response.json({ success: false, error: 'Invalid amount' }, { status: 400 });
     }
     if (fromAsset === toAsset) {
       return Response.json({ success: false, error: 'Cannot swap same asset' }, { status: 400 });
     }
 
+    if (typeof fromAsset !== 'string' || typeof toAsset !== 'string') {
+      return Response.json({ success: false, error: 'Invalid asset' }, { status: 400 });
+    }
     const fromKey = fromAsset.toLowerCase();
     const toKey = toAsset.toLowerCase();
 
@@ -140,7 +145,8 @@ Deno.serve(async (req) => {
     // --- Calculate swap ---
     const exchangeRate = fromPrice / toPrice;
     const grossAmountToAsset = numAmount * exchangeRate;
-    const feeInToAsset = grossAmountToAsset * FEE_RATE;
+    const feeRate = METALS.has(fromKey) || METALS.has(toKey) ? METAL_FEE_RATE : CURRENCY_FEE_RATE;
+    const feeInToAsset = grossAmountToAsset * feeRate;
     const netAmountToAsset = grossAmountToAsset - feeInToAsset;
     const transactionValueUSD = numAmount * fromPrice;
     const feeValueUSD = feeInToAsset * toPrice;

@@ -76,6 +76,7 @@ export default function Trading() {
       const data = result.data;
 
       if (data.success) {
+        setUser(current => current ? { ...current, wallet_balances: data.newBalances } : current);
         loadUserData();
         return { success: true, netAmount: data.netAmount, fee: data.fee };
       } else {
@@ -114,7 +115,7 @@ export default function Trading() {
               实时报价
             </Badge>
             <Badge className="bg-blue-100 text-blue-800">
-              2% 手续费
+              贵金属兑换 0.5% 手续费
             </Badge>
           </div>
         </motion.div>
@@ -191,7 +192,7 @@ export default function Trading() {
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">所有交易对目标资产收取 2% 手续费</p>
+                    <p className="text-sm">涉及贵金属的兑换收取 0.5% 手续费；其他货币兑换维持 2%</p>
                   </div>
                 </div>
               </CardContent>

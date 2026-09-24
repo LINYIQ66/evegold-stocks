@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeftRight, ArrowUpDown, AlertCircle, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const METALS = new Set(["GOLD", "SILVER", "PLATINUM", "PALLADIUM"]);
+
 export default function SwapInterface({ user, prices, onSwap, isLoading }) {
   const [fromAsset, setFromAsset] = useState("USD");
   const [toAsset, setToAsset] = useState("GOLD");
@@ -56,7 +58,8 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
 
     const exchangeRate = fromPrice / toPrice;
     const grossAmount = parseFloat(amount) * exchangeRate;
-    const fee = grossAmount * 0.02; // 2% fee
+    const feeRate = METALS.has(fromAsset) || METALS.has(toAsset) ? 0.005 : 0.02;
+    const fee = grossAmount * feeRate;
     const netAmount = grossAmount - fee;
     
     // For display purposes, show exchange rate for small currencies in 1000 units
@@ -67,6 +70,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
     return {
       grossAmount,
       fee,
+      feeRate,
       netAmount,
       exchangeRate,
       displayExchangeRate,
@@ -237,7 +241,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
               <span className="font-medium">{calculation.displayFromUnit} = {calculation.displayExchangeRate.toFixed(6)} {toAsset}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600">手续费 (2%)</span>
+              <span className="text-slate-600">手续费 ({(calculation.feeRate * 100).toFixed(1)}%)</span>
               <span className="font-medium text-red-600">-{calculation.fee.toFixed(6)} {toAsset}</span>
             </div>
             <div className="flex justify-between text-sm border-t pt-2">
