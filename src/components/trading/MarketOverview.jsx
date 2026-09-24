@@ -70,7 +70,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
                 </div>
                 
                 <div className="text-right">
-                  <p className="font-semibold text-lg text-slate-900">${metal.price.toFixed(2)}</p>
+                  <p className="font-semibold text-lg text-slate-900">{metal.price?.toFixed(2) ?? '—'}</p>
                   <div className={`flex items-center justify-end gap-1 ${
                     metal.change >= 0 ? 'text-green-600' : 'text-red-600'
                   }`}>

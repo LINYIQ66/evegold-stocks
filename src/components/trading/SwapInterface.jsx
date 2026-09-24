@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeftRight, ArrowUpDown, AlertCircle, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import OrderToolbar from "@/components/trading/OrderToolbar";
+import SwapQuoteDetails from "@/components/trading/SwapQuoteDetails";
 
 const METALS = new Set(["GOLD", "SILVER", "PLATINUM", "PALLADIUM"]);
 
-export default function SwapInterface({ user, prices, onSwap, isLoading }) {
+export default function SwapInterface({ user, prices, quote, quoteUnavailable, onSwap, isLoading }) {
   const [fromAsset, setFromAsset] = useState("USD");
   const [toAsset, setToAsset] = useState("GOLD");
   const [amount, setAmount] = useState("");
@@ -57,7 +59,8 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
     }
 
     const exchangeRate = fromPrice / toPrice;
-    const grossAmount = parseFloat(amount) * exchangeRate;
+    const grossAmount = Number(amount) * exchangeRate;
+    if (!Number.isFinite(grossAmount) || grossAmount <= 0) return null;
     const feeRate = METALS.has(fromAsset) || METALS.has(toAsset) ? 0.005 : 0.02;
     const fee = grossAmount * feeRate;
     const netAmount = grossAmount - fee;
@@ -80,11 +83,11 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
 
   const handleSwap = async () => {
     const calculation = calculateSwap();
-    if (!calculation || isInsufficientBalance || fromAsset === toAsset) return;
+    if (!calculation || isInsufficientBalance || fromAsset === toAsset || quoteUnavailable) return;
 
     setIsSwapping(true);
     const result = await onSwap(fromAsset, toAsset, parseFloat(amount));
-    setSwapResult(result);
+    setSwapResult({ ...result, toAsset });
     setIsSwapping(false);
     
     if (result.success) {
@@ -92,13 +95,6 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
       // Clear swap result after a delay for better UX
       setTimeout(() => setSwapResult(null), 3000);
     }
-  };
-
-  const setPercentage = (percentage) => {
-    const balance = getBalance(fromAsset);
-    // Truncate to 2 decimal places to prevent rounding up and exceeding the balance
-    const newAmount = Math.floor((balance * percentage / 100) * 100) / 100;
-    setAmount(newAmount.toFixed(2));
   };
 
   const swapAssets = () => {
@@ -111,7 +107,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
   const fromBalance = getBalance(fromAsset);
   const isInsufficientBalance = parseFloat(amount) > fromBalance;
   // Disable conditions for the main swap button
-  const isSwapButtonDisabled = !amount || !calculation || isInsufficientBalance || isSwapping || fromAsset === toAsset || parseFloat(amount) <= 0;
+  const isSwapButtonDisabled = !amount || !calculation || isInsufficientBalance || isSwapping || fromAsset === toAsset || quoteUnavailable;
 
 
   return (
@@ -160,21 +156,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
             />
           </div>
           
-          {/* Percentage Buttons */}
-          <div className="flex gap-2">
-            {[25, 50, 75, 100].map(percentage => (
-              <Button
-                key={percentage}
-                variant="outline"
-                size="sm"
-                onClick={() => setPercentage(percentage)}
-                className="text-xs"
-                disabled={fromBalance <= 0}
-              >
-                {percentage}%
-              </Button>
-            ))}
-          </div>
+          <OrderToolbar asset={fromAsset} balance={fromBalance} onAmountChange={setAmount} disabled={isLoading || isSwapping || quoteUnavailable} />
         </div>
 
         {/* Swap Button with Double Arrow */}
@@ -229,27 +211,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
           </div>
         </div>
 
-        {/* Swap Details */}
-        {calculation && parseFloat(amount) > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-4 bg-slate-50 rounded-lg space-y-2"
-          >
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">汇率</span>
-              <span className="font-medium">{calculation.displayFromUnit} = {calculation.displayExchangeRate.toFixed(6)} {toAsset}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">手续费 ({(calculation.feeRate * 100).toFixed(1)}%)</span>
-              <span className="font-medium text-red-600">-{calculation.fee.toFixed(6)} {toAsset}</span>
-            </div>
-            <div className="flex justify-between text-sm border-t pt-2">
-              <span className="text-slate-600">您将收到</span>
-              <span className="font-bold text-slate-900">{calculation.netAmount.toFixed(6)} {toAsset}</span>
-            </div>
-          </motion.div>
-        )}
+        <SwapQuoteDetails calculation={quoteUnavailable ? null : calculation} fromAsset={fromAsset} toAsset={toAsset} quote={quote} quoteUnavailable={quoteUnavailable} />
 
         {/* Error Messages */}
         <AnimatePresence>
@@ -315,7 +277,7 @@ export default function SwapInterface({ user, prices, onSwap, isLoading }) {
               {swapResult.success ? (
                 <>
                   <CheckCircle className="w-4 h-4" />
-                  兑换成功！收到 {swapResult.netAmount.toFixed(6)} {toAsset}
+                  兑换成功！收到 {swapResult.netAmount.toFixed(6)} {swapResult.toAsset || toAsset}
                 </>
               ) : (
                 <>

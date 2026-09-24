@@ -14,15 +14,9 @@ import MarketOverview from "../components/trading/MarketOverview";
 export default function Trading() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [prices, setPrices] = useState({
-    usd: 1.00,
-    sgd: 0.74,
-    usdt: 1.00,
-    gold: 2024.50,
-    silver: 24.85,
-    platinum: 1045.30,
-    palladium: 1825.75
-  });
+  const [prices, setPrices] = useState({});
+  const [quote, setQuote] = useState(null);
+  const [quoteUnavailable, setQuoteUnavailable] = useState(true);
   const [priceChanges, setPriceChanges] = useState({
     gold: 0,
     silver: 0,
@@ -56,11 +50,20 @@ export default function Trading() {
   const loadPrices = async () => {
     try {
       const priceData = await getMetalPrices();
-      if (priceData.data.success) {
+      const updated = Date.parse(priceData.data.forexUpdatedAt);
+      const forexStale = !Number.isFinite(updated) || Date.now() - updated > 4 * 24 * 60 * 60 * 1000;
+      if (priceData.data.success && !priceData.data.fallback && !forexStale) {
         setPrices(priceData.data.prices);
         setPriceChanges(priceData.data.changes);
+        setQuote(priceData.data);
+        setQuoteUnavailable(false);
+      } else {
+        setQuoteUnavailable(true);
+        setPrices({});
       }
     } catch (error) {
+      setQuoteUnavailable(true);
+      setPrices({});
       console.error("Error loading prices:", error);
     }
   };
@@ -112,7 +115,7 @@ export default function Trading() {
           <div className="flex items-center gap-3">
             <Badge className="bg-green-100 text-green-800">
               <Zap className="w-3 h-3 mr-1" />
-              实时报价
+              {quoteUnavailable ? '报价暂不可用' : '定期更新报价'}
             </Badge>
             <Badge className="bg-blue-100 text-blue-800">
               贵金属兑换 0.5% 手续费
@@ -158,6 +161,8 @@ export default function Trading() {
             <SwapInterface 
               user={user}
               prices={prices}
+              quote={quote}
+              quoteUnavailable={quoteUnavailable}
               onSwap={executeSwap}
               isLoading={isLoading}
             />

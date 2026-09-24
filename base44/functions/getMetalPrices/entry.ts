@@ -82,6 +82,8 @@ const getForexRatesFromExchangeRateAPI = async (apiKey) => {
   }
   
   const rates = data.conversion_rates;
+  const required = ['SGD','CNY','INR','MYR','THB','VND','IDR','LAK','EUR','GBP','AUD','NZD','JPY','HKD','TWD','CAD','AED'];
+  if (!required.every(code => Number.isFinite(rates?.[code]) && rates[code] > 0)) throw new Error('Incomplete forex quote');
   return {
     sgd: 1 / (rates.SGD || 1.35),
     cnh: 1 / (rates.CNY || 7.25),
@@ -99,7 +101,8 @@ const getForexRatesFromExchangeRateAPI = async (apiKey) => {
     hkd: 1 / (rates.HKD || 7.82),
     twd: 1 / (rates.TWD || 32.25),
     cad: 1 / (rates.CAD || 1.37),
-    aed: 1 / (rates.AED || 3.67),
+    aed: 1 / rates.AED,
+    forexUpdatedAt: data.time_last_update_utc || (data.time_last_update_unix ? new Date(data.time_last_update_unix * 1000).toISOString() : null),
   };
 };
 
@@ -132,7 +135,7 @@ Deno.serve(async (req) => {
       metalChanges = alpacaData.changes;
     }
 
-    const forexRates = await getForexRatesFromExchangeRateAPI(exchangeRateApiKey);
+    const { forexUpdatedAt, ...forexRates } = await getForexRatesFromExchangeRateAPI(exchangeRateApiKey);
 
     const currentPrices = {
       usd: 1.00,
@@ -151,7 +154,8 @@ Deno.serve(async (req) => {
       success: true,
       prices: currentPrices,
       changes: priceChanges,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      forexUpdatedAt
     });
 
   } catch (error) {
@@ -172,7 +176,8 @@ Deno.serve(async (req) => {
       prices: fallbackPrices,
       changes: zeroChanges,
       timestamp: new Date().toISOString(),
-      fallback: true
+      fallback: true,
+      forexUpdatedAt: null
     });
   }
 });
