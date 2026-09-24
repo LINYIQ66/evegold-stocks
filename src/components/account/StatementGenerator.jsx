@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, FileText } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
+import MonthlyInvestmentPdf from "@/components/account/MonthlyInvestmentPdf";
 
 export default function StatementGenerator({ user }) {
     return (
@@ -36,6 +37,7 @@ export default function StatementGenerator({ user }) {
                         View Daily Statements
                     </Button>
                 </Link>
+                <MonthlyInvestmentPdf />
             </CardContent>
         </Card>
     );

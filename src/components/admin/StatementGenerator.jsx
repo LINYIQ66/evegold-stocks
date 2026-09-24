@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGr
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { createPageUrl } from "@/utils";
+import MonthlyInvestmentPdf from "@/components/account/MonthlyInvestmentPdf";
 
 export default function StatementGenerator({ users }) {
     const [selectedUserEmail, setSelectedUserEmail] = useState("");
@@ -57,6 +58,7 @@ export default function StatementGenerator({ users }) {
                         View Statement
                     </Button>
                 </div>
+                <MonthlyInvestmentPdf users={users} />
                 <div className="text-center text-slate-500 pt-4">
                     <p>Select a user and a date range to view their statement in a new browser tab.</p>
                     <p className="text-sm">The web statement can be printed or saved as a PDF using the browser's print function.</p>
