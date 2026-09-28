@@ -882,7 +882,7 @@ export default function USStocksGuide() {
               <Badge className="bg-blue-500/80 text-white border-0 w-fit mb-3">EVE FINANCE · 美股交易</Badge>
               <h2 className="text-3xl font-bold text-white mb-2">投资美国最优质企业</h2>
               <p className="text-blue-100 max-w-lg text-sm">
-                交易 20 只热门美股通证化份额 —— Apple、NVIDIA、Tesla、OpenAI 等，最低$10 起投，7×24 小时，全球随时随地交易。
+                探索 5000+ 只可交易美股，热门标的包括 Apple、NVIDIA、Tesla 等，最低$10 起投，全球随时随地交易。
               </p>
             </div>
           </div>
@@ -890,7 +890,7 @@ export default function USStocksGuide() {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "可交易股票", val: 20, suffix: "只", icon: BarChart2, color: "from-blue-500 to-indigo-600" },
+              { label: "可交易股票", val: 5000, suffix: "+", icon: BarChart2, color: "from-blue-500 to-indigo-600" },
               { label: "总市值", val: 18, suffix: "T+", prefix: "$", icon: DollarSign, color: "from-green-500 to-emerald-600" },
               { label: "最低投资", val: 10, suffix: "", prefix: "$", icon: TrendingUp, color: "from-orange-400 to-red-500" },
               { label: "交易费率", val: 0.1, suffix: "%", icon: Activity, color: "from-purple-500 to-violet-600" },
