@@ -6,6 +6,7 @@
 // 4. Updates balances + creates transaction records atomically
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { getCryptoMarket } from '../../shared/cryptoMarket.ts';
 
 const METALS = new Set(['gold', 'silver', 'platinum', 'palladium']);
 const METAL_FEE_RATE = 0.005;
@@ -113,10 +114,21 @@ Deno.serve(async (req) => {
     const fromKey = fromAsset.toLowerCase();
     const toKey = toAsset.toLowerCase();
 
-    // --- Fetch live prices SERVER-SIDE (prevents price manipulation) ---
+    // Always read current balances before pricing or execution.
+    const users = await base44.asServiceRole.entities.User.filter({ email: user.email });
+    if (!users.length) {
+      return Response.json({ success: false, error: 'User record not found' }, { status: 404 });
+    }
+    const userRecord = users[0];
+    const currentBalances = { ...(userRecord.wallet_balances || {}) };
+
+    // Only published top-20 coins or assets already owned can be swapped.
+    const cryptoTrade = fromKey.startsWith('crypto_') || toKey.startsWith('crypto_');
+    const held = Object.keys(currentBalances).filter(key => /^crypto_[a-z0-9]{2,15}$/.test(key) && currentBalances[key] > 0).map(key => key.slice(7));
+    const crypto = cryptoTrade ? await getCryptoMarket(held) : { prices: {} };
     const metalPrices = await fetchMetalPrices();
     const forexRates = await fetchForexRates();
-    const prices = { usd: 1.0, usdt: 1.0, ...forexRates, ...metalPrices };
+    const prices = { usd: 1.0, usdt: 1.0, ...forexRates, ...metalPrices, ...crypto.prices };
 
     const fromPrice = prices[fromKey];
     const toPrice = prices[toKey];
@@ -124,14 +136,6 @@ Deno.serve(async (req) => {
     if (fromPrice === undefined || toPrice === undefined || toPrice === 0) {
       return Response.json({ success: false, error: 'Price not available for selected assets' }, { status: 400 });
     }
-
-    // --- Re-fetch user's CURRENT balances from database (NOT from client state) ---
-    const users = await base44.asServiceRole.entities.User.filter({ email: user.email });
-    if (!users.length) {
-      return Response.json({ success: false, error: 'User record not found' }, { status: 404 });
-    }
-    const userRecord = users[0];
-    const currentBalances = { ...(userRecord.wallet_balances || {}) };
 
     // --- Server-side balance validation ---
     const currentBalance = currentBalances[fromKey] || 0;
@@ -145,7 +149,7 @@ Deno.serve(async (req) => {
     // --- Calculate swap ---
     const exchangeRate = fromPrice / toPrice;
     const grossAmountToAsset = numAmount * exchangeRate;
-    const feeRate = METALS.has(fromKey) || METALS.has(toKey) ? METAL_FEE_RATE : CURRENCY_FEE_RATE;
+    const feeRate = METALS.has(fromKey) || METALS.has(toKey) || cryptoTrade ? METAL_FEE_RATE : CURRENCY_FEE_RATE;
     const feeInToAsset = grossAmountToAsset * feeRate;
     const netAmountToAsset = grossAmountToAsset - feeInToAsset;
     const transactionValueUSD = numAmount * fromPrice;

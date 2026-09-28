@@ -5,12 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { getMetalPrices } from "@/functions/getMetalPrices";
+import { getCryptoPrices } from "@/functions/getCryptoPrices";
 import { executeSwap as executeSwapFn } from "@/functions/executeSwap";
 
 import SwapInterface from "../components/trading/SwapInterface";
 import TradingViewChart from "../components/trading/TradingViewChart";
 import MarketOverview from "../components/trading/MarketOverview";
 import GoldBullionNews from "@/components/trading/GoldBullionNews";
+import CryptoMarket from "@/components/trading/CryptoMarket";
 
 export default function Trading() {
   const [user, setUser] = useState(null);
@@ -18,6 +20,9 @@ export default function Trading() {
   const [prices, setPrices] = useState({});
   const [quote, setQuote] = useState(null);
   const [quoteUnavailable, setQuoteUnavailable] = useState(true);
+  const [cryptoCoins, setCryptoCoins] = useState([]);
+  const [cryptoLoading, setCryptoLoading] = useState(true);
+  const [selectedCrypto, setSelectedCrypto] = useState(null);
   const [priceChanges, setPriceChanges] = useState({
     gold: 0,
     silver: 0,
@@ -50,19 +55,23 @@ export default function Trading() {
 
   const loadPrices = async () => {
     try {
-      const priceData = await getMetalPrices();
+      const [priceData, cryptoResult] = await Promise.all([getMetalPrices(), getCryptoPrices({}).catch(() => null)]);
+      setCryptoCoins(cryptoResult?.data?.coins || []);
+      setCryptoLoading(false);
       const updated = Date.parse(priceData.data.forexUpdatedAt);
       const forexStale = !Number.isFinite(updated) || Date.now() - updated > 4 * 24 * 60 * 60 * 1000;
       if (priceData.data.success && !priceData.data.fallback && !forexStale) {
-        setPrices(priceData.data.prices);
-        setPriceChanges(priceData.data.changes);
-        setQuote(priceData.data);
+        const combined = { ...priceData.data.prices, ...(cryptoResult?.data?.prices || {}) };
+        setPrices(combined);
+        setPriceChanges({ ...priceData.data.changes, ...(cryptoResult?.data?.changes || {}) });
+        setQuote({ ...priceData.data, prices: combined });
         setQuoteUnavailable(false);
       } else {
         setQuoteUnavailable(true);
         setPrices({});
       }
     } catch (error) {
+      setCryptoLoading(false);
       setQuoteUnavailable(true);
       setPrices({});
       console.error("Error loading prices:", error);
@@ -111,7 +120,7 @@ export default function Trading() {
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
               交易中心
             </h1>
-            <p className="text-slate-600 mt-2">以实时市场价格交易贵金属</p>
+            <p className="text-slate-600 mt-2">以市场价格交易贵金属及加密货币</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge className="bg-green-100 text-green-800">
@@ -119,7 +128,7 @@ export default function Trading() {
               {quoteUnavailable ? '报价暂不可用' : '定期更新报价'}
             </Badge>
             <Badge className="bg-blue-100 text-blue-800">
-              贵金属兑换 0.5% 手续费
+              贵金属／加密货币兑换 0.5% 手续费
             </Badge>
           </div>
         </motion.div>
@@ -151,6 +160,8 @@ export default function Trading() {
           </motion.div>
         </div>
 
+        <CryptoMarket coins={cryptoCoins} loading={cryptoLoading} onSelect={symbol => { setSelectedCrypto(symbol); document.getElementById('crypto-swap')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }} />
+
         {/* Swap Interface and Trading Tips */}
         <div className="grid lg:grid-cols-3 gap-8 mb-8">
           <motion.div
@@ -161,6 +172,8 @@ export default function Trading() {
           >
             <SwapInterface 
               user={user}
+              cryptoCoins={cryptoCoins}
+              selectedCrypto={selectedCrypto}
               prices={prices}
               quote={quote}
               quoteUnavailable={quoteUnavailable}
@@ -198,7 +211,7 @@ export default function Trading() {
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">涉及贵金属的兑换收取 0.5% 手续费；其他货币兑换维持 2%</p>
+                    <p className="text-sm">涉及贵金属或加密货币的兑换收取 0.5% 手续费；其他货币兑换维持 2%</p>
                   </div>
                 </div>
               </CardContent>

@@ -38,8 +38,8 @@ function calcCostBasis(transactions = []) {
     const toKey = tx.to_asset.toLowerCase();
     const fromKey = tx.from_asset.toLowerCase();
     // Identify stock transactions: from currency to non-currency-non-metal = buy; reverse = sell
-    const isBuy = !NON_STOCK_ASSETS.has(toKey) && CURRENCIES.has(fromKey);
-    const isSell = !NON_STOCK_ASSETS.has(fromKey) && CURRENCIES.has(toKey);
+    const isBuy = !NON_STOCK_ASSETS.has(toKey) && !toKey.startsWith('crypto_') && CURRENCIES.has(fromKey);
+    const isSell = !NON_STOCK_ASSETS.has(fromKey) && !fromKey.startsWith('crypto_') && CURRENCIES.has(toKey);
 
     if (isBuy) {
       // buying stock: amount_usd = gross spent, net shares = gross*(1-fee)/price
@@ -75,12 +75,12 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
   // Dynamically build stock keys from balances — includes custom-added stocks
   const stockKeys = [...new Set([
     ...Object.keys(balances).filter(k =>
-      !NON_STOCK_ASSETS.has(k) && !k.startsWith("frozen_") && (balances[k] || 0) > 0
+      !NON_STOCK_ASSETS.has(k) && !k.startsWith('crypto_') && !k.startsWith("frozen_") && (balances[k] || 0) > 0
     ),
     ...Object.keys(balances)
       .filter(k => k.startsWith("frozen_") && (balances[k] || 0) > 0)
       .map(k => k.replace("frozen_", ""))
-      .filter(k => !NON_STOCK_ASSETS.has(k)),
+      .filter(k => !NON_STOCK_ASSETS.has(k) && !k.startsWith('crypto_')),
   ])];
 
   const holdings = stockKeys

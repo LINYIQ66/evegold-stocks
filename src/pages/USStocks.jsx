@@ -55,7 +55,7 @@ export default function USStocks() {
   useEffect(() => {
     const excluded = new Set(['usd', 'usdt', 'eve', 'gold', 'silver', 'platinum', 'palladium', 'eur', 'gbp', 'aud', 'nzd', 'jpy', 'hkd', 'twd', 'cad', 'aed', 'sgd', 'cnh', 'inr', 'myr', 'thb', 'vnd', 'idr', 'lak']);
     const balances = user?.wallet_balances || {};
-    const symbols = [...new Set(Object.keys(balances).map(key => key.startsWith('frozen_') ? key.slice(7) : key).filter(key => !excluded.has(key) && ((balances[key] || 0) > 0 || (balances[`frozen_${key}`] || 0) > 0)))];
+    const symbols = [...new Set(Object.keys(balances).map(key => key.startsWith('frozen_') ? key.slice(7) : key).filter(key => !excluded.has(key) && !key.startsWith('crypto_') && ((balances[key] || 0) > 0 || (balances[`frozen_${key}`] || 0) > 0)))];
     if (!symbols.length) return;
     let active = true;
     getAlpacaPrices({ symbols: symbols.join(',') }).then(response => {

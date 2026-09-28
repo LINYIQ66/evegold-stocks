@@ -103,7 +103,7 @@ export default function TransactionHistory({ transactions, isLoading }) {
                     <h4 className="font-semibold text-slate-900 capitalize">
                       {transaction.transaction_type.replace(/_/g, ' ')}
                       {transaction.from_asset && transaction.to_asset && 
-                        ` ${transaction.from_asset.toUpperCase()} → ${transaction.to_asset.toUpperCase()}`
+                        ` ${transaction.from_asset.toUpperCase().replace(/^CRYPTO_/, '')} → ${transaction.to_asset.toUpperCase().replace(/^CRYPTO_/, '')}`
                       }
                       {!transaction.from_asset && !transaction.to_asset && transaction.asset &&
                         ` (${transaction.asset.toUpperCase()})`

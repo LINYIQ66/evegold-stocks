@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useLanguage } from '@/components/common/LanguageProvider';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -312,7 +313,8 @@ const content = {
 };
 
 export default function Guide() {
-  const [language, setLanguage] = useState('en');
+  const { language: appLanguage, setLanguage } = useLanguage();
+  const language = appLanguage === 'en' ? 'en' : 'zh';
   const t = content[language];
 
   return (

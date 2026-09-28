@@ -70,7 +70,7 @@ const US_STOCKS = [
   { symbol: "CRWV",   name: "CoreWeave" },
 ];
 
-export default function BalanceCards({ user, isLoading, prices, priceChanges, stockPrices, onInfoClick, transactions = [] }) {
+export default function BalanceCards({ user, isLoading, prices, priceChanges, cryptoCoins = [], stockPrices, onInfoClick, transactions = [] }) {
   const [search, setSearch] = useState("");
   const [sortByValue, setSortByValue] = useState(true);
 
@@ -119,7 +119,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
 
   const formatBalance = (balance, symbol) => {
     const decimals = ['VND', 'IDR', 'LAK', 'JPY', 'TWD'].includes(symbol) ? 0 :
-                     ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'AED', 'SGD', 'CNH', 'USDT', 'INR', 'MYR', 'THB', 'HKD'].includes(symbol) ? 2 : 4;
+                     ['USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'AED', 'SGD', 'CNH', 'USDT', 'INR', 'MYR', 'THB', 'HKD'].includes(symbol) ? 2 : symbol.startsWith('CRYPTO_') ? 8 : 4;
     return balance.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   };
 
@@ -154,7 +154,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
 
     // Dynamically include any user-held stock not in the predefined US_STOCKS list
     const customStocks = Object.keys(user?.wallet_balances || {})
-      .filter(k => !k.startsWith("frozen_"))
+      .filter(k => !k.startsWith("frozen_") && !k.startsWith('crypto_'))
       .filter(k => !knownSymbols.has(k.toUpperCase()))
       .filter(k => (user.wallet_balances[k] || 0) > 0 || (user.wallet_balances[`frozen_${k}`] || 0) > 0)
       .map(symbol => {
@@ -176,8 +176,18 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
         };
       });
 
-    return [...fiatMetals, ...stocks, ...customStocks];
-  }, [user, prices, priceChanges, stockPrices]);
+    const heldCryptoSymbols = [...Object.keys(user?.wallet_balances || {}), ...Object.keys(user?.locked_balances || {})].filter(k => /^crypto_[a-z0-9]{2,15}$/.test(k)).map(k => k.slice(7).toUpperCase());
+    const allCrypto = [...cryptoCoins, ...heldCryptoSymbols.filter(symbol => !cryptoCoins.some(coin => coin.symbol === symbol)).map(symbol => ({ symbol, name: symbol, change: 0 }))];
+    const cryptoAssets = allCrypto.filter(coin => coin.symbol !== 'USDT').map(coin => {
+      const symbol = `CRYPTO_${coin.symbol}`;
+      const avail = getAvailableBalance(symbol);
+      const locked = getLockedBalance(symbol);
+      const total = avail + locked;
+      const price = prices[symbol.toLowerCase()] || 0;
+      return { symbol, name: coin.name, icon: Coins, color: 'from-blue-500 to-indigo-600', avail, locked, total, price, change: coin.change || 0, usdValue: total * price, isCrypto: true };
+    });
+    return [...fiatMetals, ...stocks, ...customStocks, ...cryptoAssets];
+  }, [user, prices, priceChanges, stockPrices, cryptoCoins]);
 
   const filteredAssets = useMemo(() => {
     let list;
@@ -185,7 +195,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
       const q = search.toLowerCase();
       list = allAssets.filter(a => a.symbol.toLowerCase().includes(q) || a.name.toLowerCase().includes(q));
     } else {
-      list = allAssets.filter(a => a.total > 0);
+      list = allAssets.filter(a => a.total > 0 || (a.isCrypto && a.price > 0));
     }
 
     if (sortByValue) {
@@ -202,14 +212,14 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
       {/* Header + controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-bold text-slate-900">Asset Balances</h2>
-          <Badge className="bg-green-100 text-green-800">Live Prices</Badge>
+          <h2 className="text-2xl font-bold text-slate-900">资产余额</h2>
+          <Badge className="bg-green-100 text-green-800">实时价格</Badge>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
-              placeholder="Search assets..."
+              placeholder="搜索资产…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-8 h-9 w-48"
@@ -222,7 +232,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
             className="gap-1.5 h-9"
           >
             <ArrowUpDown className="w-4 h-4" />
-            By Value
+            按价值排序
           </Button>
         </div>
       </div>
@@ -255,7 +265,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
                     <p className="text-4xl font-bold">
                       {eveBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
-                    <p className="text-sm text-violet-200">Total Tokens Held</p>
+                    <p className="text-sm text-violet-200">持有代币总数</p>
                     <p className="text-lg font-semibold text-yellow-300 mt-1">
                       ≈ ${(eveBalance * 0.01).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
@@ -263,7 +273,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
                   <div className="flex flex-col items-center gap-3">
                     <Badge className="bg-yellow-400 text-yellow-900 font-semibold px-3 py-1">REWARD</Badge>
                     <Button variant="outline" size="sm" className="bg-white/10 border-white/20 hover:bg-white/20" onClick={onInfoClick}>
-                      <Info className="w-4 h-4 mr-2" />Learn More
+                      <Info className="w-4 h-4 mr-2" />了解更多
                     </Button>
                   </div>
                 </div>
@@ -288,7 +298,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
             </Card>
           ))
         ) : filteredAssets.length === 0 ? (
-          <div className="col-span-2 text-center py-10 text-slate-400">No assets found.</div>
+          <div className="col-span-2 text-center py-10 text-slate-400">未找到资产。</div>
         ) : (
           filteredAssets.map((asset, index) => (
             <motion.div
@@ -307,8 +317,9 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-slate-900">{asset.symbol}</h3>
-                            {asset.isStock && <Badge className="bg-blue-100 text-blue-700 text-xs px-1.5 py-0">Stock</Badge>}
+                            <h3 className="font-bold text-slate-900">{asset.isCrypto ? asset.symbol.slice(7) : asset.symbol}</h3>
+                                                         {asset.isCrypto && <Badge className="bg-blue-100 text-blue-700 text-xs px-1.5 py-0">加密货币</Badge>}
+                                                         {asset.isStock && <Badge className="bg-blue-100 text-blue-700 text-xs px-1.5 py-0">股票</Badge>}
                           </div>
                           <p className="text-sm text-slate-500">{asset.name}</p>
                         </div>
@@ -322,13 +333,13 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
                               : formatBalance(asset.total, asset.symbol)}
                           </p>
                           <p className="text-sm text-slate-500">
-                            Total Value ≈ ${asset.usdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </p>
+                                                       {asset.isCrypto && !asset.price ? '报价暂不可用' : `总价值 ≈ $${asset.usdValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                     </p>
                         </div>
 
                         <div className="text-sm space-y-1 pt-2 border-t mt-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-slate-500">Available:</span>
+                            <span className="text-slate-500">可用：</span>
                             <span className="font-medium text-green-600">
                               {asset.isStock
                                 ? asset.avail.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
@@ -337,7 +348,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
                           </div>
                           {asset.locked > 0 && (
                             <div className="flex items-center justify-between">
-                              <span className="flex items-center gap-1 text-slate-500"><Lock className="w-3 h-3" />Locked:</span>
+                              <span className="flex items-center gap-1 text-slate-500"><Lock className="w-3 h-3" />已锁定：</span>
                               <span className="font-medium text-yellow-800">
                                 {asset.isStock
                                   ? asset.locked.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })

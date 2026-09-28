@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,13 +10,21 @@ import SwapQuoteDetails from "@/components/trading/SwapQuoteDetails";
 
 const METALS = new Set(["GOLD", "SILVER", "PLATINUM", "PALLADIUM"]);
 
-export default function SwapInterface({ user, prices, quote, quoteUnavailable, onSwap, isLoading }) {
+export default function SwapInterface({ user, prices, quote, quoteUnavailable, onSwap, isLoading, cryptoCoins = [], selectedCrypto }) {
   const [fromAsset, setFromAsset] = useState("USD");
   const [toAsset, setToAsset] = useState("GOLD");
   const [amount, setAmount] = useState("");
   const [isSwapping, setIsSwapping] = useState(false);
   const [swapResult, setSwapResult] = useState(null);
 
+  useEffect(() => {
+    if (selectedCrypto) {
+      if (selectedCrypto === fromAsset) setFromAsset('USD');
+      setToAsset(selectedCrypto);
+    }
+  }, [selectedCrypto]);
+
+  const displayAsset = code => code.startsWith('CRYPTO_') ? code.slice(7) : code;
   const assets = [
     { symbol: "USD", name: "US Dollar", color: "text-green-600" },
     { symbol: "EUR", name: "Euro", color: "text-sky-600" },
@@ -40,7 +48,8 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
     { symbol: "GOLD", name: "Gold", color: "text-yellow-600" },
     { symbol: "SILVER", name: "Silver", color: "text-gray-500" },
     { symbol: "PLATINUM", name: "Platinum", color: "text-purple-600" },
-    { symbol: "PALLADIUM", name: "Palladium", color: "text-pink-600" }
+    { symbol: "PALLADIUM", name: "Palladium", color: "text-pink-600" },
+    ...cryptoCoins.filter(coin => coin.symbol !== 'USDT' && (coin.rank <= 20 || (user?.wallet_balances?.[`crypto_${coin.symbol.toLowerCase()}`] || 0) > 0)).map(coin => ({ symbol: `CRYPTO_${coin.symbol}`, name: coin.name, color: "text-blue-600" }))
   ];
 
   const getBalance = (asset) => {
@@ -61,7 +70,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
     const exchangeRate = fromPrice / toPrice;
     const grossAmount = Number(amount) * exchangeRate;
     if (!Number.isFinite(grossAmount) || grossAmount <= 0) return null;
-    const feeRate = METALS.has(fromAsset) || METALS.has(toAsset) ? 0.005 : 0.02;
+    const feeRate = METALS.has(fromAsset) || METALS.has(toAsset) || fromAsset.startsWith('CRYPTO_') || toAsset.startsWith('CRYPTO_') ? 0.005 : 0.02;
     const fee = grossAmount * feeRate;
     const netAmount = grossAmount - fee;
     
@@ -107,11 +116,11 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
   const fromBalance = getBalance(fromAsset);
   const isInsufficientBalance = parseFloat(amount) > fromBalance;
   // Disable conditions for the main swap button
-  const isSwapButtonDisabled = !amount || !calculation || isInsufficientBalance || isSwapping || fromAsset === toAsset || quoteUnavailable;
+  const isSwapButtonDisabled = !amount || Number(amount) <= 0 || !calculation || isInsufficientBalance || isSwapping || fromAsset === toAsset || quoteUnavailable;
 
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-2xl">
+    <Card id="crypto-swap" className="bg-white/80 backdrop-blur-sm border-0 shadow-2xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-slate-900">
           <ArrowLeftRight className="w-6 h-6 text-blue-600" />
@@ -124,7 +133,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-slate-700">从</label>
             <span className="text-sm text-slate-500">
-              余额：{fromBalance.toFixed(2)} {fromAsset}
+              余额：{fromBalance.toLocaleString('en-US', { maximumFractionDigits: 8 })} {displayAsset(fromAsset)}
             </span>
           </div>
           
@@ -137,7 +146,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
                 {assets.map(asset => (
                   <SelectItem key={asset.symbol} value={asset.symbol}>
                     <div className="flex items-center gap-2">
-                      <span className={`font-medium ${asset.color}`}>{asset.symbol}</span>
+                      <span className={`font-medium ${asset.color}`}>{displayAsset(asset.symbol)}</span>
                       <span className="text-slate-500 text-sm">{asset.name}</span>
                     </div>
                   </SelectItem>
@@ -152,11 +161,11 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
               onChange={(e) => setAmount(e.target.value)}
               className="flex-1 text-lg"
               min="0"
-              step="0.01"
+              step={fromAsset.startsWith('CRYPTO_') ? '0.00000001' : '0.01'}
             />
           </div>
           
-          <OrderToolbar asset={fromAsset} balance={fromBalance} onAmountChange={setAmount} disabled={isLoading || isSwapping || quoteUnavailable} />
+          <OrderToolbar asset={displayAsset(fromAsset)} balance={fromBalance} onAmountChange={setAmount} disabled={isLoading || isSwapping || quoteUnavailable} />
         </div>
 
         {/* Swap Button with Double Arrow */}
@@ -182,7 +191,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-slate-700">至</label>
             <span className="text-sm text-slate-500">
-              余额：{getBalance(toAsset).toFixed(2)} {toAsset}
+              余额：{getBalance(toAsset).toLocaleString('en-US', { maximumFractionDigits: 8 })} {displayAsset(toAsset)}
             </span>
           </div>
           
@@ -195,7 +204,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
                 {assets.map(asset => (
                   <SelectItem key={asset.symbol} value={asset.symbol}>
                     <div className="flex items-center gap-2">
-                      <span className={`font-medium ${asset.color}`}>{asset.symbol}</span>
+                      <span className={`font-medium ${asset.color}`}>{displayAsset(asset.symbol)}</span>
                       <span className="text-slate-500 text-sm">{asset.name}</span>
                     </div>
                   </SelectItem>
@@ -205,7 +214,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
             
             <div className="flex-1 p-3 bg-slate-50 rounded-lg border">
               <span className="text-lg font-medium text-slate-900">
-                {calculation ? calculation.netAmount.toFixed(6) : "0.00"}
+                {calculation ? calculation.netAmount.toFixed(8) : "0.00"}
               </span>
             </div>
           </div>
@@ -223,7 +232,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
               className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg"
             >
               <AlertCircle className="w-4 h-4" />
-              {fromAsset} 余额不足
+              {displayAsset(fromAsset)} 余额不足
             </motion.div>
           )}
           {fromAsset === toAsset && (
@@ -277,7 +286,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
               {swapResult.success ? (
                 <>
                   <CheckCircle className="w-4 h-4" />
-                  兑换成功！收到 {swapResult.netAmount.toFixed(6)} {swapResult.toAsset || toAsset}
+                  兑换成功！收到 {swapResult.netAmount.toFixed(8)} {displayAsset(swapResult.toAsset || toAsset)}
                 </>
               ) : (
                 <>

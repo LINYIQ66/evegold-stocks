@@ -312,7 +312,7 @@ export const translations = {
     },
     wallet: {
       title: '投资组合钱包',
-      subtitle: '管理您的贵金属和货币',
+      subtitle: '管理您的贵金属、货币和加密货币',
       deposit: '存款',
       kyc_required_tooltip: '请先完成KYC验证才能存款。',
       refresh: '刷新',

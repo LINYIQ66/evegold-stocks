@@ -26,7 +26,7 @@ export default function StockTradeHistory({ transactions = [], prices = {} }) {
       .filter(t => {
         const toKey = (t.to_asset || "").toLowerCase();
         const fromKey = (t.from_asset || "").toLowerCase();
-        return (CURRENCIES.has(fromKey) && !CURRENCIES.has(toKey) && !NON_STOCKS.has(toKey)) || (CURRENCIES.has(toKey) && !CURRENCIES.has(fromKey) && !NON_STOCKS.has(fromKey));
+        return (CURRENCIES.has(fromKey) && !CURRENCIES.has(toKey) && !NON_STOCKS.has(toKey) && !toKey.startsWith('crypto_')) || (CURRENCIES.has(toKey) && !CURRENCIES.has(fromKey) && !NON_STOCKS.has(fromKey) && !fromKey.startsWith('crypto_'));
       })
       .map(t => {
         const toKey = (t.to_asset || "").toLowerCase();

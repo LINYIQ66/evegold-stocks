@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { getMetalPrices } from "@/functions/getMetalPrices";
+import { getCryptoPrices } from "@/functions/getCryptoPrices";
 import { getStockPrices } from "@/functions/getStockPrices";
 import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
 import { getUserTransactions } from "@/functions/getUserTransactions";
@@ -36,6 +37,7 @@ export default function Wallet() {
   const [systemSettings, setSystemSettings] = useState({});
   const [prices, setPrices] = useState({});
   const [priceChanges, setPriceChanges] = useState({});
+  const [cryptoCoins, setCryptoCoins] = useState([]);
   const [stockPrices, setStockPrices] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isDepositModalOpen, setDepositModalOpen] = useState(false);
@@ -50,12 +52,13 @@ export default function Wallet() {
     setIsLoading(true);
     try {
       const userData = await User.me();
-      const [txResult, allFundRequests, settingsData, priceData, stockData] = await Promise.all([
+      const [txResult, allFundRequests, settingsData, priceData, stockData, cryptoData] = await Promise.all([
           getUserTransactions({}),
           FundRequest.list("-created_date", 50),
           SystemSetting.list(),
           getMetalPrices(),
-          getStockPrices({})
+          getStockPrices({}),
+          getCryptoPrices({}).catch(() => null)
       ]);
 
       const userTransactions = txResult?.data?.transactions || [];
@@ -73,9 +76,10 @@ export default function Wallet() {
       }, {});
       setSystemSettings(settingsMap);
 
+      setCryptoCoins(cryptoData?.data?.coins || []);
       if (priceData.data.success) {
-        setPrices(priceData.data.prices);
-        setPriceChanges(priceData.data.changes);
+        setPrices({ ...priceData.data.prices, ...(cryptoData?.data?.prices || {}) });
+        setPriceChanges({ ...priceData.data.changes, ...(cryptoData?.data?.changes || {}) });
       }
       // Merge default CMC stock prices with Alpaca prices for custom symbols (SPCX, PDD, etc.)
       let mergedStockPrices = {};
@@ -90,7 +94,7 @@ export default function Wallet() {
       ]);
       const missingStocks = [...new Set(Object.keys(userData.wallet_balances || {})
         .map(k => k.startsWith("frozen_") ? k.slice(7) : k)
-        .filter(k => !KNOWN_NON_STOCKS.has(k.toLowerCase()))
+        .filter(k => !KNOWN_NON_STOCKS.has(k.toLowerCase()) && !k.toLowerCase().startsWith('crypto_'))
         .filter(k => (userData.wallet_balances[k] || 0) > 0 || (userData.wallet_balances[`frozen_${k}`] || 0) > 0)
         .filter(k => !mergedStockPrices[k.toUpperCase()]))];
       if (missingStocks.length > 0) {
@@ -259,6 +263,8 @@ export default function Wallet() {
             </div>
           </motion.div>
 
+          {cryptoCoins.length === 0 && !isLoading && <p className="mb-4 text-sm text-amber-700">加密货币报价暂不可用，相关资产暂未计入下方的投资组合估值。</p>}
+
           {/* Portfolio Overview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -305,6 +311,7 @@ export default function Wallet() {
                 isLoading={isLoading}
                 prices={prices}
                 priceChanges={priceChanges}
+                cryptoCoins={cryptoCoins}
                 stockPrices={stockPrices}
                 onInfoClick={() => setEveInfoModalOpen(true)}
                 transactions={transactions}
