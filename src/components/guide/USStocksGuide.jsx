@@ -11,6 +11,9 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import MarketAnalysis from "@/components/guide/MarketAnalysis";
+import { base44 } from "@/api/base44Client";
+
+const formatMarketCap = value => value >= 1e12 ? `$${(value / 1e12).toFixed(2)}T` : `$${(value / 1e9).toFixed(1)}B`;
 
 // ─── Stock Data ──────────────────────────────────────────────────────────────
 const STOCKS = [
@@ -561,7 +564,7 @@ function StockCard({ stock, onClick }) {
         </div>
         <CardContent className="p-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-700">{stock.marketCap}</span>
+            <span className="text-xs font-semibold text-slate-700" title={stock.marketCapAsOf ? `Polygon · ${stock.marketCapAsOf}` : undefined}>{stock.marketCap}</span>
             <Badge className={`text-xs px-1.5 ${riskColor}`}>{stock.risk}</Badge>
           </div>
           <p className="text-xs text-slate-500 line-clamp-2">{stock.description.slice(0, 100)}…</p>
@@ -618,6 +621,7 @@ function StockDetail({ stock, onClose }) {
               </div>
             ))}
           </div>
+          {stock.marketCapAsOf && <p className="text-xs text-slate-500">市值来源：Polygon · 更新于 {stock.marketCapAsOf}（美元）</p>}
 
           {/* Description */}
           <div>
@@ -705,11 +709,28 @@ export default function USStocksGuide() {
   const [searchQ, setSearchQ] = useState("");
   const [selectedSector, setSelectedSector] = useState("All");
   const [selectedStock, setSelectedStock] = useState(null);
+  const [marketCaps, setMarketCaps] = useState({});
+  const [capStatus, setCapStatus] = useState('loading');
+
+  useEffect(() => {
+    if (activeTab !== 'stocks') return;
+    let active = true;
+    setCapStatus('loading');
+    base44.entities.SystemSetting.filter({ setting_key: 'us_stock_market_caps' })
+      .then(rows => { if (active) { setMarketCaps(rows[0]?.setting_value?.values || {}); setCapStatus('ready'); } })
+      .catch(() => { if (active) setCapStatus('error'); });
+    return () => { active = false; };
+  }, [activeTab]);
+
+  const directoryStocks = STOCKS.map(stock => {
+    const cap = marketCaps[stock.symbol];
+    return { ...stock, marketCap: stock.symbol === 'OPENAI' ? '未上市 · 无公开市值' : cap?.marketCap > 0 ? formatMarketCap(cap.marketCap) : '市值暂不可用', marketCapAsOf: cap?.asOf?.slice(0, 10) };
+  });
 
   const sectors = ["All", "Technology", "Communication Services", "Consumer Discretionary / Technology", "Financials", "Technology / Crypto", "Technology / AI", "Technology / Cloud", "Financials / Crypto"];
   const sectorShort = ["全部", "科技", "媒体", "消费", "金融", "加密货币", "人工智能", "云计算", "加密金融"];
 
-  const filteredStocks = STOCKS.filter(s => {
+  const filteredStocks = directoryStocks.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(searchQ.toLowerCase()) ||
       s.symbol.toLowerCase().includes(searchQ.toLowerCase()) ||
       s.industry.toLowerCase().includes(searchQ.toLowerCase());
@@ -963,7 +984,7 @@ export default function USStocksGuide() {
             ))}
           </div>
 
-          <p className="text-xs text-slate-400">{filteredStocks.length} 只股票</p>
+          <p className="text-xs text-slate-500">{filteredStocks.length} 只标的 · 市值来源：<a href="https://polygon.io/" target="_blank" rel="noopener noreferrer" className="underline">Polygon</a>，每周自动更新（非实时）；OPENAI 未上市，无公开股票市值。{capStatus === 'loading' ? ' 正在加载市值…' : capStatus === 'error' ? ' 市值数据暂不可用。' : ''}</p>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredStocks.map((stock, i) => (

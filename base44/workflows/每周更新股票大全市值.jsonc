@@ -1,0 +1,118 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_stock_directory_market_caps",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "update_first": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "refreshStockMarketCaps",
+            "args": {
+              "batch": 0
+            }
+          },
+          "then": "wait_first",
+          "x-base44": {
+            "title": "\u66f4\u65b0\u7b2c\u4e00\u7ec4\u80a1\u7968\u5e02\u503c"
+          }
+        }
+      },
+      {
+        "wait_first": {
+          "wait": "PT2M",
+          "then": "update_second",
+          "x-base44": {
+            "title": "\u7b49\u5f85\u63a5\u53e3\u989d\u5ea6\u6062\u590d"
+          }
+        }
+      },
+      {
+        "update_second": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "refreshStockMarketCaps",
+            "args": {
+              "batch": 1
+            }
+          },
+          "then": "wait_second",
+          "x-base44": {
+            "title": "\u66f4\u65b0\u7b2c\u4e8c\u7ec4\u80a1\u7968\u5e02\u503c"
+          }
+        }
+      },
+      {
+        "wait_second": {
+          "wait": "PT2M",
+          "then": "update_third",
+          "x-base44": {
+            "title": "\u7b49\u5f85\u63a5\u53e3\u989d\u5ea6\u6062\u590d"
+          }
+        }
+      },
+      {
+        "update_third": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "refreshStockMarketCaps",
+            "args": {
+              "batch": 2
+            }
+          },
+          "then": "wait_third",
+          "x-base44": {
+            "title": "\u66f4\u65b0\u7b2c\u4e09\u7ec4\u80a1\u7968\u5e02\u503c"
+          }
+        }
+      },
+      {
+        "wait_third": {
+          "wait": "PT2M",
+          "then": "update_fourth",
+          "x-base44": {
+            "title": "\u7b49\u5f85\u63a5\u53e3\u989d\u5ea6\u6062\u590d"
+          }
+        }
+      },
+      {
+        "update_fourth": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "refreshStockMarketCaps",
+            "args": {
+              "batch": 3
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "\u66f4\u65b0\u7b2c\u56db\u7ec4\u80a1\u7968\u5e02\u503c"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 16 * * 1",
+      "one_time_date": null,
+      "timezone": "Asia/Singapore",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "\u6bcf\u5468\u4e00\u65b0\u52a0\u5761\u65f6\u95f416:00\u4ecePolygon\u9010\u6279\u66f4\u65b0\u80a1\u7968\u5927\u5168\u4e2d19\u53ea\u4e0a\u5e02\u80a1\u7968\u7684\u7f8e\u5143\u5e02\u503c\uff0c\u907f\u5f00\u63a5\u53e3\u6bcf\u5206\u949f\u8bf7\u6c42\u4e0a\u9650\uff1b\u672a\u4e0a\u5e02\u6807\u7684\u4e0d\u8ba1\u7b97\u5e02\u503c\u3002",
+  "name": "\u6bcf\u5468\u66f4\u65b0\u80a1\u7968\u5927\u5168\u5e02\u503c"
+}
