@@ -13,6 +13,7 @@ import StockHoldings from "../components/usstocks/StockHoldings";
 import StockTradeHistory from "../components/usstocks/StockTradeHistory";
 import USStocksFooter from "../components/usstocks/USStocksFooter";
 import USStockPendingOrders from "../components/usstocks/USStockPendingOrders.jsx";
+import RankingNavigation from "@/components/usstocks/RankingNavigation";
 
 export default function USStocks() {
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
@@ -99,6 +100,7 @@ export default function USStocks() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
+        <RankingNavigation />
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -6,6 +6,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import USStockPopular from '@/pages/USStockPopular';
+import USStockMovers from '@/pages/USStockMovers';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -57,6 +59,8 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      <Route path="/USStockPopular" element={<LayoutWrapper currentPageName="USStocks"><USStockPopular /></LayoutWrapper>} />
+      <Route path="/USStockMovers" element={<LayoutWrapper currentPageName="USStocks"><USStockMovers /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

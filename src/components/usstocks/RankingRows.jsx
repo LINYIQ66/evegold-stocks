@@ -1,0 +1,7 @@
+import React from 'react';
+
+const usd = value => `$${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`;
+export default function RankingRows({ rows, mode }) {
+  if (!rows?.length) return <p className="p-6 text-sm text-slate-500">该时段暂无可比较的数据。</p>;
+  return <div className="overflow-x-auto"><table className="w-full text-sm text-left"><thead className="bg-slate-50 text-slate-500"><tr><th className="p-3">排名</th><th className="p-3">代码</th><th className="p-3 text-right">收盘价</th><th className="p-3 text-right">成交量</th><th className="p-3 text-right">{mode === 'popular' ? '成交额估算' : '涨跌幅'}</th></tr></thead><tbody>{rows.map((row, i) => <tr key={row.symbol} className="border-t"><td className="p-3 text-slate-500">{i + 1}</td><td className="p-3 font-semibold text-slate-900">{row.symbol}</td><td className="p-3 text-right">{usd(row.price)}</td><td className="p-3 text-right">{Math.round(row.volume).toLocaleString('en-US')}</td><td className={`p-3 text-right font-semibold ${mode !== 'popular' ? row.change >= 0 ? 'text-green-600' : 'text-red-600' : ''}`}>{mode === 'popular' ? `$${Math.round(row.turnover).toLocaleString('en-US')}` : `${row.change >= 0 ? '+' : ''}${row.change.toFixed(2)}%`}</td></tr>)}</tbody></table></div>;
+}
