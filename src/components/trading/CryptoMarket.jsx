@@ -19,7 +19,7 @@ export default function CryptoMarket({ coins, loading, onSelect }) {
               <div className="mt-2 flex items-center justify-between gap-2 text-sm"><span>${(indicative[coin.symbol] ?? coin.price) < 1 ? (indicative[coin.symbol] ?? coin.price).toFixed(6) : (indicative[coin.symbol] ?? coin.price).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span><span className={coin.change >= 0 ? 'text-green-600' : 'text-red-600'}>{coin.change >= 0 ? '+' : ''}{coin.change.toFixed(2)}%</span></div>
             </button>)}
           </div>}
-        <p className="mt-3 text-xs text-muted-foreground hidden">优先使用 OKX 现货美元报价；没有美元交易对时按 USDT／美元价格折算。OKX 报价不可用时使用 CoinMarketCap。USDT 已列于货币兑换；API 基准价每 30 秒刷新；展示价每 1–2 秒围绕基准价随机波动 ±0.05%–0.1%，仅供参考，交易按提交时服务端报价结算。</p>
+        
       </CardContent>
     </Card>);
 
