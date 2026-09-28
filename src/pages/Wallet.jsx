@@ -88,11 +88,11 @@ export default function Wallet() {
         "eur", "gbp", "aud", "nzd", "jpy", "hkd", "twd", "cad", "aed",
         "sgd", "cnh", "inr", "myr", "thb", "vnd", "idr", "lak"
       ]);
-      const missingStocks = Object.keys(userData.wallet_balances || {})
-        .filter(k => !k.startsWith("frozen_"))
+      const missingStocks = [...new Set(Object.keys(userData.wallet_balances || {})
+        .map(k => k.startsWith("frozen_") ? k.slice(7) : k)
         .filter(k => !KNOWN_NON_STOCKS.has(k.toLowerCase()))
-        .filter(k => (userData.wallet_balances[k] || 0) > 0)
-        .filter(k => !mergedStockPrices[k.toUpperCase()]);
+        .filter(k => (userData.wallet_balances[k] || 0) > 0 || (userData.wallet_balances[`frozen_${k}`] || 0) > 0)
+        .filter(k => !mergedStockPrices[k.toUpperCase()]))];
       if (missingStocks.length > 0) {
         try {
           const alpacaResult = await getAlpacaPrices({ symbols: missingStocks.join(",") });

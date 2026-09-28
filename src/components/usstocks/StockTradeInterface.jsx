@@ -106,10 +106,9 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
   // ---- BUY calc ----
   const calcBuy = () => {
     const spent = parseFloat(spendAmount) || 0;
-    const shares = parseFloat(buyShares) || 0;
-    if (spent <= 0 || shares <= 0 || execPrice <= 0) return null;
+    if (spent <= 0 || execPrice <= 0) return null;
     const fee = spent * FEE_RATE;
-    return { spent, fee, sharesReceived: shares, execPrice };
+    return { spent, fee, sharesReceived: (spent - fee) / execPrice, execPrice };
   };
 
   // ---- SELL calc ----
@@ -167,7 +166,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
           <div className="text-right">
             {livePrice ? (
               <>
-                <span className="text-xl font-bold text-slate-900">${livePrice.toFixed(2)}</span>
+                <span className="text-xl font-bold text-slate-900">${livePrice < 1 ? livePrice.toFixed(4) : livePrice.toFixed(2)}</span>
                 <div className="flex gap-2 justify-end mt-0.5">
                   <span className="text-xs text-green-600">买 ${(livePrice * (1 + SPREAD)).toFixed(2)}</span>
                   <span className="text-xs text-red-600">卖 ${(livePrice * (1 - SPREAD)).toFixed(2)}</span>
@@ -227,12 +226,12 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             </Label>
             <Input
               type="number"
-              placeholder={livePrice ? `如 ${livePrice.toFixed(2)}` : "输入限价"}
+              placeholder={livePrice ? `如 ${livePrice < 1 ? livePrice.toFixed(4) : livePrice.toFixed(2)}` : "输入限价"}
               value={limitPrice}
               onChange={e => handleLimitPriceChange(e.target.value)}
               min="0"
             />
-            <p className="text-xs text-slate-400">当前市价: {livePrice ? `$${livePrice.toFixed(2)}` : "—"}</p>
+            <p className="text-xs text-slate-400">当前市价: {livePrice ? `$${livePrice < 1 ? livePrice.toFixed(4) : livePrice.toFixed(2)}` : "—"}</p>
           </div>
         )}
 
@@ -241,7 +240,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
           <div className="flex items-center justify-between px-3 py-2 bg-blue-50 rounded-lg border border-blue-100">
             <span className="text-xs text-blue-600 font-medium">{side === "buy" ? "买入价(Ask)" : "卖出价(Bid)"}</span>
             <span className="text-sm font-bold text-blue-700">
-              {execPrice > 0 ? `$${execPrice.toFixed(2)}` : "—"}
+              {execPrice > 0 ? `$${execPrice < 1 ? execPrice.toFixed(4) : execPrice.toFixed(2)}` : "—"}
             </span>
           </div>
         )}
@@ -393,7 +392,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
                   <span className="text-red-500 font-medium">-${calc.fee.toFixed(4)} {currency}</span>
                 </div>
                 <div className="flex justify-between border-t border-slate-200 pt-2">
-                  <span className="font-semibold text-slate-700">实际到账</span>
+                  <span className="font-semibold text-slate-700">预计到账</span>
                   <span className="font-bold text-green-600">{calc.sharesReceived.toFixed(6)} {selectedSymbol}</span>
                 </div>
               </>

@@ -15,6 +15,7 @@ import USStocksFooter from "../components/usstocks/USStocksFooter";
 import USStockPendingOrders from "../components/usstocks/USStockPendingOrders.jsx";
 import RankingNavigation from "@/components/usstocks/RankingNavigation";
 import TradableFunds from "@/components/usstocks/TradableFunds";
+import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
 
 export default function USStocks() {
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
@@ -49,6 +50,19 @@ export default function USStocks() {
     });
     return unsubscribe;
   }, []);
+
+  // Price all held funds and custom stocks, including holdings outside the visible fund page.
+  useEffect(() => {
+    const excluded = new Set(['usd', 'usdt', 'eve', 'gold', 'silver', 'platinum', 'palladium', 'eur', 'gbp', 'aud', 'nzd', 'jpy', 'hkd', 'twd', 'cad', 'aed', 'sgd', 'cnh', 'inr', 'myr', 'thb', 'vnd', 'idr', 'lak']);
+    const balances = user?.wallet_balances || {};
+    const symbols = [...new Set(Object.keys(balances).map(key => key.startsWith('frozen_') ? key.slice(7) : key).filter(key => !excluded.has(key) && ((balances[key] || 0) > 0 || (balances[`frozen_${key}`] || 0) > 0)))];
+    if (!symbols.length) return;
+    let active = true;
+    getAlpacaPrices({ symbols: symbols.join(',') }).then(response => {
+      if (active && response?.data?.prices) setAllPrices(previous => ({ ...previous, ...response.data.prices }));
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [user?.wallet_balances]);
 
   // Keep the selected quote when it is already present, avoiding a loading flash.
   useEffect(() => {
@@ -190,7 +204,7 @@ export default function USStocks() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <StockTradeHistory transactions={transactions} />
+            <StockTradeHistory transactions={transactions} prices={allPrices} />
           </motion.div>
         </div>
 

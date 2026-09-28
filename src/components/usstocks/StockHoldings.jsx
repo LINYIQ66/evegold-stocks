@@ -20,7 +20,7 @@ const DISPLAY_NAMES = {
   coin: "Coinbase", baba: "Alibaba", openai: "OpenAI", crwv: "CoreWeave"
 };
 
-const CURRENCIES = new Set(["usdt", "usd", "eve"]);
+const CURRENCIES = new Set(["usdt", "usd", "eve", "eur", "gbp", "aud", "nzd", "jpy", "hkd", "twd", "cad", "aed", "sgd", "cnh", "inr", "myr", "thb", "vnd", "idr", "lak"]);
 // Metals are priced via getMetalPrices (spot price API), not getStockPrices — exclude from stock holdings
 const METALS = new Set(["gold", "silver", "platinum", "palladium"]);
 const NON_STOCK_ASSETS = new Set([...CURRENCIES, ...METALS]);
@@ -79,7 +79,8 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
     ),
     ...Object.keys(balances)
       .filter(k => k.startsWith("frozen_") && (balances[k] || 0) > 0)
-      .map(k => k.replace("frozen_", "")),
+      .map(k => k.replace("frozen_", ""))
+      .filter(k => !NON_STOCK_ASSETS.has(k)),
   ])];
 
   const holdings = stockKeys
@@ -101,7 +102,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
         key, symbol, shares, frozenShares, price, change24h,
         marketValue, avgCost, totalCost,
         unrealizedPnl, pnlPct,
-        name: DISPLAY_NAMES[key] || symbol
+        name: prices?.[symbol]?.name || DISPLAY_NAMES[key] || symbol
       };
     });
 

@@ -5,10 +5,8 @@ import { History, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Chevro
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 
-const US_STOCK_SYMBOLS_SET = new Set([
-  "aapl","msft","nvda","amzn","googl","meta","tsla","amd","intc","sndk",
-  "mu","mstr","pltr","hood","nflx","orcl","coin","baba","openai","crwv"
-]);
+const CURRENCIES = new Set(['usdt', 'usd']);
+const NON_STOCKS = new Set(['gold', 'silver', 'platinum', 'palladium', 'eve', 'eur', 'gbp', 'aud', 'nzd', 'jpy', 'hkd', 'twd', 'cad', 'aed', 'sgd', 'cnh', 'inr', 'myr', 'thb', 'vnd', 'idr', 'lak']);
 
 const DISPLAY_NAMES = {
   aapl: "Apple", msft: "Microsoft", nvda: "NVIDIA", amzn: "Amazon",
@@ -18,7 +16,7 @@ const DISPLAY_NAMES = {
   coin: "Coinbase", baba: "Alibaba", openai: "OpenAI", crwv: "CoreWeave"
 };
 
-export default function StockTradeHistory({ transactions = [] }) {
+export default function StockTradeHistory({ transactions = [], prices = {} }) {
   const [expanded, setExpanded] = useState(false);
   const [filter, setFilter] = useState("all"); // "all" | "buy" | "sell"
 
@@ -28,21 +26,21 @@ export default function StockTradeHistory({ transactions = [] }) {
       .filter(t => {
         const toKey = (t.to_asset || "").toLowerCase();
         const fromKey = (t.from_asset || "").toLowerCase();
-        return US_STOCK_SYMBOLS_SET.has(toKey) || US_STOCK_SYMBOLS_SET.has(fromKey);
+        return (CURRENCIES.has(fromKey) && !CURRENCIES.has(toKey) && !NON_STOCKS.has(toKey)) || (CURRENCIES.has(toKey) && !CURRENCIES.has(fromKey) && !NON_STOCKS.has(fromKey));
       })
       .map(t => {
         const toKey = (t.to_asset || "").toLowerCase();
         const fromKey = (t.from_asset || "").toLowerCase();
-        const isBuy = US_STOCK_SYMBOLS_SET.has(toKey);
+        const isBuy = CURRENCIES.has(fromKey);
         const symbol = isBuy ? toKey : fromKey;
         const price = t.exchange_rate || 0;
-        const shares = price > 0 ? t.amount_usd / price : 0;
+        const shares = price > 0 ? (isBuy ? t.amount_usd - (t.fee_usd || 0) : t.amount_usd) / price : 0;
         const fee = t.fee_usd || 0;
         return {
           id: t.id,
           side: isBuy ? "buy" : "sell",
           symbol: symbol.toUpperCase(),
-          name: DISPLAY_NAMES[symbol] || symbol.toUpperCase(),
+          name: prices[symbol.toUpperCase()]?.name || DISPLAY_NAMES[symbol] || symbol.toUpperCase(),
           shares,
           price,
           amount: t.amount_usd,
@@ -51,7 +49,7 @@ export default function StockTradeHistory({ transactions = [] }) {
           date: t.created_date,
         };
       });
-  }, [transactions]);
+  }, [transactions, prices]);
 
   const filtered = filter === "all" ? stockTrades : stockTrades.filter(t => t.side === filter);
   const visible = expanded ? filtered : filtered.slice(0, 5);

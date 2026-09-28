@@ -156,7 +156,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, st
     const customStocks = Object.keys(user?.wallet_balances || {})
       .filter(k => !k.startsWith("frozen_"))
       .filter(k => !knownSymbols.has(k.toUpperCase()))
-      .filter(k => (user.wallet_balances[k] || 0) > 0)
+      .filter(k => (user.wallet_balances[k] || 0) > 0 || (user.wallet_balances[`frozen_${k}`] || 0) > 0)
       .map(symbol => {
         const sym = symbol.toUpperCase();
         const avail = getAvailableBalance(sym);
