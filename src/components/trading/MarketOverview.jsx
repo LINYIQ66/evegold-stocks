@@ -2,13 +2,15 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Coins } from "lucide-react";
 import { motion } from "framer-motion";
+import useIndicativePrices from '@/components/quotes/useIndicativePrices';
 
 export default function MarketOverview({ prices, priceChanges, onSymbolClick }) {
+  const indicative = useIndicativePrices(prices);
   const metals = [
     {
       symbol: "GOLD",
       name: "黄金",
-      price: prices.gold,
+      price: indicative.gold,
       change: priceChanges?.gold || 0,
       volume: "$2.4B",
       color: "from-yellow-500 to-orange-600"
@@ -16,7 +18,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
     {
       symbol: "SILVER",
       name: "白银",
-      price: prices.silver,
+      price: indicative.silver,
       change: priceChanges?.silver || 0,
       volume: "$890M",
       color: "from-gray-400 to-gray-600"
@@ -24,7 +26,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
     {
       symbol: "PLATINUM",
       name: "铂金",
-      price: prices.platinum,
+      price: indicative.platinum,
       change: priceChanges?.platinum || 0,
       volume: "$145M",
       color: "from-purple-500 to-indigo-600"
@@ -32,7 +34,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
     {
       symbol: "PALLADIUM",
       name: "钯金",
-      price: prices.palladium,
+      price: indicative.palladium,
       change: priceChanges?.palladium || 0,
       volume: "$98M",
       color: "from-pink-500 to-rose-600"
@@ -47,6 +49,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
             <Coins className="w-5 h-5 text-blue-600" />
             市场概览
           </CardTitle>
+          <p className="text-xs text-slate-500">展示价：API 基准价 ±0.05%–0.1% 模拟波动，每 1–2 秒更新；非成交价</p>
         </CardHeader>
         <CardContent className="flex-1 p-3 space-y-3">
           {metals.map((metal, index) => (

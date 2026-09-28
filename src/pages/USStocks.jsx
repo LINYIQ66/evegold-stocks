@@ -131,7 +131,7 @@ export default function USStocks() {
           </div>
           <div className="flex items-center gap-2">
             <Badge className="bg-green-100 text-green-800 text-xs">
-              <Zap className="w-3 h-3 mr-1" /> 实时报价
+              <Zap className="w-3 h-3 mr-1" /> API 基准价 · 模拟波动
             </Badge>
             <Badge className="bg-blue-100 text-blue-800 text-xs">
               <TrendingUp className="w-3 h-3 mr-1" /> 0.1% 手续费

@@ -7,6 +7,7 @@ import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
 import { User } from "@/entities/all";
 import StockSearch from "./StockSearch";
 import StockQuoteMetrics from "./StockQuoteMetrics";
+import useIndicativePrices from '@/components/quotes/useIndicativePrices';
 
 // Default stock list — dynamically updated from backend
 const DEFAULT_STOCKS = [
@@ -38,6 +39,7 @@ export { DEFAULT_STOCKS as US_STOCKS };
 
 export default function StockMarketOverview({ onStockClick, selectedSymbol, onPriceUpdate, onAllPricesUpdate, user }) {
   const [prices, setPrices] = useState({});
+  const indicative = useIndicativePrices(prices);
   const [loading, setLoading] = useState(true);
   const [addedStocks, setAddedStocks] = useState([]);
   const intervalRef = useRef(null);
@@ -143,9 +145,10 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
       <CardHeader className="pb-2 flex-shrink-0">
         <CardTitle className="text-slate-900 text-base flex items-center gap-2">
           美股行情
-          <Badge className="bg-green-100 text-green-800 text-xs">实时</Badge>
+          <Badge className="bg-green-100 text-green-800 text-xs">模拟波动</Badge>
           {loading && <RefreshCw className="w-3 h-3 animate-spin text-slate-400" />}
         </CardTitle>
+        <p className="text-xs text-slate-500">展示价每 1–2 秒围绕 API 报价波动 ±0.05%–0.1%；交易以真实报价为准</p>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto p-2 min-h-0">
         <div className="mb-2">
@@ -187,7 +190,7 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
                       {data?.price ? (
                         <>
                           <p className={`font-bold text-base leading-tight ${isSelected ? "text-white" : "text-slate-900"}`}>
-                            ${data.price.toFixed(2)}
+                            ${(indicative[stock.symbol] ?? data.price).toFixed(2)}
                           </p>
                           <div className={`flex items-center gap-0.5 justify-end text-xs font-semibold mt-1 ${
                             isSelected ? "text-blue-100" : isPositive ? "text-green-600" : "text-red-500"
