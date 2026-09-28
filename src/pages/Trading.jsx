@@ -125,7 +125,7 @@ export default function Trading() {
           <div className="flex items-center gap-3">
             <Badge className="bg-green-100 text-green-800">
               <Zap className="w-3 h-3 mr-1" />
-              {quoteUnavailable ? '报价暂不可用' : '展示价模拟波动 · 交易按真实报价'}
+              {quoteUnavailable ? '报价暂不可用' : '展示价仅供参考 · 交易按真实报价'}
             </Badge>
             <Badge className="bg-blue-100 text-blue-800">
               贵金属／加密货币兑换 0.5% 手续费
