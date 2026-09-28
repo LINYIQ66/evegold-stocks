@@ -125,8 +125,6 @@ export default function USStocks() {
           </div>
         </motion.div>
 
-        <TradableFunds onSelect={setSelectedSymbol} onPrices={(quotes) => setAllPrices(previous => ({ ...previous, ...quotes }))} />
-
         {/* Chart + Market List */}
         <div className="grid lg:grid-cols-3 gap-6 mb-6">
           <motion.div
@@ -195,6 +193,8 @@ export default function USStocks() {
             <StockTradeHistory transactions={transactions} />
           </motion.div>
         </div>
+
+        <TradableFunds onSelect={setSelectedSymbol} onPrices={(quotes) => setAllPrices(previous => ({ ...previous, ...quotes }))} />
 
         {/* Footer */}
         <USStocksFooter />
