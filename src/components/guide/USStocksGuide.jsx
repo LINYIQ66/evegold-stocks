@@ -73,7 +73,7 @@ const STOCKS = [
     color: "#76b900",
     gradient: "from-green-500 to-green-700",
     badge: "bg-green-100 text-green-700",
-    image: "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800&q=80",
+    image: "https://www.nvidia.com/content/dam/en-zz/Solutions/gtcs22/data-center/h100/hopper-h100-kv-bb460_420-d.jpg",
     logo: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/NVIDIA_Corporation_logo.png/220px-NVIDIA_Corporation_logo.png",
     description: "NVIDIA designs GPU chips and AI computing platforms. Its H100 and Blackwell chips power the world's largest data centers, AI training, and autonomous vehicle research.",
     revenue: "$60B (FY2024)",
@@ -669,7 +669,7 @@ function StockCard({ stock, onClick }) {
           <img
             src={stock.image}
             alt={stock.name}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover ${stock.symbol === 'NVDA' ? 'object-right' : ''}`}
           />
           <div className={`absolute inset-0 bg-gradient-to-t ${stock.gradient} opacity-70`} />
           <div className="absolute top-3 left-3">
@@ -713,7 +713,7 @@ function StockDetail({ stock, onClose }) {
       >
         {/* Hero image */}
         <div className="relative h-52 overflow-hidden rounded-t-2xl">
-          <img src={stock.image} alt={stock.name} className="w-full h-full object-cover" />
+          <img src={stock.image} alt={stock.name} className={`w-full h-full object-cover ${stock.symbol === 'NVDA' ? 'object-right' : ''}`} />
           <div className={`absolute inset-0 bg-gradient-to-t ${stock.gradient} opacity-75`} />
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/40">✕</button>
           <div className="absolute bottom-4 left-4">
