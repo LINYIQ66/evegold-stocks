@@ -18,9 +18,9 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
   const [swapResult, setSwapResult] = useState(null);
 
   useEffect(() => {
-    if (selectedCrypto) {
-      if (selectedCrypto === fromAsset) setFromAsset('USD');
-      setToAsset(selectedCrypto);
+    if (selectedCrypto?.symbol) {
+      if (selectedCrypto.symbol === fromAsset) setFromAsset('USD');
+      setToAsset(selectedCrypto.symbol);
     }
   }, [selectedCrypto]);
 
@@ -165,7 +165,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
             />
           </div>
           
-          <OrderToolbar asset={displayAsset(fromAsset)} balance={fromBalance} onAmountChange={setAmount} disabled={isLoading || isSwapping || quoteUnavailable} />
+          <OrderToolbar asset={displayAsset(fromAsset)} isCrypto={fromAsset.startsWith('CRYPTO_')} balance={fromBalance} onAmountChange={setAmount} disabled={isLoading || isSwapping || quoteUnavailable} />
         </div>
 
         {/* Swap Button with Double Arrow */}

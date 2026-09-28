@@ -362,7 +362,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, cr
                           <div className="flex items-center gap-2 pt-2 border-t mt-2">
                             <span className="text-sm font-medium text-slate-600">
                               ${asset.isStock ? asset.price.toFixed(2) : asset.price.toFixed(
-                                ['VND', 'IDR', 'LAK', 'JPY', 'TWD'].includes(asset.symbol) ? 6 :
+                                ['VND', 'IDR', 'LAK', 'JPY', 'TWD'].includes(asset.symbol) || (asset.isCrypto && asset.price < 1) ? 6 :
                                 ['INR', 'MYR', 'THB', 'CNH', 'SGD', 'USD', 'EUR', 'GBP', 'AUD', 'NZD', 'CAD', 'AED', 'USDT', 'HKD'].includes(asset.symbol) ? 3 : 2
                               )}
                             </span>

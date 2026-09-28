@@ -160,7 +160,7 @@ export default function Trading() {
           </motion.div>
         </div>
 
-        <CryptoMarket coins={cryptoCoins} loading={cryptoLoading} onSelect={symbol => { setSelectedCrypto(symbol); document.getElementById('crypto-swap')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }} />
+        <CryptoMarket coins={cryptoCoins} loading={cryptoLoading} onSelect={symbol => { setSelectedCrypto({ symbol }); document.getElementById('crypto-swap')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }} />
 
         {/* Swap Interface and Trading Tips */}
         <div className="grid lg:grid-cols-3 gap-8 mb-8">
