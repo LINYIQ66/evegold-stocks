@@ -3,7 +3,7 @@ import { FundRequest, SystemSetting, Transaction, PhysicalRedemption, SupportTic
 import { base44 } from "@/api/base44Client";
 import { UploadFile } from "@/integrations/Core";
 import { Button } from "@/components/ui/button";
-import { UserCheck, LogIn, LogOut, User as UserIcon, Activity, FileText, Package, LifeBuoy, Shield, Zap, Star, TrendingUp } from "lucide-react"; // Added LifeBuoy, Shield, Zap, Star. Removed TrendingUp as per outline.
+import { UserCheck, LogOut, User as UserIcon, Activity, FileText, Package, LifeBuoy, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -19,7 +19,7 @@ import StatementGenerator from "../components/account/StatementGenerator";
 import MyPhysicalInventory from "../components/account/MyPhysicalInventory";
 import SupportTickets from "../components/account/SupportTickets"; // New Import
 import InterestHistory from "../components/wallet/InterestHistory";
-import LiquidGlassLoginCard from '../components/account/LiquidGlassLoginCard'; // Import the new card
+import GuestAccountGate from '@/components/account/GuestAccountGate';
 import CryptoCollateralDashboard from '@/components/account/CryptoCollateralDashboard';
 import { useLanguage } from "@/components/common/LanguageProvider";
 
@@ -208,111 +208,8 @@ export default function Account() {
     }
   };
   
-  // If not logged in, show login interface
-  if (!user && !isLoading) {
-    return (
-      <div 
-        className="min-h-screen flex items-center justify-center p-4"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2155&q=80)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="grid lg:grid-cols-2 gap-16 max-w-6xl w-full items-center">
-          {/* Left Side - Platform Introduction */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-lg text-white hidden lg:block"
-            style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}
-          >
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg bg-white/20 p-1">
-                <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a0d6759fb_Screenshot2025-08-23105026.png" 
-                  alt="EVE FINANCE Logo" 
-                  className="w-full h-full object-cover rounded-md"
-                />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">{t('login.company_name')}</h1>
-                <p className="text-sm font-medium opacity-80">{t('login.company_tagline')}</p>
-              </div>
-            </div>
-
-            <h2 className="text-4xl font-bold mb-6">
-              {t('login.future_of_trading')} <span className="text-blue-300">{t('login.precious_metals')}</span> {t('login.trading')}
-            </h2>
-            
-            <p className="text-lg opacity-90 mb-8 leading-relaxed">
-              {t('login.platform_description')}
-            </p>
-
-            <div className="space-y-4">
-               <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                    <Shield className="w-4 h-4 text-green-300" />
-                  </div>
-                  <span>{t('login.bank_grade_security')}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                    <Zap className="w-4 h-4 text-blue-300" />
-                  </div>
-                  <span>{t('login.instant_trading')}</span>
-                </div>
-                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                    <Star className="w-4 h-4 text-yellow-300" />
-                  </div>
-                  <span>{t('login.eve_rewards')}</span>
-                </div>
-            </div>
-          </motion.div>
-
-          {/* Right Side - Login Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="max-w-md w-full"
-          >
-            <LiquidGlassLoginCard>
-              <div className="text-center">
-                <h2 className="text-3xl font-bold mb-2">
-                  {t('login.account_access')}
-                </h2>
-                <p className="opacity-80 mb-8">
-                  {t('login.login_description')}
-                </p>
-                
-                <Button 
-                  onClick={handleLogin}
-                  size="lg"
-                  className="w-full bg-white/20 hover:bg-white/30 text-white text-lg py-6 shadow-lg backdrop-blur-sm border border-white/20"
-                >
-                  <LogIn className="w-5 h-5 mr-3" />
-                  {t('login.login_with_google')}
-                </Button>
-                <p className="text-xs opacity-60 mt-4">
-                  {t('login.secure_auth')}
-                </p>
-                
-                <div className="mt-8 pt-6 border-t border-white/20">
-                  <p className="text-xs opacity-50">
-                    {t('login.military_encryption')}<br />
-                    {t('login.data_safe')}
-                  </p>
-                </div>
-              </div>
-            </LiquidGlassLoginCard>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
+  if (!user && isLoading) return <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground" role="status">正在加载账户…</div>;
+  if (!user) return <GuestAccountGate onLogin={handleLogin} />;
 
   return (
     <>
