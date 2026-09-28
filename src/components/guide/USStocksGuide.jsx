@@ -10,11 +10,7 @@ import {
   ArrowRight, Play, Info, LineChart, PieChart, Activity
 } from "lucide-react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis, LineChart as ReLineChart, Line
-} from "recharts";
+import MarketAnalysis from "@/components/guide/MarketAnalysis";
 
 // ─── Stock Data ──────────────────────────────────────────────────────────────
 const STOCKS = [
@@ -460,44 +456,6 @@ const STOCKS = [
   },
 ];
 
-// ─── Sector data for chart ───────────────────────────────────────────────────
-const SECTOR_DATA = [
-  { sector: "Technology", count: 12, color: "#6366f1" },
-  { sector: "Communication", count: 3, color: "#06b6d4" },
-  { sector: "Consumer Disc.", count: 2, color: "#f59e0b" },
-  { sector: "Financials", count: 2, color: "#10b981" },
-  { sector: "Fintech/Crypto", count: 1, color: "#f97316" },
-];
-
-const MARKET_CAP_DATA = [
-  { name: "AAPL", cap: 3300 },
-  { name: "MSFT", cap: 3100 },
-  { name: "NVDA", cap: 2800 },
-  { name: "AMZN", cap: 2000 },
-  { name: "GOOGL", cap: 2100 },
-  { name: "META", cap: 1400 },
-  { name: "TSLA", cap: 800 },
-  { name: "NFLX", cap: 420 },
-  { name: "ORCL", cap: 430 },
-  { name: "AMD", cap: 240 },
-];
-
-const REVENUE_TREND = [
-  { year: "2020", aapl: 274, msft: 143, nvda: 17, amzn: 386 },
-  { year: "2021", aapl: 365, msft: 168, nvda: 27, amzn: 470 },
-  { year: "2022", aapl: 394, msft: 198, nvda: 27, amzn: 514 },
-  { year: "2023", aapl: 383, msft: 211, nvda: 60, amzn: 574 },
-];
-
-const RISK_RADAR = [
-  { metric: "Market Cap", value: 90 },
-  { metric: "Revenue Growth", value: 75 },
-  { metric: "Profitability", value: 80 },
-  { metric: "Innovation", value: 95 },
-  { metric: "Dividend", value: 30 },
-  { metric: "Volatility", value: 60 },
-];
-
 // ─── Q&A Data ────────────────────────────────────────────────────────────────
 const QA = [
   {
@@ -564,87 +522,6 @@ function AnimatedCounter({ value, suffix = "", prefix = "" }) {
   }, [inView, value]);
 
   return <span ref={ref}>{prefix}{count.toLocaleString()}{suffix}</span>;
-}
-
-function SectorChart() {
-  return (
-    <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={SECTOR_DATA} layout="vertical">
-        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-        <XAxis type="number" tick={{ fontSize: 11 }} />
-        <YAxis dataKey="sector" type="category" tick={{ fontSize: 11 }} width={100} />
-        <Tooltip />
-        <Bar dataKey="count" radius={[0, 6, 6, 0]}>
-          {SECTOR_DATA.map((entry, i) => (
-            <rect key={i} fill={entry.color} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  );
-}
-
-function MarketCapChart() {
-  return (
-    <ResponsiveContainer width="100%" height={250}>
-      <BarChart data={MARKET_CAP_DATA}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-        <YAxis tick={{ fontSize: 11 }} unit="B" />
-        <Tooltip formatter={(v) => [`$${v}B`, "Market Cap"]} />
-        <Bar dataKey="cap" fill="#6366f1" radius={[6, 6, 0, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
-  );
-}
-
-function RevenueTrendChart() {
-  return (
-    <ResponsiveContainer width="100%" height={220}>
-      <AreaChart data={REVENUE_TREND}>
-        <defs>
-          <linearGradient id="gAAPL" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#6e6e73" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#6e6e73" stopOpacity={0} />
-          </linearGradient>
-          <linearGradient id="gMSFT" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#00a1f1" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#00a1f1" stopOpacity={0} />
-          </linearGradient>
-          <linearGradient id="gNVDA" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#76b900" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#76b900" stopOpacity={0} />
-          </linearGradient>
-          <linearGradient id="gAMZN" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#ff9900" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#ff9900" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-        <YAxis tick={{ fontSize: 11 }} unit="B" />
-        <Tooltip formatter={(v) => [`$${v}B`, ""]} />
-        <Area type="monotone" dataKey="aapl" name="AAPL" stroke="#6e6e73" fill="url(#gAAPL)" strokeWidth={2} />
-        <Area type="monotone" dataKey="msft" name="MSFT" stroke="#00a1f1" fill="url(#gMSFT)" strokeWidth={2} />
-        <Area type="monotone" dataKey="nvda" name="NVDA" stroke="#76b900" fill="url(#gNVDA)" strokeWidth={2} />
-        <Area type="monotone" dataKey="amzn" name="AMZN" stroke="#ff9900" fill="url(#gAMZN)" strokeWidth={2} />
-      </AreaChart>
-    </ResponsiveContainer>
-  );
-}
-
-function RiskRadarChart() {
-  return (
-    <ResponsiveContainer width="100%" height={220}>
-      <RadarChart data={RISK_RADAR}>
-        <PolarGrid />
-        <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10 }} />
-        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={false} />
-        <Radar name="US Tech" dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
-        <Tooltip />
-      </RadarChart>
-    </ResponsiveContainer>
-  );
 }
 
 function StockCard({ stock, onClick }) {
@@ -1099,127 +976,7 @@ export default function USStocksGuide() {
       )}
 
       {/* ── CHARTS ── */}
-      {activeTab === "charts" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-0 shadow-md">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <BarChart2 className="w-4 h-4 text-blue-500" /> 市值（十亿美元）— 前 10 大
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MarketCapChart />
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-md">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-green-500" /> 营收增长 2020–2023（十亿美元）
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RevenueTrendChart />
-                <div className="flex gap-4 mt-2 flex-wrap">
-                  {[{c:"#6e6e73",l:"AAPL"},{c:"#00a1f1",l:"MSFT"},{c:"#76b900",l:"NVDA"},{c:"#ff9900",l:"AMZN"}].map(d => (
-                    <span key={d.l} className="flex items-center gap-1 text-xs text-slate-500">
-                      <span className="w-3 h-1.5 rounded-full" style={{ background: d.c }} />{d.l}
-                    </span>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-md">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <PieChart className="w-4 h-4 text-purple-500" /> 投资组合质量因子（美国科技）
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RiskRadarChart />
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-md">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-cyan-500" /> 行业分布 — 已上市股票
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 mt-2">
-                  {[
-                    { name: "Technology (Pure)", pct: 60, color: "bg-indigo-500", count: 12 },
-                    { name: "Communication / Media", pct: 15, color: "bg-cyan-500", count: 3 },
-                    { name: "E-Commerce / Consumer", pct: 10, color: "bg-amber-500", count: 2 },
-                    { name: "Fintech / Crypto", pct: 10, color: "bg-emerald-500", count: 2 },
-                    { name: "AI Infrastructure", pct: 5, color: "bg-violet-500", count: 1 },
-                  ].map((s, i) => (
-                    <div key={i}>
-                      <div className="flex justify-between text-xs text-slate-600 mb-1">
-                        <span>{s.name}</span>
-                        <span className="font-medium">{s.count} stocks · {s.pct}%</span>
-                      </div>
-                      <div className="w-full bg-slate-100 rounded-full h-2">
-                        <motion.div
-                          className={`${s.color} h-2 rounded-full`}
-                          initial={{ width: 0 }}
-                          animate={{ width: `${s.pct}%` }}
-                          transition={{ duration: 0.8, delay: i * 0.1 }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Comparison table */}
-          <Card className="border-0 shadow-md">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-slate-700">巨型市值公司对比（前 6 大）</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b border-slate-100">
-                      <th className="text-left py-2 text-slate-500 font-medium">股票</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">市值</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">营收</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">市盈率</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">风险</th>
-                      <th className="text-right py-2 text-slate-500 font-medium">股息</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {STOCKS.slice(0, 6).map((s, i) => (
-                      <tr key={s.symbol} className="border-b border-slate-50 hover:bg-slate-50 cursor-pointer" onClick={() => { setSelectedStock(s); }}>
-                        <td className="py-2.5">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-800">{s.symbol}</span>
-                            <span className="text-slate-400 hidden md:inline">{s.name.split(" ")[0]}</span>
-                          </div>
-                        </td>
-                        <td className="text-right font-medium text-slate-700">{s.marketCap}</td>
-                        <td className="text-right text-slate-600">{s.revenue.split(" ")[0]}</td>
-                        <td className="text-right text-slate-600">{s.peRatio}</td>
-                        <td className="text-right">
-                          <Badge className={`text-xs px-1 ${s.badge}`}>{s.risk}</Badge>
-                        </td>
-                        <td className="text-right text-slate-600">{s.divYield}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+      {activeTab === "charts" && <MarketAnalysis stocks={STOCKS} onSelectStock={setSelectedStock} />}
 
       {/* ── Q&A ── */}
       {activeTab === "qa" && (
