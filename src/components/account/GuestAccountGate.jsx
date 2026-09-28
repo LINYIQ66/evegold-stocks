@@ -19,7 +19,7 @@ export default function GuestAccountGate({ onLogin }) {
             <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl">从这里，开启<br />您的投资旅程。</h1>
             <p className="mt-6 max-w-md text-base leading-relaxed text-muted-foreground">一个账户，探索贵金属、美股与数字资产。登录以继续，或创建账户开始使用 EVE 金融。</p>
             <div className="mt-9 space-y-4">
-              <Button type="button" onClick={onLogin} size="lg" className="w-full justify-between py-6 text-base sm:max-w-sm">登录或创建账户 <ArrowRight aria-hidden="true" /></Button>
+              <Button type="button" onClick={onLogin} size="lg" className="w-full justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-7 text-base font-bold text-white shadow-xl ring-4 ring-blue-100 hover:from-blue-700 hover:to-indigo-700 focus-visible:ring-blue-500 sm:max-w-md">登录或创建账户 <ArrowRight aria-hidden="true" /></Button>
               <p className="text-xs leading-relaxed text-muted-foreground">新用户可在安全认证页面注册；可用的登录方式以认证页面实际显示为准。</p>
             </div>
           </div>

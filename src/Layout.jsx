@@ -134,15 +134,17 @@ const SidebarMenuContent = ({ visibleNavItems, location, showLogin, loginLabel }
           <SidebarMenuButton 
             asChild 
             onClick={handleMenuClick}
-            className={`hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 transition-all duration-300 rounded-xl mb-1 ${
-              location.pathname === item.url 
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg' 
-                : 'text-slate-600'
+            className={`transition-all duration-300 rounded-xl mb-1 ${
+              showLogin && item.page === 'Account'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg ring-2 ring-blue-200 hover:from-blue-700 hover:to-indigo-700 hover:text-white'
+                : location.pathname === item.url
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:text-white'
+                  : 'text-slate-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700'
             }`}
           >
             <Link to={item.url} className="flex items-center gap-3 px-4 py-3">
               <item.icon className="w-5 h-5" />
-              <span className="font-medium">{item.title}</span>
+              <span className={showLogin && item.page === 'Account' ? 'font-bold' : 'font-medium'}>{item.title}</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
