@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User } from "@/entities/all";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap } from "lucide-react";
 import { motion } from "framer-motion";
@@ -10,6 +10,7 @@ import { executeSwap as executeSwapFn } from "@/functions/executeSwap";
 import SwapInterface from "../components/trading/SwapInterface";
 import TradingViewChart from "../components/trading/TradingViewChart";
 import MarketOverview from "../components/trading/MarketOverview";
+import GoldBullionNews from "@/components/trading/GoldBullionNews";
 
 export default function Trading() {
   const [user, setUser] = useState(null);
@@ -205,30 +206,14 @@ export default function Trading() {
           </motion.div>
         </div>
 
-        {/* RSS Feed */}
+        {/* Gold and silver news */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           className="mt-8"
         >
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-slate-900">最新资讯与动态</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="w-full overflow-hidden rounded-b-lg">
-                <iframe 
-                  width="100%" 
-                  height="800" 
-                  src="https://rss.app/embed/v1/wall/t4eSLPbO9kswK4As" 
-                  frameBorder="0"
-                  className="w-full"
-                  title="Latest News Feed"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <GoldBullionNews />
         </motion.div>
       </div>
     </div>
