@@ -84,7 +84,7 @@ export default function Account() {
   };
 
   const handleLogin = () => {
-    base44.auth.redirectToLogin();
+    base44.auth.redirectToLogin('/Account');
   };
 
   const handleLogout = async () => {

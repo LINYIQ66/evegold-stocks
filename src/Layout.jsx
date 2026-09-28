@@ -17,7 +17,6 @@ import {
   Languages,
   ChevronDown,
   BarChart2,
-  LogIn,
   Code2
 } from "lucide-react";
 import {
@@ -42,7 +41,6 @@ import { LanguageProvider, useLanguage } from "@/components/common/LanguageProvi
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
 import { canAccessPage } from "@/lib/accessControl";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
 
 const LanguageSwitcher = () => {
     const { language, setLanguage } = useLanguage();
@@ -118,7 +116,7 @@ const LanguageSwitcher = () => {
     );
 };
 
-const SidebarMenuContent = ({ visibleNavItems, location, showLogin, loginLabel }) => {
+const SidebarMenuContent = ({ visibleNavItems, location, isGuest }) => {
   const { setOpen } = useSidebar();
 
   const handleMenuClick = () => {
@@ -135,7 +133,7 @@ const SidebarMenuContent = ({ visibleNavItems, location, showLogin, loginLabel }
             asChild 
             onClick={handleMenuClick}
             className={`transition-all duration-300 rounded-xl mb-1 ${
-              showLogin && item.page === 'Account'
+              isGuest && item.page === 'Account'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg ring-2 ring-blue-200 hover:from-blue-700 hover:to-indigo-700 hover:text-white'
                 : location.pathname === item.url
                   ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg hover:text-white'
@@ -144,27 +142,11 @@ const SidebarMenuContent = ({ visibleNavItems, location, showLogin, loginLabel }
           >
             <Link to={item.url} className="flex items-center gap-3 px-4 py-3">
               <item.icon className="w-5 h-5" />
-              <span className={showLogin && item.page === 'Account' ? 'font-bold' : 'font-medium'}>{item.title}</span>
+              <span className={isGuest && item.page === 'Account' ? 'font-bold' : 'font-medium'}>{item.title}</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
-      {showLogin && (
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            onClick={() => {
-              handleMenuClick();
-              base44.auth.redirectToLogin(window.location.href);
-            }}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 rounded-xl mb-1 shadow-lg"
-          >
-            <div className="flex items-center gap-3 px-4 py-3 w-full">
-              <LogIn className="w-5 h-5" />
-              <span className="font-medium">{loginLabel}</span>
-            </div>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      )}
     </SidebarMenu>
   );
 };
@@ -228,7 +210,7 @@ const AppLayout = ({ children }) => {
           <SidebarContent className="p-3 bg-white">
             <SidebarGroup>
               <SidebarGroupContent>
-                <SidebarMenuContent visibleNavItems={visibleNavItems} location={location} showLogin={!user} loginLabel={t('sidebar.login')} />
+                <SidebarMenuContent visibleNavItems={visibleNavItems} location={location} isGuest={!user} />
               </SidebarGroupContent>
             </SidebarGroup>
 

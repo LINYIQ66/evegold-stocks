@@ -44,7 +44,7 @@ const ROLE_PAGE_ACCESS = {
   user: ['Home', 'Wallet', 'Trading', 'USStocks', 'Physical', 'Lending', 'Staking', 'Account', 'DailyStatement', 'Guide', 'ApiDocs'], // Legacy
 };
 
-export const PUBLIC_PAGES = ['Home', 'Guide', 'ApiDocs'];
+export const PUBLIC_PAGES = ['Home', 'Guide', 'ApiDocs', 'Account'];
 
 /**
  * Check if a role can access a specific page
