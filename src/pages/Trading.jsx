@@ -211,7 +211,7 @@ export default function Trading() {
                   </div>
                   <div className="flex items-start gap-2">
                     <div className="w-2 h-2 bg-blue-300 rounded-full mt-2 flex-shrink-0" />
-                    <p className="text-sm">涉及贵金属或加密货币的兑换收取 0.5% 手续费；其他货币兑换维持 2%</p>
+                    <p className="text-sm">贵金属、加密货币及外汇兑换均收取 0.5% 手续费；双向兑换均从到账资产中扣除</p>
                   </div>
                 </div>
               </CardContent>

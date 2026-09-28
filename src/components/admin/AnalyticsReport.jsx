@@ -8,6 +8,7 @@ import { TrendingUp, Users, DollarSign, Activity, Download, Calendar, RefreshCw 
 import { generateReport } from "@/functions/generateReport";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/components/common/LanguageProvider";
+import ForexRevenue from '@/components/admin/ForexRevenue';
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6'];
 
@@ -236,7 +237,8 @@ export default function AnalyticsReport() {
           {/* Transaction History */}
           {(reportType === 'all' || reportType === 'transaction_history') && reportData.transaction_history && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">Transaction History</h3>
+              <ForexRevenue entries={reportData.transaction_history.forex_fee_entries} total={reportData.transaction_history.forex_fee_income_usd || 0} />
+              <h3 className="text-2xl font-bold text-slate-900 my-4">Transaction History</h3>
               <div className="grid md:grid-cols-4 gap-6 mb-6">
                 <StatCard 
                   title="Total Transactions" 

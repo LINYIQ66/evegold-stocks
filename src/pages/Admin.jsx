@@ -384,8 +384,9 @@ export default function Admin() {
   const metrics = (() => {
     const totalUsers = users.length;
     const pendingKYC = users.filter(u => u.kyc_status === "pending").length;
-    const totalVolume = transactions.reduce((sum, t) => sum + (t.amount_usd || 0), 0);
-    const totalFees = transactions.reduce((sum, t) => sum + (t.fee_usd || 0), 0);
+    const completed = transactions.filter(t => t.status === 'completed' && t.transaction_type !== 'eve_reward');
+    const totalVolume = completed.reduce((sum, t) => sum + (t.amount_usd || 0), 0);
+    const totalFees = completed.reduce((sum, t) => sum + (t.fee_usd || 0), 0);
     const activeLoans = loans.filter(l => l.status === "active").length;
     const pendingDeposits = fundRequests.length; // Already filtered to pending requests
     return { totalUsers, pendingKYC, totalVolume, totalFees, activeLoans, pendingDeposits };

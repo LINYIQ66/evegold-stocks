@@ -70,7 +70,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
     const exchangeRate = fromPrice / toPrice;
     const grossAmount = Number(amount) * exchangeRate;
     if (!Number.isFinite(grossAmount) || grossAmount <= 0) return null;
-    const feeRate = METALS.has(fromAsset) || METALS.has(toAsset) || fromAsset.startsWith('CRYPTO_') || toAsset.startsWith('CRYPTO_') ? 0.005 : 0.02;
+    const feeRate = 0.005;
     const fee = grossAmount * feeRate;
     const netAmount = grossAmount - fee;
     

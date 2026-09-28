@@ -1,6 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -11,8 +11,8 @@ Deno.serve(async (req) => {
 
     const { reportType, startDate, endDate, groupBy } = await req.json();
 
-    const start = new Date(startDate || Date.now() - 30 * 24 * 60 * 60 * 1000);
-    const end = new Date(endDate || Date.now());
+    const start = new Date(startDate ? `${startDate}T00:00:00` : Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const end = new Date(endDate ? `${endDate}T23:59:59.999` : Date.now());
 
     let reportData = {};
 
@@ -49,11 +49,14 @@ Deno.serve(async (req) => {
     }
 
     if (reportType === 'transaction_history' || reportType === 'all') {
-      const transactions = await base44.asServiceRole.entities.Transaction.list("-created_date", 5000);
-      
+      const [transactions, feeEntries] = await Promise.all([
+        base44.asServiceRole.entities.Transaction.list("-created_date", 5000),
+        base44.asServiceRole.entities.PlatformFee.filter({ status: 'completed' }, "-created_date", 5000)
+      ]);
+      const forexFees = feeEntries.filter(f => new Date(f.created_date) >= start && new Date(f.created_date) <= end);
       const filteredTransactions = transactions.filter(t => {
         const date = new Date(t.created_date);
-        return date >= start && date <= end;
+        return date >= start && date <= end && t.status === 'completed';
       });
 
       const volumeByDate = {};
@@ -78,7 +81,9 @@ Deno.serve(async (req) => {
       reportData.transaction_history = {
         total_transactions: filteredTransactions.length,
         total_volume: filteredTransactions.reduce((sum, t) => sum + (t.amount_usd || 0), 0),
-        total_fees: filteredTransactions.reduce((sum, t) => sum + (t.fee_usd || 0), 0),
+        total_fees: filteredTransactions.reduce((sum, t) => sum + (t.transaction_type === 'eve_reward' ? 0 : (t.fee_usd || 0)), 0),
+        forex_fee_income_usd: forexFees.reduce((sum, f) => sum + (f.fee_usd || 0), 0),
+        forex_fee_entries: forexFees,
         trading_volume: tradingVolume,
         volume_by_type: volumeByType,
         volume_by_asset: volumeByAsset,
@@ -170,4 +175,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

@@ -10,7 +10,7 @@ import { getCryptoMarket } from '../../shared/cryptoMarket.ts';
 
 const METALS = new Set(['gold', 'silver', 'platinum', 'palladium']);
 const METAL_FEE_RATE = 0.005;
-const CURRENCY_FEE_RATE = 0.02;
+const CURRENCY_FEE_RATE = 0.005;
 
 // Fetch metal prices from MetalPriceAPI (with Alpaca fallback)
 async function fetchMetalPrices() {
@@ -64,8 +64,11 @@ async function fetchForexRates() {
   const data = await response.json();
   if (data.result !== 'success') throw new Error('Failed to fetch exchange rates');
   const rates = data.conversion_rates;
+  const required = ['SGD','CNY','INR','MYR','THB','VND','IDR','LAK','EUR','GBP','AUD','NZD','JPY','HKD','TWD','CAD','AED'];
+  const updated = Date.parse(data.time_last_update_utc || new Date(data.time_last_update_unix * 1000).toISOString());
+  if (!required.every(code => Number.isFinite(rates?.[code]) && rates[code] > 0) || !Number.isFinite(updated) || Date.now() - updated > 4 * 24 * 60 * 60 * 1000) throw new Error('Forex quote unavailable or stale');
   return {
-    sgd: 1 / (rates.SGD || 1.35),
+    sgd: 1 / rates.SGD,
     cnh: 1 / (rates.CNY || 7.25),
     inr: 1 / (rates.INR || 83.50),
     myr: 1 / (rates.MYR || 4.70),
@@ -85,7 +88,7 @@ async function fetchForexRates() {
   };
 }
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -97,22 +100,19 @@ Deno.serve(async (req) => {
     const { fromAsset, toAsset, amount } = body;
 
     // --- Input validation ---
-    if (!fromAsset || !toAsset || !amount) {
+    if (!fromAsset || !toAsset || amount === undefined || amount === null || amount === '') {
       return Response.json({ success: false, error: 'Missing parameters' }, { status: 400 });
     }
     const numAmount = Number(amount);
     if (!Number.isFinite(numAmount) || numAmount <= 0) {
       return Response.json({ success: false, error: 'Invalid amount' }, { status: 400 });
     }
-    if (fromAsset === toAsset) {
-      return Response.json({ success: false, error: 'Cannot swap same asset' }, { status: 400 });
-    }
-
     if (typeof fromAsset !== 'string' || typeof toAsset !== 'string') {
       return Response.json({ success: false, error: 'Invalid asset' }, { status: 400 });
     }
     const fromKey = fromAsset.toLowerCase();
     const toKey = toAsset.toLowerCase();
+    if (fromKey === toKey) return Response.json({ success: false, error: 'Cannot swap same asset' }, { status: 400 });
 
     // Always read current balances before pricing or execution.
     const users = await base44.asServiceRole.entities.User.filter({ email: user.email });
@@ -139,7 +139,7 @@ Deno.serve(async (req) => {
 
     // --- Server-side balance validation ---
     const currentBalance = currentBalances[fromKey] || 0;
-    if (numAmount > currentBalance + 1e-9) {
+    if (numAmount > currentBalance) {
       return Response.json({
         success: false,
         error: `Insufficient ${fromAsset} balance. Available: ${currentBalance.toFixed(6)}, Requested: ${numAmount}`
@@ -150,10 +150,14 @@ Deno.serve(async (req) => {
     const exchangeRate = fromPrice / toPrice;
     const grossAmountToAsset = numAmount * exchangeRate;
     const feeRate = METALS.has(fromKey) || METALS.has(toKey) || cryptoTrade ? METAL_FEE_RATE : CURRENCY_FEE_RATE;
+    const isForex = !METALS.has(fromKey) && !METALS.has(toKey) && !cryptoTrade;
     const feeInToAsset = grossAmountToAsset * feeRate;
     const netAmountToAsset = grossAmountToAsset - feeInToAsset;
     const transactionValueUSD = numAmount * fromPrice;
     const feeValueUSD = feeInToAsset * toPrice;
+    if (![exchangeRate, grossAmountToAsset, netAmountToAsset, transactionValueUSD, feeValueUSD].every(Number.isFinite) || netAmountToAsset <= 0 || Math.abs(feeValueUSD - transactionValueUSD * feeRate) > Math.max(1e-8, feeValueUSD * 1e-10)) {
+      return Response.json({ success: false, error: 'Quote reconciliation failed' }, { status: 400 });
+    }
 
     // --- Update balances ---
     currentBalances[fromKey] = currentBalance - numAmount;
@@ -165,13 +169,8 @@ Deno.serve(async (req) => {
       currentBalances.eve = (currentBalances.eve || 0) + eveReward;
     }
 
-    // --- Atomically save updated balances ---
-    await base44.asServiceRole.entities.User.update(userRecord.id, {
-      wallet_balances: currentBalances,
-    });
-
-    // --- Create transaction records ---
-    await base44.asServiceRole.entities.Transaction.create({
+    // Record the intended trade before changing balances; only completed records count as earned fees.
+    const trade = await base44.asServiceRole.entities.Transaction.create({
       transaction_type: "swap",
       user_email: user.email,
       from_asset: fromAsset,
@@ -179,8 +178,27 @@ Deno.serve(async (req) => {
       amount_usd: transactionValueUSD,
       fee_usd: feeValueUSD,
       exchange_rate: exchangeRate,
-      status: "completed",
+      status: "pending",
+      description: `${numAmount} ${fromAsset.toUpperCase()} → ${grossAmountToAsset} ${toAsset.toUpperCase()} gross; ${feeInToAsset} ${toAsset.toUpperCase()} fee (${feeRate * 100}%); ${netAmountToAsset} ${toAsset.toUpperCase()} net`,
     });
+    const feeEntry = isForex ? await base44.asServiceRole.entities.PlatformFee.create({
+      user_email: user.email,
+      transaction_id: trade.id,
+      from_asset: fromAsset.toUpperCase(),
+      from_amount: numAmount,
+      to_asset: toAsset.toUpperCase(),
+      gross_to_amount: grossAmountToAsset,
+      fee_to_amount: feeInToAsset,
+      net_to_amount: netAmountToAsset,
+      fee_usd: feeValueUSD,
+      exchange_rate: exchangeRate,
+      fee_rate: feeRate,
+      status: 'pending',
+    }) : null;
+
+    await base44.asServiceRole.entities.User.update(userRecord.id, { wallet_balances: currentBalances });
+    await base44.asServiceRole.entities.Transaction.update(trade.id, { status: 'completed' });
+    if (feeEntry) await base44.asServiceRole.entities.PlatformFee.update(feeEntry.id, { status: 'completed' });
 
     if (eveReward > 0) {
       await base44.asServiceRole.entities.Transaction.create({
@@ -206,4 +224,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ success: false, error: error.message }, { status: 500 });
   }
-});
+}

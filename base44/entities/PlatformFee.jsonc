@@ -1,0 +1,83 @@
+{
+  "name": "PlatformFee",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "transaction_id": {
+      "type": "string"
+    },
+    "from_asset": {
+      "type": "string"
+    },
+    "from_amount": {
+      "type": "number"
+    },
+    "to_asset": {
+      "type": "string"
+    },
+    "gross_to_amount": {
+      "type": "number"
+    },
+    "fee_to_amount": {
+      "type": "number"
+    },
+    "net_to_amount": {
+      "type": "number"
+    },
+    "fee_usd": {
+      "type": "number"
+    },
+    "exchange_rate": {
+      "type": "number"
+    },
+    "fee_rate": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "user_email",
+    "transaction_id",
+    "from_asset",
+    "from_amount",
+    "to_asset",
+    "gross_to_amount",
+    "fee_to_amount",
+    "net_to_amount",
+    "fee_usd",
+    "exchange_rate",
+    "fee_rate",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
