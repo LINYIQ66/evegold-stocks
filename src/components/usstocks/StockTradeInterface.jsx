@@ -41,6 +41,10 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
   // track which input was last edited to avoid circular updates
   const [lastBuyEdit, setLastBuyEdit] = useState("spend"); // "spend" | "shares"
 
+  useEffect(() => {
+    setSpendAmount(''); setBuyShares(''); setSellShares(''); setLimitPrice(''); setResult(null);
+  }, [selectedSymbol]);
+
   const usdtBalance = user?.wallet_balances?.usdt || 0;
   const usdBalance = user?.wallet_balances?.usd || 0;
   const stockBalance = user?.wallet_balances?.[selectedSymbol.toLowerCase()] || 0;

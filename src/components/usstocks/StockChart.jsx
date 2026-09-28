@@ -22,6 +22,12 @@ const STOCK_TV_MAP = {
   SNDK:   "NASDAQ:SNDK",
   BRK:    "NYSE:BRK.B",
   JPM:    "NYSE:JPM",
+  SPY:    "AMEX:SPY",
+  QQQ:    "NASDAQ:QQQ",
+  VTI:    "AMEX:VTI",
+  IWM:    "AMEX:IWM",
+  TLT:    "NASDAQ:TLT",
+  GLD:    "AMEX:GLD",
 };
 
 function StockChart({ symbol = "AAPL" }) {
