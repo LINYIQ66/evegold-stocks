@@ -49,7 +49,7 @@ export default function MarketOverview({ prices, priceChanges, onSymbolClick }) 
             <Coins className="w-5 h-5 text-blue-600" />
             市场概览
           </CardTitle>
-          <p className="text-xs text-slate-500">展示价：API 基准价 ±0.05%–0.1% 模拟波动，每 1–2 秒更新；非成交价</p>
+          <p className="text-xs text-slate-500">实时行情，每 1–2 秒更新；最终成交价以下单确认为准</p>
         </CardHeader>
         <CardContent className="flex-1 p-3 space-y-3">
           {metals.map((metal, index) => (

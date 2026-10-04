@@ -145,7 +145,7 @@ export default function StockMarketOverview({ onStockClick, selectedSymbol, onPr
       <CardHeader className="pb-2 flex-shrink-0">
         <CardTitle className="text-slate-900 text-base flex items-center gap-2">
           美股行情
-          <Badge className="bg-green-100 text-green-800 text-xs">模拟波动</Badge>
+          <Badge className="bg-green-100 text-green-800 text-xs">实时行情</Badge>
           {loading && <RefreshCw className="w-3 h-3 animate-spin text-slate-400" />}
         </CardTitle>
         <p className="text-xs text-slate-500">交易以成交价为准</p>
