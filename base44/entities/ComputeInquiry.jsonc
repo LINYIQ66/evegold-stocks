@@ -1,0 +1,89 @@
+{
+  "name": "ComputeInquiry",
+  "type": "object",
+  "properties": {
+    "contact_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "company": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "contact_details": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200
+    },
+    "request_type": {
+      "type": "string",
+      "enum": [
+        "bulk",
+        "forward",
+        "hosting",
+        "custom"
+      ]
+    },
+    "gpu_model": {
+      "type": "string",
+      "enum": [
+        "H100 SXM",
+        "H200",
+        "B200",
+        "B300"
+      ]
+    },
+    "gpu_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "region": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "duration_months": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60
+    },
+    "requirements": {
+      "type": "string",
+      "maxLength": 3000
+    }
+  },
+  "required": [
+    "contact_name",
+    "contact_details",
+    "request_type",
+    "gpu_model",
+    "gpu_count",
+    "region",
+    "start_date",
+    "duration_months"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

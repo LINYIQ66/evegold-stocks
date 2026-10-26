@@ -1,0 +1,45 @@
+{
+  "name": "\u6bcf\u5468\u66f4\u65b0GPU\u516c\u5f00\u79df\u8d41\u4ef7\u683c",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 2 * * 1",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "\u6bcf\u5468\u4e00\u65b0\u52a0\u5761\u65f6\u95f410:00\u6838\u9a8cRunpod\u516c\u5f00GPU\u5c0f\u65f6\u79df\u91d1\u5e76\u4fdd\u7559\u6765\u6e90\u65e5\u671f\uff0c\u540c\u65f6\u6838\u5bf9CME\u5b98\u65b9\u7b97\u529b\u671f\u8d27\u4ea7\u54c1\u8d44\u6599\uff1b\u4e0d\u5c06\u79df\u91d1\u6807\u4e3a\u671f\u8d27\u62a5\u4ef7\uff0c\u4e0d\u6267\u884c\u4ea4\u6613\u3002",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_public_gpu_rental_prices",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "refresh_prices": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "refreshComputePrices",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "\u6838\u9a8cGPU\u79df\u91d1\u4e0e\u4ea4\u6613\u6240\u4ea7\u54c1\u8d44\u6599",
+            "description": "\u4fdd\u5b58\u6765\u6e90\u65e5\u671f\uff1b\u6293\u53d6\u5931\u8d25\u4fdd\u7559\u4e0a\u6b21\u79df\u91d1\uff1b\u4e0d\u63d0\u4f9b\u6a21\u62df\u671f\u8d27\u4ef7\u683c"
+          }
+        }
+      }
+    ]
+  }
+}

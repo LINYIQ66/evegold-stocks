@@ -1,0 +1,42 @@
+export const computeCopy = {
+  zh: {
+    title: 'AI Data Center & Computing Power', subtitle: '人工智能数据中心与全球算力服务',
+    intro: 'EVE METAL 依托 25 年金属贸易与金融市场经验，积极布局人工智能基础设施、GPU 算力及新一代数据中心产业，推动能源、金融与人工智能深度融合。',
+    plan: '平台计划整合全球数据中心及 GPU 计算资源，重点覆盖 NVIDIA H100、H200、B300 等高性能计算设备，为企业提供 AI 模型训练、推理部署、GPU 服务器租赁、设备托管、专属算力集群及 AI Agent 基础设施服务。',
+    strategy: '战略方向：连接能源金属、核能、电力、数据中心与 AI 算力市场，打造跨行业数字化资源交易服务平台。',
+    disclaimer: '所有可用资源与报价以合作供应商实际确认为准。公开目录不代表 EVE METAL 自有库存、供应商合作关系或可执行报价。',
+    marketplace: 'GPU Marketplace｜GPU 资源与租赁参考价', priceNote: '按需租赁参考价，单位为 USD / GPU·小时；不是可中断实例 Spot 折扣价，也不是期货或远期报价。不同云服务等级不可直接等同。',
+    weekly: '每周一新加坡时间 10:00 核对供应商价目。周更核验不是实时行情；来源未发布新价时保留原价与原始日期。',
+    sourceDate: '供应商价目日期', checked: '最近成功核验', loading: '正在加载公开租赁价格…', loadError: '价格暂时无法加载，请重试。', retry: '重试', pending: '尚未取得经核验的价格，请查看供应商原始价目。', stale: '超过一周未成功核验，请注意数据时效。', priceFailed: '最近一次核验未成功，以下保留上次成功数据。',
+    model: 'GPU 型号', memory: '显存', provider: '公开供应商', region: '部署地区', quantity: '可用数量', confirm: '供应商确认', notPublished: '未公开，需确认', community: 'Community Cloud', secure: 'Secure Cloud', source: '原始来源', enquire: '提交租赁询价',
+    dataCenter: 'AI Data Center｜公开资源目录', catalogNote: '以下为第三方公开资源信息，不表示已签约合作或当前可用容量；具体 GPU 型号、机柜及网络容量须分别确认。', power: '供电与冗余', racks: '机柜托管', network: '网络资源', available: '可用机柜 / GPU 数量',
+    futures: '算力期货｜交易所产品资料', futuresIntro: 'CME 官方资料列示 H100（GPU1）与 B200（GPU2）租赁指数期货，每份合约 730 GPU·小时、现金结算，月份合约列示至 36 个月；实际上市与交易状态以交易所公告为准。',
+    futuresMissing: '当前未接入授权期货行情，不展示无法核实的成交价、结算价或远期曲线。H200、B300 尚未取得可核验的交易所期货报价，不用租赁价格替代。',
+    trading: '真实期货交易尚未开放。需接入有资质的经纪商、交易账户、授权行情及适当性与风控流程；本栏目不下单、不扣款，不改变现有钱包或交易功能。', official: '查看 CME 官方产品资料',
+    calculator: 'Compute Calculator｜算力预算', hours: '每日使用小时', days: '每月使用天数', months: '预算月数', hourly: 'GPU 总小时费用', monthly: '预计月租金', budget: '预计总预算', calcNote: '费用 = 单 GPU 时租 × GPU 数量 × 使用小时；月预算按所选天数计算。仅为预算估算，不是远期或期货报价；未含税、存储、网络、电力与托管等额外费用。', noRate: '当前无可核验租金，暂不计算预算。',
+    desk: 'OTC Compute Desk｜企业算力询价', deskNote: '支持批量 GPU 租赁、未来起租的远期租赁、长期采购及企业定制需求；提交询价不构成订单、锁价或交易所期货交易。', name: '联系人', company: '公司（选填）', contact: '联系方式', contactHint: '邮箱、电话或微信，至少填写一种', type: '需求类型', count: 'GPU 数量', start: '预计起租日期', duration: '租期（月）', requirements: '部署与定制需求（选填）', privacy: '询价资料仅管理员可查看，用于评估需求与联系，不公开发布。', submit: '提交企业询价', submitting: '正在提交…', submitted: '询价已提交', submittedNote: '我们已收到你的需求，将由业务团队评估资源并通过所留联系方式沟通；价格及资源仍需供应商确认。', failed: '提交失败，请稍后重试，已填写内容会保留。', invalid: '请完整填写有效的联系方式、数量、地区、租期及起租日期。',
+    bulk: '批量 GPU 租赁', forward: '远期租赁 / 长期采购', hosting: '设备与机柜托管', custom: '专属集群 / AI Agent 基础设施',
+    enquiries: 'Business Enquiries｜业务咨询', tagline: 'EVE METAL — Powering the Future of AI & Global Markets.',
+    adminTitle: '算力询价', inquiriesLoading: '正在加载算力询价…', refresh: '刷新', empty: '暂无算力询价', listError: '询价加载失败，请刷新重试。', more: '加载更多', details: '查看详情', received: '提交时间'
+  },
+  en: {
+    title: 'AI Data Center & Computing Power', subtitle: 'AI Data Centers & Global Compute Services',
+    intro: 'Building on 25 years of metals trading and financial-market experience, EVE METAL is expanding into AI infrastructure, GPU computing and next-generation data centers, connecting energy, finance and artificial intelligence.',
+    plan: 'The platform plans to integrate global data-center and GPU resources, focusing on NVIDIA H100, H200, B300 and other high-performance systems for model training, inference, GPU server rental, equipment hosting, dedicated clusters and AI Agent infrastructure.',
+    strategy: 'Our strategy: connect energy metals, nuclear energy, electricity, data centers and AI compute markets through cross-industry digital resource services.',
+    disclaimer: 'All availability and quotes are subject to supplier confirmation. Public listings do not establish EVE METAL-owned inventory, a supplier partnership or an executable offer.',
+    marketplace: 'GPU Marketplace | Rental references', priceNote: 'On-demand rental references in USD / GPU-hour, not interruptible Spot discounts, exchange futures or forward quotations. Cloud tiers have different service conditions.',
+    weekly: 'Supplier prices checked Mondays at 10:00 Singapore time. Weekly verification is not a live feed. Original prices and dates remain when no new price list is published.',
+    sourceDate: 'Supplier price-list date', checked: 'Last successful check', loading: 'Loading public rental prices…', loadError: 'Unable to load prices. Please retry.', retry: 'Retry', pending: 'No verified prices yet. Consult the original supplier price list.', stale: 'No successful verification in over a week. Check data freshness.', priceFailed: 'The latest check failed. Last successfully checked prices remain below.',
+    model: 'GPU model', memory: 'VRAM', provider: 'Public supplier', region: 'Deployment region', quantity: 'Available quantity', confirm: 'Supplier confirmation', notPublished: 'Not published; confirm with supplier', community: 'Community Cloud', secure: 'Secure Cloud', source: 'Original source', enquire: 'Request rental quote',
+    dataCenter: 'AI Data Center | Public resource directory', catalogNote: 'Third-party public information, not confirmed partnerships or currently available capacity. GPU models, cabinets and network capacity must each be confirmed.', power: 'Power & redundancy', racks: 'Colocation', network: 'Networking', available: 'Available cabinets / GPUs',
+    futures: 'Compute futures | Exchange product information', futuresIntro: 'CME official materials describe H100 (GPU1) and B200 (GPU2) rental-index futures: 730 GPU-hours per contract, financial settlement and monthly contracts listed out 36 months. Confirm listing and trading status with the exchange.',
+    futuresMissing: 'An authorized futures feed is not connected. Unverified trade prices, settlements and forward curves are not displayed. No verified exchange futures quotes are available here for H200 or B300; rental rates are not substitutes.',
+    trading: 'Real futures trading is not enabled. It requires an appropriately authorized broker, trading accounts, licensed data, suitability and risk controls. This section does not place orders, debit funds or change existing wallets or trading.', official: 'CME official product information',
+    calculator: 'Compute Calculator | Budget planner', hours: 'Hours per day', days: 'Days per month', months: 'Budget months', hourly: 'Total hourly GPU cost', monthly: 'Estimated monthly rental', budget: 'Estimated total budget', calcNote: 'Cost = per-GPU hourly rent × GPU count × usage hours. Monthly estimates use the selected day count. Budget estimates are not forwards or futures prices and exclude taxes, storage, networking, electricity and hosting extras.', noRate: 'No verified rate is available to calculate a budget.',
+    desk: 'OTC Compute Desk | Enterprise enquiries', deskNote: 'Bulk GPU rentals, future-start leases, long-term procurement and custom deployments. Enquiries are not orders, price locks or exchange futures trades.', name: 'Contact name', company: 'Company (optional)', contact: 'Contact details', contactHint: 'Email, phone or WeChat; provide at least one', type: 'Request type', count: 'GPU count', start: 'Expected start date', duration: 'Lease months', requirements: 'Deployment & custom requirements (optional)', privacy: 'Enquiries are visible only to administrators for assessment and contact; they are not published.', submit: 'Submit enterprise enquiry', submitting: 'Submitting…', submitted: 'Enquiry submitted', submittedNote: 'We have received your requirements. Our team will assess resources and follow up using the contact provided. Prices and capacity remain subject to supplier confirmation.', failed: 'Submission failed. Please retry; your entries have been retained.', invalid: 'Provide valid contact details, GPU count, region, lease duration and start date.',
+    bulk: 'Bulk GPU rental', forward: 'Forward lease / long-term procurement', hosting: 'Equipment & colocation', custom: 'Dedicated cluster / AI Agent infrastructure',
+    enquiries: 'Business Enquiries', tagline: 'EVE METAL — Powering the Future of AI & Global Markets.',
+    adminTitle: 'Compute enquiries', inquiriesLoading: 'Loading compute enquiries…', refresh: 'Refresh', empty: 'No compute enquiries yet', listError: 'Unable to load enquiries. Refresh to retry.', more: 'Load more', details: 'View details', received: 'Submitted'
+  }
+};

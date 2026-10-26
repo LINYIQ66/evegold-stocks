@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Phone, Building2 } from 'lucide-react';
 import RecruitmentForm from '@/components/careers/RecruitmentForm';
+import AiComputeSection from '@/components/compute/AiComputeSection';
 
 export default function CompanySections({ copy }) {
   const linkClass = 'inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium hover:bg-muted';
@@ -18,6 +19,7 @@ export default function CompanySections({ copy }) {
       <section id="energy" className="scroll-mt-6 rounded-2xl bg-desk-navy p-7 text-desk-silver">
         <h2 className="text-2xl font-semibold">{copy.energyTitle}</h2><p className="mt-4 max-w-3xl text-sm leading-relaxed text-desk-silver/80">{copy.energyText}</p><Link to="/UraniumMarket" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-desk-gold underline">{copy.energyLink}<ArrowUpRight className="h-4 w-4" /></Link>
       </section>
+      <AiComputeSection />
       <div className="grid gap-8 md:grid-cols-2">
         <section id="venues" className="scroll-mt-6"><Building2 className="mb-4 h-6 w-6 text-desk-gold" /><h2 className="text-2xl font-semibold">{copy.venuesTitle}</h2><p className="mt-4 text-sm leading-relaxed text-muted-foreground">{copy.venuesText}</p><Link to="/Home" className={`${linkClass} mt-5`}>{copy.venuesLink}<ArrowUpRight className="h-4 w-4" /></Link></section>
       </div>

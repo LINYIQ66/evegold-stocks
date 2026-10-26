@@ -4,7 +4,7 @@ import { ArrowUpRight, Globe2 } from 'lucide-react';
 
 export default function DeskShell({ language, setLanguage, children }) {
   const zh = language === 'zh';
-  const sections = [['about', 'About Us', '关于我们'], ['financial-markets', 'Financial Markets', '金融市场'], ['energy', 'Energy and Commodities', '能源与大宗商品'], ['venues', 'Venues', '服务渠道'], ['careers', 'Careers', '加入我们'], ['contact', 'Contact Us', '联系我们']];
+  const sections = [['about', 'About Us', '关于我们'], ['financial-markets', 'Financial Markets', '金融市场'], ['energy', 'Energy and Commodities', '能源与大宗商品'], ['ai-compute', 'AI Data Center & Computing', 'AI 数据中心与算力'], ['venues', 'Venues', '服务渠道'], ['careers', 'Careers', '加入我们'], ['contact', 'Contact Us', '联系我们']];
   return (
     <div className="min-h-screen bg-background text-foreground" lang={zh ? 'zh-CN' : 'en'}>
       <header className="border-b border-border px-5 py-6 md:px-10">

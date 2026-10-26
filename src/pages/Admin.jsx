@@ -20,6 +20,7 @@ import DeliveryRequests from "../components/admin/DeliveryRequests";
 import SupportTicketReview from "../components/admin/SupportTicketReview";
 import AnalyticsReport from "../components/admin/AnalyticsReport";
 import RecruitmentApplications from '@/components/admin/RecruitmentApplications';
+import ComputeInquiries from '@/components/admin/ComputeInquiries';
 
 export default function Admin() {
   const [adminUser, setAdminUser] = useState(null);
@@ -428,6 +429,7 @@ export default function Admin() {
             <TabsTrigger value="users" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Users className="w-4 h-4 mr-2" />Users</TabsTrigger>
             <TabsTrigger value="system" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Settings className="w-4 h-4 mr-2" />System</TabsTrigger>
             <TabsTrigger value="recruitment" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Users className="w-4 h-4 mr-2" />招聘申请</TabsTrigger>
+            <TabsTrigger value="compute-inquiries" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><MessageSquare className="w-4 h-4 mr-2" />算力询价</TabsTrigger>
           </TabsList>
           <TabsContent value="kyc"><KYCReview users={users.filter(u => u.kyc_status === "pending")} onUpdateKYC={updateKYCStatus} isLoading={isLoading} /></TabsContent>
           <TabsContent value="funds"><FundRequests requests={fundRequests} onUpdateRequest={updateFundRequestStatus} isLoading={isLoading} /></TabsContent>
@@ -441,6 +443,7 @@ export default function Admin() {
           <TabsContent value="users"><UserManagement users={users} isLoading={isLoading} /></TabsContent>
           <TabsContent value="system"><PaymentSettings settings={systemSettings} onUpdateSettings={updateSystemSettings} /></TabsContent>
           <TabsContent value="recruitment">{adminUser?.role === 'admin' && <RecruitmentApplications adminId={adminUser.id} />}</TabsContent>
+          <TabsContent value="compute-inquiries">{adminUser?.role === 'admin' && <ComputeInquiries adminId={adminUser.id} />}</TabsContent>
         </Tabs>
       </div>
     </div>
