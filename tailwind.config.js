@@ -4,12 +4,23 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
-  		borderRadius: {
+  		fontFamily: {
+            heading: 'var(--font-heading)',
+            body: 'var(--font-body)',
+            display: 'var(--font-display)'
+        },
+        borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+            vision: {
+                night: 'hsl(var(--vision-night))',
+                panel: 'hsl(var(--vision-panel))',
+                glow: 'hsl(var(--vision-glow))',
+                line: 'hsl(var(--vision-line))'
+            },
             desk: {
                 navy: 'hsl(var(--desk-navy))',
                 silver: 'hsl(var(--desk-silver))',

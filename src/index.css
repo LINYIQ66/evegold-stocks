@@ -32,6 +32,13 @@
     --desk-navy: 213 66% 16%;
     --desk-silver: 207 27% 92%;
     --desk-gold: 39 47% 60%;
+    --vision-night: 222 58% 6%;
+    --vision-panel: 218 42% 12%;
+    --vision-glow: 185 76% 67%;
+    --vision-line: 214 27% 25%;
+    --font-heading: ui-sans-serif, system-ui, sans-serif;
+    --font-body: ui-sans-serif, system-ui, sans-serif;
+    --font-display: ui-sans-serif, system-ui, sans-serif;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -70,6 +77,13 @@
     --desk-navy: 213 66% 16%;
     --desk-silver: 207 27% 92%;
     --desk-gold: 39 47% 60%;
+    --vision-night: 222 58% 6%;
+    --vision-panel: 218 42% 12%;
+    --vision-glow: 185 76% 67%;
+    --vision-line: 214 27% 25%;
+    --font-heading: ui-sans-serif, system-ui, sans-serif;
+    --font-body: ui-sans-serif, system-ui, sans-serif;
+    --font-display: ui-sans-serif, system-ui, sans-serif;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
