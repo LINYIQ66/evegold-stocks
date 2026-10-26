@@ -11,7 +11,7 @@ export default function DeskShell({ language, setLanguage, children }) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link to="/AboutUs" className="flex items-center gap-3">
             <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a0d6759fb_Screenshot2025-08-23105026.png" alt="EVE METAL" className="h-10 w-10 rounded-lg" />
-            <div><p className="text-xl font-bold tracking-widest text-desk-navy">EVE METAL</p><p className="text-xs text-muted-foreground">Global Metals & Financial Markets</p></div>
+            <div><p className="text-xl font-bold tracking-widest text-desk-navy">EVE METAL</p><p className="text-xs text-muted-foreground">{zh ? '全球金属与金融市场' : 'Global Metals & Financial Markets'}</p></div>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <Globe2 className="h-4 w-4 text-muted-foreground" />
@@ -27,7 +27,7 @@ export default function DeskShell({ language, setLanguage, children }) {
         </nav>
       </header>
       {children}
-      <footer className="border-t border-border px-5 py-8 text-xs text-muted-foreground md:px-10"><p>EVE METAL — Global Metals & Financial Markets.</p><p className="mt-2">© {new Date().getFullYear()} EVE METAL. {zh ? '本栏仅作资讯与研究用途。' : 'This section is for information and research only.'}</p></footer>
+      <footer className="border-t border-border px-5 py-8 text-xs text-muted-foreground md:px-10"><p>{zh ? 'EVE METAL — 全球金属与金融市场。' : 'EVE METAL — Global Metals & Financial Markets.'}</p><p className="mt-2">© {new Date().getFullYear()} EVE METAL. {zh ? '本栏仅作资讯与研究用途。' : 'This section is for information and research only.'}</p></footer>
     </div>
   );
 }

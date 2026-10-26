@@ -10,7 +10,7 @@ export default function UraniumPriceHistory({ copy }) {
         <p className="text-xs font-semibold tracking-widest text-desk-gold">{copy.quoteLabel}</p>
         <h2 className="mt-8 text-lg">{copy.quoteTitle}</h2>
         <p className="mt-3 text-5xl font-semibold tabular-nums">$52.71</p>
-        <p className="mt-2 text-sm text-desk-gold">USD/lb U₃O₈ equivalent</p>
+        <p className="mt-2 text-sm text-desk-gold">{copy.unit}</p>
         <p className="mt-6 text-sm leading-relaxed text-desk-silver/80">{copy.quoteNote}</p>
         <a href={sources.prices} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 text-sm text-desk-gold underline">{copy.source}: U.S. EIA · Table 3<ExternalLink className="h-3 w-3" /></a>
       </div>

@@ -1,10 +1,6 @@
-import { useState } from 'react';
+import { useLanguage } from '@/components/common/LanguageProvider';
 
 export default function useDeskLanguage() {
-  const [language, setLanguageState] = useState(() => localStorage.getItem('eve-metal-desk-language') === 'zh' ? 'zh' : 'en');
-  const setLanguage = (value) => {
-    localStorage.setItem('eve-metal-desk-language', value);
-    setLanguageState(value);
-  };
-  return [language, setLanguage];
+  const { language, setLanguage } = useLanguage();
+  return [language === 'zh' ? 'zh' : 'en', setLanguage];
 }

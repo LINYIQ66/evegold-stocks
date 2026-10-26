@@ -16,6 +16,7 @@ export const marketContent = {
     quoteLabel: 'U₃O₈ · HISTORICAL RESEARCH', quoteTitle: '2024 annual purchase average', quoteNote: 'U.S. civilian reactor owners and operators. Weighted-average delivered purchase price, U₃O₈ equivalent. Not a spot index or an executable quote.',
     chartTitle: 'Historical uranium purchase prices', chartSub: 'Annual U.S. weighted-average purchase prices · USD/lb U₃O₈ equivalent · 2021–2024',
     source: 'Source', snapshot: 'Fixed research snapshot · checked 26 October 2026',
+    coverageLabel: 'GLOBAL COVERAGE', energyLabel: 'EVE METAL · Energy & Commodities', unit: 'USD/lb U₃O₈ equivalent',
     unavailable: 'A licensed live spot-price feed is not connected. No live spot price or intraday price history is shown.',
     regionsTitle: 'A global market, distinct regional roles', regionsSub: 'Production, demand, policy and fuel-cycle capacity shape different parts of the market.',
     regions: [
@@ -41,6 +42,7 @@ export const marketContent = {
     quoteLabel: 'U₃O₈ · 历史研究数据', quoteTitle: '2024 年年度采购均价', quoteNote: '美国民用核电反应堆业主及运营商的加权平均交付采购价格，以 U₃O₈ 当量计；并非现货指数或可成交报价。',
     chartTitle: '铀历史采购价格', chartSub: '美国年度加权平均采购价 · USD/lb U₃O₈ 当量 · 2021–2024 年',
     source: '数据来源', snapshot: '固定历史研究快照 · 核对日期：2026 年 10 月 26 日',
+    coverageLabel: '全球市场覆盖', energyLabel: 'EVE METAL · 能源与大宗商品', unit: '美元/磅 · U₃O₈ 当量',
     unavailable: '尚未接入获授权的实时现货行情；本页不展示实时现货价格或分时价格走势。',
     regionsTitle: '全球市场，不同区域的产业角色', regionsSub: '生产、需求、政策和燃料服务能力共同影响核燃料市场。',
     regions: [
