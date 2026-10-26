@@ -106,7 +106,8 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
       };
     });
 
-  if (holdings.length === 0) return null;
+  const visibleHoldings = holdings.filter(h => h.shares + h.frozenShares >= 0.01);
+  if (visibleHoldings.length === 0) return null;
 
   const totalMarketValue = holdings.reduce((s, h) => s + (h.marketValue || 0), 0);
   const totalCost = holdings.reduce((s, h) => s + (h.totalCost || 0), 0);
@@ -120,7 +121,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
           <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
             <Briefcase className="w-4 h-4 text-blue-500" />
             我的股票持仓
-            <Badge className="bg-blue-100 text-blue-700 text-xs">{holdings.length} 个持仓</Badge>
+            <Badge className="bg-blue-100 text-blue-700 text-xs">{visibleHoldings.length} 个持仓</Badge>
           </CardTitle>
 
           {/* View toggle */}
@@ -177,7 +178,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
         {view === "overview" ? (
           /* ── Overview Grid ── */
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-            {holdings.map((h, i) => (
+            {visibleHoldings.map((h, i) => (
               <motion.div
                 key={h.key}
                 initial={{ opacity: 0, y: 10 }}
@@ -197,9 +198,9 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
                 </div>
                 <p className="text-xs text-slate-500 truncate">{h.name}</p>
                 <div className="text-xs text-slate-600 mt-1">
-                  <span>{h.shares.toFixed(6)} 股</span>
-                  {h.frozenShares > 0 && (
-                    <span className="text-yellow-600 ml-1">({h.frozenShares.toFixed(6)} 冻结)</span>
+                  <span>{h.shares.toFixed(2)} 股</span>
+                  {h.frozenShares >= 0.01 && (
+                    <span className="text-yellow-600 ml-1">({h.frozenShares.toFixed(2)} 冻结)</span>
                   )}
                 </div>
                 {h.marketValue !== null && (
@@ -226,7 +227,7 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
                 </tr>
               </thead>
               <tbody>
-                {holdings.map((h, i) => (
+                {visibleHoldings.map((h, i) => (
                   <motion.tr
                     key={h.key}
                     initial={{ opacity: 0, x: -6 }}
@@ -240,9 +241,9 @@ export default function StockHoldings({ user, prices, onSymbolClick, transaction
                       <div className="text-slate-400 text-xs">{h.name}</div>
                     </td>
                     <td className="py-2.5 px-2 text-right text-slate-700 font-medium">
-                      {h.shares.toFixed(6)}
-                      {h.frozenShares > 0 && (
-                        <div className="text-xs text-yellow-600 font-normal">{h.frozenShares.toFixed(6)} 待成交</div>
+                      {h.shares.toFixed(2)}
+                      {h.frozenShares >= 0.01 && (
+                        <div className="text-xs text-yellow-600 font-normal">{h.frozenShares.toFixed(2)} 待成交</div>
                       )}
                     </td>
                     <td className="py-2.5 px-2 text-right text-slate-600">

@@ -198,6 +198,8 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, cr
       list = allAssets.filter(a => a.total > 0 || (a.isCrypto && a.price > 0));
     }
 
+    list = list.filter(asset => !asset.isStock || asset.total >= 0.01);
+
     if (sortByValue) {
       list = [...list].sort((a, b) => b.usdValue - a.usdValue);
     }
@@ -329,7 +331,7 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, cr
                         <div>
                           <p className="text-2xl font-bold text-slate-900">
                             {asset.isStock
-                              ? asset.total.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+                              ? asset.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                               : formatBalance(asset.total, asset.symbol)}
                           </p>
                           <p className="text-sm text-slate-500">
@@ -342,16 +344,16 @@ export default function BalanceCards({ user, isLoading, prices, priceChanges, cr
                             <span className="text-slate-500">可用：</span>
                             <span className="font-medium text-green-600">
                               {asset.isStock
-                                ? asset.avail.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+                                ? asset.avail.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                 : formatBalance(asset.avail, asset.symbol)}
                             </span>
                           </div>
-                          {asset.locked > 0 && (
+                          {(asset.isStock ? asset.locked >= 0.01 : asset.locked > 0) && (
                             <div className="flex items-center justify-between">
                               <span className="flex items-center gap-1 text-slate-500"><Lock className="w-3 h-3" />已锁定：</span>
                               <span className="font-medium text-yellow-800">
                                 {asset.isStock
-                                  ? asset.locked.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 })
+                                  ? asset.locked.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                   : formatBalance(asset.locked, asset.symbol)}
                               </span>
                             </div>

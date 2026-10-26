@@ -336,7 +336,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             <div className="space-y-1">
               <div className="flex justify-between text-sm">
                 <Label className="text-slate-700">卖出股数 ({selectedSymbol})</Label>
-                <span className="text-slate-500">持仓: {stockBalance.toFixed(6)} {selectedSymbol}</span>
+                {stockBalance >= 0.01 && <span className="text-slate-500">持仓: {stockBalance.toFixed(2)} {selectedSymbol}</span>}
               </div>
               <Input
                 type="number"
@@ -429,7 +429,7 @@ export default function StockTradeInterface({ user, selectedSymbol, livePrice: l
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {side === "buy" ? `${currency} 余额不足（最多可用: ${payBalance.toFixed(2)}）` : `${selectedSymbol} 持仓不足（最多可卖: ${stockBalance.toFixed(6)}）`}
+              {side === "buy" ? `${currency} 余额不足（最多可用: ${payBalance.toFixed(2)}）` : `${selectedSymbol} 持仓不足（最多可卖约: ${stockBalance.toFixed(2)}）`}
             </motion.div>
           )}
           {isLimitPriceInvalid && (
