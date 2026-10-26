@@ -1,0 +1,45 @@
+{
+  "name": "\u6bcf\u5468\u66f4\u65b0\u94c0\u73b0\u8d27\u4e0e\u671f\u8d27\u4ef7\u683c",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "namespace": "base44",
+      "name": "weekly_uranium_market_prices",
+      "version": "1.0"
+    },
+    "do": [
+      {
+        "refresh_prices": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "refreshUraniumPrices",
+            "args": {}
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "\u66f4\u65b0\u94c0\u73b0\u8d27\u4e0e\u671f\u8d27\u4ef7\u683c",
+            "description": "\u4fdd\u5b58\u6765\u6e90\u65e5\u671f\u53ca\u5386\u53f2\uff0c\u7f3a\u5931\u6216\u5931\u8d25\u4e0d\u7f16\u9020\u4ef7\u683c"
+          }
+        }
+      }
+    ]
+  },
+  "description": "\u6bcf\u5468\u4e00\u65b0\u52a0\u5761\u65f6\u95f4 10:00 \u68c0\u67e5 Cameco \u6708\u672b\u73b0\u8d27\u4e0e Yahoo Finance UX=F \u671f\u8d27\u516c\u5f00\u62a5\u4ef7\uff0c\u4fdd\u7559 2024 \u5e74\u8d77\u5386\u53f2\uff0c\u6765\u6e90\u5931\u8d25\u65f6\u4fdd\u7559\u65e7\u503c\u5e76\u8bb0\u5f55\u5931\u8d25\u3002",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 10 * * 1",
+      "one_time_date": null,
+      "timezone": "Asia/Singapore",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  }
+}

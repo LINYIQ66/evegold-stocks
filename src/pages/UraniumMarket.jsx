@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowDown, Atom } from 'lucide-react';
 import DeskShell from '@/components/uranium/DeskShell';
 import UraniumPriceHistory from '@/components/uranium/UraniumPriceHistory';
+import UraniumMarketPrices from '@/components/uranium/UraniumMarketPrices';
 import UraniumResearch from '@/components/uranium/UraniumResearch';
 import NuclearFuelOverview from '@/components/uranium/NuclearFuelOverview';
 import useDeskLanguage from '@/components/uranium/useDeskLanguage';
@@ -21,6 +22,7 @@ export default function UraniumMarket() {
       </section>
       <main className="mx-auto max-w-6xl space-y-14 px-5 py-12 md:px-10">
         <UraniumPriceHistory copy={copy} />
+        <UraniumMarketPrices language={language} />
         <UraniumResearch copy={copy} />
         <NuclearFuelOverview copy={copy} />
       </main>

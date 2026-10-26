@@ -17,7 +17,7 @@ export const marketContent = {
     chartTitle: 'Historical uranium purchase prices', chartSub: 'Annual U.S. weighted-average purchase prices · USD/lb U₃O₈ equivalent · 2021–2024',
     source: 'Source', snapshot: 'Fixed research snapshot · checked 26 October 2026',
     coverageLabel: 'GLOBAL COVERAGE', energyLabel: 'EVE METAL · Energy & Commodities', unit: 'USD/lb U₃O₈ equivalent',
-    unavailable: 'A licensed live spot-price feed is not connected. No live spot price or intraday price history is shown.',
+    unavailable: 'This chart shows historical purchase averages, not spot or futures prices. Updated public spot and futures references are displayed separately below.',
     regionsTitle: 'A global market, distinct regional roles', regionsSub: 'Production, demand, policy and fuel-cycle capacity shape different parts of the market.',
     regions: [
       ['Kazakhstan', 'Production & Kazatomprom', 'Kazakhstan is a leading uranium-producing country. Kazatomprom is an important participant in its mining industry.'],
@@ -43,7 +43,7 @@ export const marketContent = {
     chartTitle: '铀历史采购价格', chartSub: '美国年度加权平均采购价 · USD/lb U₃O₈ 当量 · 2021–2024 年',
     source: '数据来源', snapshot: '固定历史研究快照 · 核对日期：2026 年 10 月 26 日',
     coverageLabel: '全球市场覆盖', energyLabel: 'EVE METAL · 能源与大宗商品', unit: '美元/磅 · U₃O₈ 当量',
-    unavailable: '尚未接入获授权的实时现货行情；本页不展示实时现货价格或分时价格走势。',
+    unavailable: '本图为历史采购均价，不是现货或期货价格；每周检查的公开现货与期货参考数据在下方单独展示。',
     regionsTitle: '全球市场，不同区域的产业角色', regionsSub: '生产、需求、政策和燃料服务能力共同影响核燃料市场。',
     regions: [
       ['哈萨克斯坦', '铀生产与 Kazatomprom', '哈萨克斯坦是主要铀生产国，Kazatomprom 是当地铀矿业的重要参与者。'],
