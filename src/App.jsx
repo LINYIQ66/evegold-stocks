@@ -8,6 +8,8 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import USStockPopular from '@/pages/USStockPopular';
 import USStockMovers from '@/pages/USStockMovers';
+import UraniumMarket from '@/pages/UraniumMarket';
+import AboutUs from '@/pages/AboutUs';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -61,6 +63,8 @@ const AuthenticatedApp = () => {
       ))}
       <Route path="/USStockPopular" element={<LayoutWrapper currentPageName="USStocks"><USStockPopular /></LayoutWrapper>} />
       <Route path="/USStockMovers" element={<LayoutWrapper currentPageName="USStocks"><USStockMovers /></LayoutWrapper>} />
+      <Route path="/UraniumMarket" element={<LayoutWrapper currentPageName="UraniumMarket"><UraniumMarket /></LayoutWrapper>} />
+      <Route path="/AboutUs" element={<LayoutWrapper currentPageName="AboutUs"><AboutUs /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -17,7 +17,9 @@ import {
   Languages,
   ChevronDown,
   BarChart2,
-  Code2
+  Code2,
+  Atom,
+  Building2
 } from "lucide-react";
 import {
   Sidebar,
@@ -154,7 +156,7 @@ const SidebarMenuContent = ({ visibleNavItems, location, isGuest }) => {
 const AppLayout = ({ children }) => {
   const location = useLocation();
   const [user, setUser] = useState(null);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -175,6 +177,8 @@ const AppLayout = ({ children }) => {
     { title: t('sidebar.physical'), url: createPageUrl("Physical"), icon: Package, page: 'Physical' },
     { title: t('sidebar.loan'), url: createPageUrl("Lending"), icon: Banknote, page: 'Lending' },
     { title: t('sidebar.us_stocks'), url: createPageUrl("USStocks"), icon: BarChart2, page: 'USStocks' },
+    { title: language === 'zh' ? '全球铀市场' : 'Uranium Market', url: '/UraniumMarket', icon: Atom, page: 'UraniumMarket' },
+    { title: language === 'zh' ? '关于 EVE METAL' : 'About EVE METAL', url: '/AboutUs', icon: Building2, page: 'AboutUs' },
     { title: t('sidebar.staking'), url: createPageUrl("Staking"), icon: PiggyBank, page: 'Staking' },
     { title: t('sidebar.account'), url: createPageUrl("Account"), icon: UserCheck, page: 'Account' },
     { title: t('sidebar.statement'), url: createPageUrl("DailyStatement"), icon: FileText, page: 'DailyStatement' },
