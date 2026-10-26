@@ -19,6 +19,7 @@ import PhysicalInventory from "../components/admin/PhysicalInventory";
 import DeliveryRequests from "../components/admin/DeliveryRequests";
 import SupportTicketReview from "../components/admin/SupportTicketReview";
 import AnalyticsReport from "../components/admin/AnalyticsReport";
+import RecruitmentApplications from '@/components/admin/RecruitmentApplications';
 
 export default function Admin() {
   const [adminUser, setAdminUser] = useState(null);
@@ -414,7 +415,7 @@ export default function Admin() {
           <Card className="bg-gradient-to-r from-cyan-600 to-sky-600 text-white border-0 shadow-lg"><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-cyan-100 mb-2">Pending Deposits</p><p className="text-3xl font-bold">{metrics.pendingDeposits}</p></div><Landmark className="w-8 h-8 text-cyan-200" /></div></CardContent></Card>
         </motion.div>
         <Tabs defaultValue="kyc" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-11 bg-white shadow-lg">
+          <TabsList className="flex h-auto w-full flex-wrap bg-white shadow-lg">
             <TabsTrigger value="kyc" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><FileText className="w-4 h-4 mr-2" />KYC</TabsTrigger>
             <TabsTrigger value="funds" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Landmark className="w-4 h-4 mr-2" />Funds</TabsTrigger>
             <TabsTrigger value="tickets" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><MessageSquare className="w-4 h-4 mr-2" />Tickets</TabsTrigger>
@@ -426,6 +427,7 @@ export default function Admin() {
             <TabsTrigger value="statements" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><FileText className="w-4 h-4 mr-2" />Statements</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Users className="w-4 h-4 mr-2" />Users</TabsTrigger>
             <TabsTrigger value="system" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Settings className="w-4 h-4 mr-2" />System</TabsTrigger>
+            <TabsTrigger value="recruitment" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Users className="w-4 h-4 mr-2" />招聘申请</TabsTrigger>
           </TabsList>
           <TabsContent value="kyc"><KYCReview users={users.filter(u => u.kyc_status === "pending")} onUpdateKYC={updateKYCStatus} isLoading={isLoading} /></TabsContent>
           <TabsContent value="funds"><FundRequests requests={fundRequests} onUpdateRequest={updateFundRequestStatus} isLoading={isLoading} /></TabsContent>
@@ -438,6 +440,7 @@ export default function Admin() {
           <TabsContent value="statements"><StatementGenerator users={users} /></TabsContent>
           <TabsContent value="users"><UserManagement users={users} isLoading={isLoading} /></TabsContent>
           <TabsContent value="system"><PaymentSettings settings={systemSettings} onUpdateSettings={updateSystemSettings} /></TabsContent>
+          <TabsContent value="recruitment">{adminUser?.role === 'admin' && <RecruitmentApplications adminId={adminUser.id} />}</TabsContent>
         </Tabs>
       </div>
     </div>

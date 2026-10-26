@@ -8,7 +8,7 @@ export const companyContent = {
     financialTitle: 'Financial Markets', financialText: 'Explore the platform’s existing U.S. stocks, precious metals and digital-asset markets. Availability and applicable conditions are shown within each existing service.', stocks: 'U.S. stocks', metals: 'Metals & digital assets', wallet: 'Existing wallet',
     energyTitle: 'Energy and Commodities', energyText: 'Our research coverage is expanding to energy metals, strategic minerals and the global nuclear energy supply chain. The uranium section provides public research and historical information, not nuclear-material trading services.', energyLink: 'Explore uranium market research',
     venuesTitle: 'Venues', venuesText: 'This website is our digital information and service channel. Research content is not a listing venue or exchange. Access to existing platform markets remains through the relevant market pages.', venuesLink: 'Platform home',
-    careersTitle: 'Careers', careersText: 'No open roles are published in this section. For general company enquiries, use the contact details below.',
+    careersTitle: 'Careers', careersText: 'Join EVE METAL. Tell us about yourself and your career interests, leave your contact details and upload your résumé.',
     contactTitle: 'Contact Us', contactText: 'General company enquiries', call: 'Call EVE METAL', contactNote: 'This contact section does not accept nuclear-material purchase or sale instructions.',
     brandNote: 'EVE METAL content describes EVE METAL only. It does not represent another firm’s staff, permissions or services.'
   },
@@ -20,7 +20,7 @@ export const companyContent = {
     financialTitle: '金融市场', financialText: '浏览平台现有美股、贵金属及数字资产市场。各项服务的可用范围与适用条件以对应页面为准。', stocks: '美股市场', metals: '金属与数字资产', wallet: '现有钱包',
     energyTitle: '能源与大宗商品', energyText: '研究范围逐步延伸至能源金属、战略矿产及全球核能产业链。铀市场栏目提供公开研究与历史数据，不提供核材料交易服务。', energyLink: '浏览铀市场研究',
     venuesTitle: '服务渠道', venuesText: '本网站为数字资讯与服务渠道。研究内容不构成挂牌场所或交易所；现有市场功能仍通过对应市场页面提供。', venuesLink: '平台主页',
-    careersTitle: '加入我们', careersText: '本栏目前未发布招聘职位。一般公司咨询可使用下方联系方式。',
+    careersTitle: '招聘', careersText: '加入 EVE METAL，介绍你的个人情况与求职意向，留下联系方式并上传简历。',
     contactTitle: '联系我们', contactText: '一般公司咨询', call: '致电 EVE METAL', contactNote: '本联系栏目不接收核材料采购或出售指令。',
     brandNote: 'EVE METAL 内容仅描述本公司，不代表其他机构的人员、业务许可或服务。'
   }

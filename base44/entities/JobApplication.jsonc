@@ -1,0 +1,62 @@
+{
+  "name": "JobApplication",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "contact_details": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200
+    },
+    "introduction": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 5000
+    },
+    "resume_file_uri": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "resume_file_name": {
+      "type": "string",
+      "maxLength": 255,
+      "pattern": "\\.[pP][dD][fF]$|\\.[dD][oO][cC][xX]?$"
+    },
+    "resume_file_size": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10485760
+    }
+  },
+  "required": [
+    "full_name",
+    "contact_details",
+    "introduction",
+    "resume_file_uri",
+    "resume_file_name",
+    "resume_file_size"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
