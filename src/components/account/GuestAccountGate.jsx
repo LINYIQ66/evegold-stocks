@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EveVideoPanel from '@/components/account/EveVideoPanel';
+import LegalDraftLinks from '@/components/legal/LegalDraftLinks';
 
 const LOGO = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/a0d6759fb_Screenshot2025-08-23105026.png';
 
@@ -21,6 +22,7 @@ export default function GuestAccountGate({ onLogin }) {
             <div className="mt-9 space-y-4">
               <Button type="button" onClick={onLogin} size="lg" className="w-full justify-between rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-7 text-base font-bold text-white shadow-xl ring-4 ring-blue-100 hover:from-blue-700 hover:to-indigo-700 focus-visible:ring-blue-500 sm:max-w-md">登录或注册 <ArrowRight aria-hidden="true" /></Button>
               <p className="text-xs leading-relaxed text-muted-foreground">新用户可在安全认证页面注册；可用的登录方式以认证页面实际显示为准。</p>
+              <LegalDraftLinks />
             </div>
           </div>
           <div className="flex items-center gap-2 border-t border-border pt-5 text-xs text-muted-foreground"><ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />由平台安全认证服务保护账户访问</div>
