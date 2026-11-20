@@ -6,18 +6,7 @@ import { createPageUrl } from "@/utils";
 import { CheckCircle, Wallet, ArrowLeftRight, LogOut } from "lucide-react"; // Added LogOut icon
 import { motion } from "framer-motion";
 
-export default function Account() { // Renamed from KYCApproved
-  // This function would handle the actual logout logic, e.g., clearing tokens,
-  // making an API call to invalidate session, and then redirecting the user
-  // to a login page or home page. For this example, it's a placeholder.
-  const handleLogout = () => {
-    console.log("Logout initiated. In a real application, this would clear user session and redirect.");
-    // Example: Assuming you have a way to navigate
-    // import { useNavigate } from "react-router-dom";
-    // const navigate = useNavigate();
-    // navigate(createPageUrl("Login")); // Redirect to login page
-  };
-
+export default function KYCApproved({ onLogout }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -49,7 +38,7 @@ export default function Account() { // Renamed from KYCApproved
             <Button
               size="lg"
               variant="destructive" // A 'destructive' variant often suits logout actions
-              onClick={handleLogout}
+              onClick={onLogout}
               className="text-lg px-8 py-4"
             >
               <LogOut className="w-5 h-5 mr-2" />

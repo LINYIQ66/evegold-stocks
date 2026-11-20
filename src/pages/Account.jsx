@@ -282,7 +282,7 @@ export default function Account() {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="mb-8">
                   <KYCStatus user={user} isLoading={isLoading} />
                 </motion.div>
-                {user?.kyc_status === "approved" ? ( <KYCApproved /> ) : (
+                {user?.kyc_status === "approved" ? ( <KYCApproved onLogout={handleLogout} /> ) : (
                   <div className="space-y-8">
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
                       <KYCForm user={user} onSubmit={handleFormSubmit} isLoading={isLoading} />
