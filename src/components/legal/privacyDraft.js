@@ -2,7 +2,7 @@ export const privacyDraft = {
   title: '隐私政策', english: 'Privacy',
   sections: [
     { title: '1. 适用范围', paragraphs: [
-      '本隐私政策说明 EVE METAL 网站在账号登录、账户服务、招聘申请、企业询价及客户支持过程中涉及的个人信息处理。部分账户界面使用 EVE FINANCE 名称，本政策中的“网站”指本网站及其账户功能。',
+      '本隐私政策说明由 EVE METAL PTE LTD 运营的 EVE METAL 网站在账号登录、账户服务、招聘申请、企业询价及客户支持过程中涉及的个人信息处理。部分账户界面使用 EVE FINANCE 名称，本政策中的“网站”指本网站及其账户功能。',
       '如对个人信息处理有疑问，请通过关于我们页面的联系栏目或账户内的客服工单联系网站。'
     ] },
     { title: '2. 登录与账号识别', paragraphs: [
@@ -38,7 +38,7 @@ export const privacyDraft = {
       '根据 Google 官方说明，解除登录关联不会删除应用已保存的数据。删除本站资料需单独联系网站处理；请勿假定撤销 Google 关联后仍可通过其他方式进入同一账号。'
     ], links: [{ href: 'https://myaccount.google.com/connections', label: 'Google 账号：管理关联应用' }, { href: 'https://support.google.com/accounts/answer/13533235?hl=zh-Hans', label: 'Google 官方撤销关联说明' }] },
     { title: '8. 联系我们', paragraphs: [
-      '有关本政策及个人信息的咨询、更正或删除请求，请通过关于我们页面的联系栏目或已登录账户的客服工单提出。请说明请求事项，不要在留言中发送密码或登录令牌。'
+      '有关本政策及个人信息的咨询、更正或删除请求，请联系 EVE METAL PTE LTD，邮箱：LUIS@EVEMETAL.COM；也可通过关于我们页面的联系栏目或已登录账户的客服工单提出。请说明请求事项，不要在留言中发送密码或登录令牌。'
     ] }
   ]
 };
