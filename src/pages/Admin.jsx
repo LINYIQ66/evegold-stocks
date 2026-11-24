@@ -4,7 +4,8 @@ import { SendEmail } from "@/integrations/Core";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Users, FileText, TrendingUp, AlertTriangle, Landmark, DollarSign, Package, Truck, MessageSquare } from "lucide-react"; // Added MessageSquare
+import { Settings, Users, FileText, TrendingUp, AlertTriangle, Landmark, DollarSign, Package, Truck, MessageSquare, Coins } from "lucide-react";
+import ListedTokensAdmin from "@/components/admin/listing/ListedTokensAdmin"; // Added MessageSquare
 import { motion } from "framer-motion";
 import { createPageUrl } from '@/utils';
 
@@ -430,6 +431,7 @@ export default function Admin() {
             <TabsTrigger value="system" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Settings className="w-4 h-4 mr-2" />System</TabsTrigger>
             <TabsTrigger value="recruitment" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Users className="w-4 h-4 mr-2" />招聘申请</TabsTrigger>
             <TabsTrigger value="compute-inquiries" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><MessageSquare className="w-4 h-4 mr-2" />算力询价</TabsTrigger>
+            <TabsTrigger value="token-listing" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"><Coins className="w-4 h-4 mr-2" />代币上架</TabsTrigger>
           </TabsList>
           <TabsContent value="kyc"><KYCReview users={users.filter(u => u.kyc_status === "pending")} onUpdateKYC={updateKYCStatus} isLoading={isLoading} /></TabsContent>
           <TabsContent value="funds"><FundRequests requests={fundRequests} onUpdateRequest={updateFundRequestStatus} isLoading={isLoading} /></TabsContent>
@@ -444,6 +446,7 @@ export default function Admin() {
           <TabsContent value="system"><PaymentSettings settings={systemSettings} onUpdateSettings={updateSystemSettings} /></TabsContent>
           <TabsContent value="recruitment">{adminUser?.role === 'admin' && <RecruitmentApplications adminId={adminUser.id} />}</TabsContent>
           <TabsContent value="compute-inquiries">{adminUser?.role === 'admin' && <ComputeInquiries adminId={adminUser.id} />}</TabsContent>
+          <TabsContent value="token-listing">{adminUser?.role === 'admin' && <ListedTokensAdmin />}</TabsContent>
         </Tabs>
       </div>
     </div>

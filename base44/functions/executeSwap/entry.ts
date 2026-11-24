@@ -6,7 +6,7 @@
 // 4. Updates balances + creates transaction records atomically
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
-import { getCryptoMarket } from '../../shared/cryptoMarket.ts';
+import { getCryptoMarket, loadListedTokens } from '../../shared/cryptoMarket.ts';
 
 const METALS = new Set(['gold', 'silver', 'platinum', 'palladium']);
 const METAL_FEE_RATE = 0.005;
@@ -125,7 +125,11 @@ export default async function(req) {
     // Only published top-20 coins or assets already owned can be swapped.
     const cryptoTrade = fromKey.startsWith('crypto_') || toKey.startsWith('crypto_');
     const held = Object.keys(currentBalances).filter(key => /^crypto_[a-z0-9]{2,15}$/.test(key) && currentBalances[key] > 0).map(key => key.slice(7));
-    const crypto = cryptoTrade ? await getCryptoMarket(held) : { prices: {} };
+    const crypto = cryptoTrade ? await getCryptoMarket(held, await loadListedTokens(base44)) : { prices: {}, coins: [] };
+    const suspended = crypto.coins.find(c => c.tradable === false && [fromKey, toKey].includes(`crypto_${c.symbol.toLowerCase()}`));
+    if (suspended) {
+      return Response.json({ success: false, error: `${suspended.symbol} 已暂停交易` }, { status: 400 });
+    }
     const metalPrices = await fetchMetalPrices();
     const forexRates = await fetchForexRates();
     const prices = { usd: 1.0, usdt: 1.0, ...forexRates, ...metalPrices, ...crypto.prices };

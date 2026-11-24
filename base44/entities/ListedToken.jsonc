@@ -1,0 +1,106 @@
+{
+  "name": "ListedToken",
+  "type": "object",
+  "properties": {
+    "token_id": {
+      "type": "string",
+      "description": "ave.ai token id: <address>-<chain>"
+    },
+    "chain": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string",
+      "description": "Platform trading symbol; wallet key is crypto_<symbol lowercase>"
+    },
+    "ave_symbol": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "disabled"
+      ],
+      "enumColors": [
+        "yellow",
+        "green",
+        "red",
+        "gray"
+      ],
+      "default": "pending"
+    },
+    "market_cap": {
+      "type": "number"
+    },
+    "tvl": {
+      "type": "number"
+    },
+    "holders": {
+      "type": "number"
+    },
+    "risk_level": {
+      "type": "number"
+    },
+    "risk_score": {
+      "type": "number"
+    },
+    "buy_tax": {
+      "type": "number"
+    },
+    "sell_tax": {
+      "type": "number"
+    },
+    "is_honeypot": {
+      "type": "boolean"
+    },
+    "is_mintable": {
+      "type": "boolean"
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "review_note": {
+      "type": "string"
+    },
+    "requested_by_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "token_id",
+    "chain",
+    "address",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

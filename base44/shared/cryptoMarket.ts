@@ -1,4 +1,5 @@
 import { secrets } from 'base44:runtime';
+import { fetchAvePrices } from './aveToken.ts';
 
 let topCache = null;
 let cachedAt = 0;
@@ -58,10 +59,14 @@ async function cmc(path) {
   return data.data;
 }
 
-// On-chain tokens priced from their DEX pool (not listed on CMC/OKX under these contracts).
-const ONCHAIN_TOKENS = [
-  { symbol: 'PIX', name: 'PiX (Polygon)', chain: 'polygon', address: '0xab787774bdf01fc22410165ffabf76e0e0ebc94f' },
-];
+// Built-in on-chain token; others come from admin-approved ListedToken records.
+const PIX = { symbol: 'PIX', name: 'PiX (Polygon)', chain: 'polygon', address: '0xab787774bdf01fc22410165ffabf76e0e0ebc94f', logo_url: '' };
+
+// Approved tokens trade; disabled tokens keep a price (wallet valuation) but cannot trade.
+export async function loadListedTokens(base44) {
+  const res = await base44.asServiceRole.entities.ListedToken.filter({ status: { $in: ['approved', 'disabled'] } }, '-created_date', 500);
+  return Array.isArray(res) ? res : (res?.items || []);
+}
 
 const onchainCache = new Map();
 
@@ -82,43 +87,57 @@ async function getGeckoTerminalQuote(token) {
 async function getDexScreenerQuote(token) {
   const data = await fetchJson(`https://api.dexscreener.com/tokens/v1/${token.chain}/${token.address}`);
   const pair = (Array.isArray(data) ? data : data.pairs || [])
-    .filter(p => p.chainId === token.chain && p.baseToken?.address?.toLowerCase() === token.address && Number(p.priceUsd) > 0)
+    .filter(p => p.chainId === token.chain && p.baseToken?.address?.toLowerCase() === token.address.toLowerCase() && Number(p.priceUsd) > 0)
     .sort((a, b) => (b.liquidity?.usd || 0) - (a.liquidity?.usd || 0))[0];
   if (!pair) throw new Error('no pair');
   return { price: Number(pair.priceUsd), change: pair.priceChange?.h24 ?? 0, source: 'DexScreener' };
 }
 
-async function getAveQuote(token) {
-  const response = await fetch(`https://prod.ave-api.com/v2/tokens/${token.address}-${token.chain}`, {
-    headers: { 'X-API-KEY': secrets.get('AVE_API_KEY'), Accept: 'application/json' },
-    signal: AbortSignal.timeout(8000),
-  });
-  if (!response.ok) throw new Error(`ave.ai HTTP ${response.status}`);
-  const data = (await response.json())?.data?.token;
-  const price = Number(data?.current_price_usd);
-  if (!(price > 0)) throw new Error('no price');
-  return { price, change: Number(data.price_change_24h) || 0, source: 'ave.ai' };
-}
-
-async function getOnchainQuote(token) {
-  const cached = onchainCache.get(token.symbol);
-  if (cached && Date.now() - cached.at < 60000) return cached.coin;
-  let quote;
-  for (const source of [getAveQuote, getGeckoTerminalQuote, getDexScreenerQuote]) {
-    try {
-      quote = await source(token);
-      break;
-    } catch (error) {
-      console.warn(`${source.name} failed for ${token.symbol}:`, error.message);
-    }
+async function getFallbackQuote(token) {
+  try {
+    return await getGeckoTerminalQuote(token);
+  } catch {
+    return await getDexScreenerQuote(token);
   }
-  if (!quote) throw new Error(`No on-chain quote for ${token.symbol}`);
-  const coin = { symbol: token.symbol, name: token.name, onchain: true, ...quote, quotedAt: new Date().toISOString() };
-  onchainCache.set(token.symbol, { coin, at: Date.now() });
-  return coin;
 }
 
-export async function getCryptoMarket(heldSymbols = []) {
+// ave.ai batch quote first; tokens it misses fall back to GeckoTerminal / DexScreener.
+async function getOnchainCoins(tokens) {
+  const now = Date.now();
+  const coins = [];
+  const stale = [];
+  for (const token of tokens) {
+    const cached = onchainCache.get(token.token_id);
+    if (cached && now - cached.at < 60000) coins.push({ ...cached.coin, tradable: token.tradable });
+    else stale.push(token);
+  }
+  if (!stale.length) return coins;
+  let quotes = {};
+  try {
+    quotes = await fetchAvePrices(stale.map(t => t.token_id));
+  } catch (error) {
+    console.warn('ave.ai batch quotes unavailable:', error.message);
+  }
+  const missing = stale.filter(t => !quotes[t.token_id]).slice(0, 6);
+  const fallbacks = await Promise.allSettled(missing.map(getFallbackQuote));
+  missing.forEach((token, i) => {
+    if (fallbacks[i].status === 'fulfilled') quotes[token.token_id] = fallbacks[i].value;
+    else console.warn(`On-chain quote unavailable for ${token.symbol}:`, fallbacks[i].reason?.message);
+  });
+  for (const token of stale) {
+    const quote = quotes[token.token_id];
+    if (!quote) continue;
+    const coin = {
+      symbol: token.symbol, name: token.name, chain: token.chain, address: token.address, logo: token.logo_url || '',
+      onchain: true, price: quote.price, change: quote.change, source: quote.source, quotedAt: new Date().toISOString(),
+    };
+    onchainCache.set(token.token_id, { coin, at: now });
+    coins.push({ ...coin, tradable: token.tradable });
+  }
+  return coins;
+}
+
+export async function getCryptoMarket(heldSymbols = [], listedTokens = []) {
   if (!topCache || Date.now() - cachedAt > 30000) {
     const listings = await cmc('listings/latest?start=1&limit=20&convert=USD');
     if (!Array.isArray(listings) || !listings.some(c => c.symbol === 'BTC') || !listings.some(c => c.symbol === 'ETH')) throw new Error('Incomplete crypto market quotes');
@@ -126,8 +145,17 @@ export async function getCryptoMarket(heldSymbols = []) {
     cachedAt = Date.now();
   }
   const coins = topCache.map(coin => ({ ...coin }));
+  const onchainTokens = [
+    { ...PIX, tradable: true },
+    ...listedTokens
+      .filter(t => /^[A-Z0-9]{2,15}$/.test(t.symbol || '') && t.symbol !== 'PIX')
+      .map(t => ({ symbol: t.symbol, name: t.name || t.symbol, chain: t.chain, address: t.address, logo_url: t.logo_url, tradable: t.status === 'approved' })),
+  ]
+    .filter(t => !coins.some(c => c.symbol === t.symbol))
+    .map(t => ({ ...t, token_id: `${t.address}-${t.chain}` }));
+
   const extra = [...new Set(heldSymbols.map(s => String(s).toUpperCase()))]
-    .filter(s => /^[A-Z0-9]{2,15}$/.test(s) && !coins.some(c => c.symbol === s) && !ONCHAIN_TOKENS.some(t => t.symbol === s)).slice(0, 40);
+    .filter(s => /^[A-Z0-9]{2,15}$/.test(s) && !coins.some(c => c.symbol === s) && !onchainTokens.some(t => t.symbol === s)).slice(0, 40);
   if (extra.length) {
     const quotes = await cmc(`quotes/latest?symbol=${encodeURIComponent(extra.join(','))}&convert=USD`);
     for (const symbol of extra) {
@@ -156,13 +184,7 @@ export async function getCryptoMarket(heldSymbols = []) {
     prices[`crypto_${coin.symbol.toLowerCase()}`] = coin.price;
     changes[`crypto_${coin.symbol.toLowerCase()}`] = coin.change;
   }
-  const onchain = await Promise.allSettled(ONCHAIN_TOKENS.map(getOnchainQuote));
-  for (const result of onchain) {
-    if (result.status !== 'fulfilled') {
-      console.warn('On-chain quote unavailable:', result.reason?.message);
-      continue;
-    }
-    const coin = result.value;
+  for (const coin of await getOnchainCoins(onchainTokens)) {
     coins.push(coin);
     prices[`crypto_${coin.symbol.toLowerCase()}`] = coin.price;
     changes[`crypto_${coin.symbol.toLowerCase()}`] = coin.change;

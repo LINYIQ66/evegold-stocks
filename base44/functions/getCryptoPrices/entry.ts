@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.49';
-import { getCryptoMarket } from '../../shared/cryptoMarket.ts';
+import { getCryptoMarket, loadListedTokens } from '../../shared/cryptoMarket.ts';
 
 export default async function(req) {
   try {
@@ -9,7 +9,7 @@ export default async function(req) {
     const held = [...Object.keys(user.wallet_balances || {}), ...Object.keys(user.locked_balances || {})]
       .filter(key => /^crypto_[a-z0-9]{2,15}$/.test(key))
       .map(key => key.slice(7));
-    return Response.json(await getCryptoMarket(held));
+    return Response.json(await getCryptoMarket(held, await loadListedTokens(base44)));
   } catch (error) {
     return Response.json({ error: error.message }, { status: 503 });
   }

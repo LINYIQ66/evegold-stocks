@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import useIndicativePrices from '@/components/quotes/useIndicativePrices';
 
 export default function CryptoMarket({ coins, loading, onSelect }) {
-  const top = coins.filter((coin) => (coin.rank <= 20 || coin.onchain) && coin.symbol !== 'USDT');
+  const top = coins.filter((coin) => (coin.rank <= 20 || (coin.onchain && coin.tradable !== false)) && coin.symbol !== 'USDT');
   const base = useMemo(() => Object.fromEntries(coins.map((coin) => [coin.symbol, coin.price])), [coins]);
   const indicative = useIndicativePrices(base);
   return (

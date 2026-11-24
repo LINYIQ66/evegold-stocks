@@ -1,4 +1,5 @@
 import React from 'react';
+import AveListingAction from '@/components/wallet/ave/AveListingAction';
 
 const usd = v => {
   if (!v) return '—';
@@ -9,12 +10,12 @@ const usd = v => {
 };
 const price = v => !v ? '—' : v >= 1 ? `$${v.toFixed(4)}` : `$${v.toPrecision(4)}`;
 
-export default function AveTokenTable({ tokens }) {
+export default function AveTokenTable({ tokens, listingStatus, requesting, onRequest }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-border">
       <table className="w-full text-sm">
         <thead className="bg-secondary text-xs text-muted-foreground">
-          <tr><th className="px-3 py-2 text-left">代币</th><th className="px-3 py-2 text-left">链</th><th className="px-3 py-2 text-right">价格</th><th className="px-3 py-2 text-right">24h</th><th className="px-3 py-2 text-right">市值</th><th className="px-3 py-2 text-right">24h 成交额</th><th className="px-3 py-2 text-right">流动性</th><th className="px-3 py-2 text-right">持币地址</th></tr>
+          <tr><th className="px-3 py-2 text-left">代币</th><th className="px-3 py-2 text-left">链</th><th className="px-3 py-2 text-right">价格</th><th className="px-3 py-2 text-right">24h</th><th className="px-3 py-2 text-right">市值</th><th className="px-3 py-2 text-right">24h 成交额</th><th className="px-3 py-2 text-right">流动性</th><th className="px-3 py-2 text-right">持币地址</th><th className="px-3 py-2 text-right">交易</th></tr>
         </thead>
         <tbody>
           {tokens.map(t => (
@@ -32,6 +33,7 @@ export default function AveTokenTable({ tokens }) {
               <td className="px-3 py-2 text-right tabular-nums">{usd(t.tx_volume_u_24h)}</td>
               <td className="px-3 py-2 text-right tabular-nums">{usd(t.main_pair_tvl)}</td>
               <td className="px-3 py-2 text-right tabular-nums">{t.holders ? t.holders.toLocaleString() : '—'}</td>
+              <td className="px-3 py-2 text-right"><AveListingAction status={listingStatus(t)} busy={requesting === t.id} onRequest={() => onRequest(t)} /></td>
             </tr>
           ))}
         </tbody>
