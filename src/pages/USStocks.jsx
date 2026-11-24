@@ -15,6 +15,7 @@ import USStocksFooter from "../components/usstocks/USStocksFooter";
 import USStockPendingOrders from "../components/usstocks/USStockPendingOrders.jsx";
 import RankingNavigation from "@/components/usstocks/RankingNavigation";
 import TradableFunds from "@/components/usstocks/TradableFunds";
+import UraniumHub from "@/components/usstocks/uranium/UraniumHub";
 import { getAlpacaPrices } from "@/functions/getAlpacaPrices";
 
 export default function USStocks() {
@@ -209,6 +210,8 @@ export default function USStocks() {
         </div>
 
         <TradableFunds onSelect={setSelectedSymbol} onPrices={(quotes) => setAllPrices(previous => ({ ...previous, ...quotes }))} />
+
+        <UraniumHub onSelect={setSelectedSymbol} onPrices={(quotes) => setAllPrices(previous => ({ ...previous, ...quotes }))} />
 
         {/* Footer */}
         <USStocksFooter />

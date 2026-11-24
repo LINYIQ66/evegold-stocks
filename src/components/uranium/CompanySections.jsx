@@ -17,7 +17,7 @@ export default function CompanySections({ copy }) {
         <div className="mt-6 flex flex-wrap gap-3">{[['/USStocks', copy.stocks], ['/Trading', copy.metals], ['/Wallet', copy.wallet]].map(([href, text]) => <Link key={href} to={href} className={linkClass}>{text}<ArrowUpRight className="h-4 w-4" /></Link>)}</div>
       </section>
       <section id="energy" className="scroll-mt-6 rounded-2xl bg-desk-navy p-7 text-desk-silver">
-        <h2 className="text-2xl font-semibold">{copy.energyTitle}</h2><p className="mt-4 max-w-3xl text-sm leading-relaxed text-desk-silver/80">{copy.energyText}</p><Link to="/UraniumMarket" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-desk-gold underline">{copy.energyLink}<ArrowUpRight className="h-4 w-4" /></Link>
+        <h2 className="text-2xl font-semibold">{copy.energyTitle}</h2><p className="mt-4 max-w-3xl text-sm leading-relaxed text-desk-silver/80">{copy.energyText}</p><Link to="/USStocks#uranium" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-desk-gold underline">{copy.energyLink}<ArrowUpRight className="h-4 w-4" /></Link>
       </section>
       <AiComputeSection />
       <div className="grid gap-8 md:grid-cols-2">

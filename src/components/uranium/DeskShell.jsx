@@ -23,7 +23,7 @@ export default function DeskShell({ language, setLanguage, children }) {
         <nav aria-label={zh ? 'EVE METAL 导航' : 'EVE METAL navigation'} className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
           <Link to="/Home" className="hover:underline">{zh ? '主页' : 'Home'}</Link>
           {sections.map(([id, en, cn]) => <Link key={id} to={`/AboutUs#${id}`} className="text-muted-foreground hover:text-foreground hover:underline">{zh ? cn : en}</Link>)}
-          <Link to="/UraniumMarket" className="inline-flex items-center gap-1 font-semibold text-desk-navy">{zh ? '核燃料市场研究' : 'Nuclear Fuels Desk'}<ArrowUpRight className="h-4 w-4" /></Link>
+          <Link to="/USStocks#uranium" className="inline-flex items-center gap-1 font-semibold text-desk-navy">{zh ? '核燃料市场研究' : 'Nuclear Fuels Desk'}<ArrowUpRight className="h-4 w-4" /></Link>
         </nav>
       </header>
       {children}

@@ -2,13 +2,12 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import USStockPopular from '@/pages/USStockPopular';
 import USStockMovers from '@/pages/USStockMovers';
-import UraniumMarket from '@/pages/UraniumMarket';
 import AboutUs from '@/pages/AboutUs';
 import Privacy from '@/pages/Privacy';
 import Terms from '@/pages/Terms';
@@ -76,7 +75,7 @@ const AuthenticatedApp = () => {
       ))}
       <Route path="/USStockPopular" element={<LayoutWrapper currentPageName="USStocks"><USStockPopular /></LayoutWrapper>} />
       <Route path="/USStockMovers" element={<LayoutWrapper currentPageName="USStocks"><USStockMovers /></LayoutWrapper>} />
-      <Route path="/UraniumMarket" element={<LayoutWrapper currentPageName="UraniumMarket"><UraniumMarket /></LayoutWrapper>} />
+      <Route path="/UraniumMarket" element={<Navigate to="/USStocks#uranium" replace />} />
       <Route path="/AboutUs" element={<LayoutWrapper currentPageName="AboutUs"><AboutUs /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
