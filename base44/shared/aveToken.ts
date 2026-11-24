@@ -19,11 +19,13 @@ async function sync() {
   if (budget.day !== key) { budget.day = key; budget.total = 0; }
   const n = budget.pending;
   budget.pending = 0;
+  let recs = await E.filter({ setting_key: key }, 'created_date');
   if (n) {
-    const r = await E.updateMany({ setting_key: key }, { $inc: { 'setting_value.count': n } });
-    if (!r.updated) await E.create({ setting_key: key, setting_value: { count: n, limit: AVE_DAILY_LIMIT } });
+    // Increment only the oldest record; concurrent first writes of the day may leave extras, which are summed.
+    if (recs.length) await E.updateMany({ id: recs[0].id }, { $inc: { 'setting_value.count': n } });
+    else await E.create({ setting_key: key, setting_value: { count: n, limit: AVE_DAILY_LIMIT } });
+    recs = await E.filter({ setting_key: key });
   }
-  const recs = await E.filter({ setting_key: key });
   budget.total = recs.reduce((s, r) => s + num(r.setting_value?.count), 0);
 }
 

@@ -7,6 +7,7 @@
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import { getCryptoMarket, loadListedTokens } from '../../shared/cryptoMarket.ts';
+import { useAveBudget } from '../../shared/aveToken.ts';
 
 const METALS = new Set(['gold', 'silver', 'platinum', 'palladium']);
 const METAL_FEE_RATE = 0.005;
@@ -91,6 +92,7 @@ async function fetchForexRates() {
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
+    useAveBudget(base44);
     const user = await base44.auth.me();
     if (!user) {
       return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 });

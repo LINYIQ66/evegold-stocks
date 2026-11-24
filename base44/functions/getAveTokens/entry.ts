@@ -32,7 +32,7 @@ export default async function(req) {
     const topicId = topicsCache.some(t => t.id === topic) ? topic : 'hot';
 
     const path = q
-      ? `/tokens?keyword=${encodeURIComponent(q.toLowerCase())}&limit=300${['market_cap', 'tx_volume_u_24h', 'main_pair_tvl', 'fdv'].includes(orderby) ? `&orderby=${orderby}` : ''}`
+      ? `/tokens?keyword=${encodeURIComponent(q)}&limit=300${['market_cap', 'tx_volume_u_24h', 'main_pair_tvl', 'fdv'].includes(orderby) ? `&orderby=${orderby}` : ''}`
       : `/ranks?topic=${encodeURIComponent(topicId)}`;
     let hit = listCache.get(path);
     if (!hit || Date.now() - hit.at > LIST_TTL) {

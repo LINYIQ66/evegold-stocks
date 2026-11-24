@@ -1,9 +1,11 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.49';
 import { getCryptoMarket, loadListedTokens } from '../../shared/cryptoMarket.ts';
+import { useAveBudget } from '../../shared/aveToken.ts';
 
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
+    useAveBudget(base44);
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
     const held = [...Object.keys(user.wallet_balances || {}), ...Object.keys(user.locked_balances || {})]
