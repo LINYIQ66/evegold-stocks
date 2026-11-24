@@ -1,16 +1,54 @@
-import { secrets } from 'base44:runtime';
+import { secrets, waitUntil } from 'base44:runtime';
 
 const BASE = 'https://prod.ave-api.com/v2';
 const num = v => Number(v) || 0;
 
+// Daily ave.ai quota shared by every function: usage is counted per UTC day in SystemSetting
+// (ave_usage_YYYY-MM-DD) with atomic $inc, flushed in small batches to stay under entity rate limits.
+export const AVE_DAILY_LIMIT = 990000;
+const budget = { client: null, day: '', total: 0, pending: 0, syncing: null, flushQueued: false };
+const dayKey = () => `ave_usage_${new Date().toISOString().slice(0, 10)}`;
+
+export function useAveBudget(base44) {
+  budget.client = base44.asServiceRole;
+}
+
+async function sync() {
+  const E = budget.client.entities.SystemSetting;
+  const key = dayKey();
+  if (budget.day !== key) { budget.day = key; budget.total = 0; }
+  const n = budget.pending;
+  budget.pending = 0;
+  if (n) {
+    const r = await E.updateMany({ setting_key: key }, { $inc: { 'setting_value.count': n } });
+    if (!r.updated) await E.create({ setting_key: key, setting_value: { count: n, limit: AVE_DAILY_LIMIT } });
+  }
+  const recs = await E.filter({ setting_key: key });
+  budget.total = recs.reduce((s, r) => s + num(r.setting_value?.count), 0);
+}
+
+const syncOnce = () => (budget.syncing ||= sync().finally(() => { budget.syncing = null; }));
+
+async function charge(cost) {
+  if (!budget.client) throw new Error('ave.ai 流量计数未初始化');
+  if (budget.day !== dayKey()) await syncOnce();
+  if (budget.total + budget.pending + cost > AVE_DAILY_LIMIT) throw new Error('今日 ave.ai 流量额度已用完，次日（UTC 0 点）自动恢复');
+  budget.pending += cost;
+  if (!budget.flushQueued) {
+    budget.flushQueued = true;
+    waitUntil(new Promise(r => setTimeout(r, 5000)).then(syncOnce).catch(e => console.warn('ave.ai 用量同步失败:', e.message)).finally(() => { budget.flushQueued = false; }));
+  }
+}
+
 // ave.ai free-tier keys are rate limited per second; wait once and retry before failing.
-export async function ave(path, init = {}, retried = false) {
+export async function ave(path, init = {}, retried = false, cost = 1) {
+  await charge(cost);
   const headers = { 'X-API-KEY': secrets.get('AVE_API_KEY'), Accept: 'application/json' };
   if (init.body) headers['Content-Type'] = 'application/json';
   const res = await fetch(`${BASE}${path}`, { ...init, headers, signal: AbortSignal.timeout(10000) });
   if ((res.status === 403 || res.status === 429) && !retried) {
     await new Promise(r => setTimeout(r, 1200));
-    return ave(path, init, true);
+    return ave(path, init, true, cost);
   }
   if (!res.ok) throw new Error(`ave.ai 数据暂不可用 (${res.status})`);
   const json = await res.json();
@@ -63,7 +101,9 @@ export function suggestSymbol(aveSymbol) {
 // Batch live quotes: { [token_id]: { price, change } }
 export async function fetchAvePrices(tokenIds) {
   if (!tokenIds.length) return {};
-  const data = await ave('/tokens/price', { method: 'POST', body: JSON.stringify({ token_ids: tokenIds.slice(0, 200) }) });
+  const ids = tokenIds.slice(0, 200);
+  // Counted per token so batch quotes never under-count against the daily quota.
+  const data = await ave('/tokens/price', { method: 'POST', body: JSON.stringify({ token_ids: ids }) }, false, ids.length);
   const out = {};
   for (const [id, q] of Object.entries(data || {})) {
     const price = num(q?.current_price_usd);
