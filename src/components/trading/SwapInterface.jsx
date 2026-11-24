@@ -49,7 +49,7 @@ export default function SwapInterface({ user, prices, quote, quoteUnavailable, o
     { symbol: "SILVER", name: "Silver", color: "text-gray-500" },
     { symbol: "PLATINUM", name: "Platinum", color: "text-purple-600" },
     { symbol: "PALLADIUM", name: "Palladium", color: "text-pink-600" },
-    ...cryptoCoins.filter(coin => coin.symbol !== 'USDT' && (coin.rank <= 20 || (user?.wallet_balances?.[`crypto_${coin.symbol.toLowerCase()}`] || 0) > 0)).map(coin => ({ symbol: `CRYPTO_${coin.symbol}`, name: coin.name, color: "text-blue-600" }))
+    ...cryptoCoins.filter(coin => coin.symbol !== 'USDT' && (coin.rank <= 20 || coin.onchain || (user?.wallet_balances?.[`crypto_${coin.symbol.toLowerCase()}`] || 0) > 0)).map(coin => ({ symbol: `CRYPTO_${coin.symbol}`, name: coin.name, color: "text-blue-600" }))
   ];
 
   const getBalance = (asset) => {
