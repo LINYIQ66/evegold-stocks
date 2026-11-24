@@ -27,6 +27,7 @@ import EveTokenInfoModal from "../components/wallet/EveTokenInfoModal";
 import FundRequestList from "../components/wallet/FundRequestList";
 import PendingOrdersList from "../components/wallet/PendingOrdersList";
 import InterestHistory from "../components/wallet/InterestHistory";
+import AveTokenExplorer from "@/components/wallet/ave/AveTokenExplorer";
 import { useLanguage } from "@/components/common/LanguageProvider";
 
 
@@ -359,6 +360,8 @@ export default function Wallet() {
                 </TabsContent>
             </Tabs>
           </motion.div>
+
+          <AveTokenExplorer />
         </div>
       </div>
     </>
