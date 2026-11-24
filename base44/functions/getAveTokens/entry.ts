@@ -5,8 +5,13 @@ const BASE = 'https://prod.ave-api.com/v2';
 const SORTS = ['market_cap', 'tx_volume_u_24h', 'main_pair_tvl', 'fdv', 'price_change_24h', 'holders'];
 let topicsCache = null;
 
-async function ave(path) {
+async function ave(path, retried = false) {
   const res = await fetch(`${BASE}${path}`, { headers: { 'X-API-KEY': secrets.get('AVE_API_KEY') }, signal: AbortSignal.timeout(10000) });
+  // Free-tier keys are rate limited per second; wait once and retry before failing.
+  if ((res.status === 403 || res.status === 429) && !retried) {
+    await new Promise(r => setTimeout(r, 1200));
+    return ave(path, true);
+  }
   if (!res.ok) throw new Error(`ave.ai 数据暂不可用 (${res.status})`);
   const json = await res.json();
   if (json.status !== 1) throw new Error(json.msg || 'ave.ai 数据暂不可用');
