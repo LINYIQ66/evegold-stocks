@@ -88,15 +88,31 @@ async function getDexScreenerQuote(token) {
   return { price: Number(pair.priceUsd), change: pair.priceChange?.h24 ?? 0, source: 'DexScreener' };
 }
 
+async function getAveQuote(token) {
+  const response = await fetch(`https://prod.ave-api.com/v2/tokens/${token.address}-${token.chain}`, {
+    headers: { 'X-API-KEY': secrets.get('AVE_API_KEY'), Accept: 'application/json' },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!response.ok) throw new Error(`ave.ai HTTP ${response.status}`);
+  const data = (await response.json())?.data?.token;
+  const price = Number(data?.current_price_usd);
+  if (!(price > 0)) throw new Error('no price');
+  return { price, change: Number(data.price_change_24h) || 0, source: 'ave.ai' };
+}
+
 async function getOnchainQuote(token) {
   const cached = onchainCache.get(token.symbol);
   if (cached && Date.now() - cached.at < 60000) return cached.coin;
   let quote;
-  try {
-    quote = await getGeckoTerminalQuote(token);
-  } catch {
-    quote = await getDexScreenerQuote(token);
+  for (const source of [getAveQuote, getGeckoTerminalQuote, getDexScreenerQuote]) {
+    try {
+      quote = await source(token);
+      break;
+    } catch (error) {
+      console.warn(`${source.name} failed for ${token.symbol}:`, error.message);
+    }
   }
+  if (!quote) throw new Error(`No on-chain quote for ${token.symbol}`);
   const coin = { symbol: token.symbol, name: token.name, onchain: true, ...quote, quotedAt: new Date().toISOString() };
   onchainCache.set(token.symbol, { coin, at: Date.now() });
   return coin;
