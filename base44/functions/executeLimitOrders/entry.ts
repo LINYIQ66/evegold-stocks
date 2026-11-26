@@ -149,6 +149,10 @@ export default async function(req) {
 
       if (!shouldExecute) continue;
 
+      // Risk control: order must still be pending (not cancelled / already filled)
+      const fresh = await base44.asServiceRole.entities.Transaction.get(tx.id);
+      if (fresh?.status !== "pending") continue;
+
       // Fetch the user's current balances
       const users = await base44.asServiceRole.entities.User.filter({ email: tx.user_email });
       if (!users.length) continue;
@@ -158,6 +162,14 @@ export default async function(req) {
       const currencyKey = (currency || "USDT").toLowerCase();
       const frozenCurrKey = `frozen_${currencyKey}`;
       const frozenStockKey = `frozen_${stockKey}`;
+
+      // Risk control: frozen collateral must fully cover the order (spot, no leverage)
+      const needed = side === "buy" ? tx.amount_usd : shares;
+      const frozenKey = side === "buy" ? frozenCurrKey : frozenStockKey;
+      if ((newBalances[frozenKey] || 0) + 1e-9 < needed) {
+        errors.push({ id: tx.id, reason: `insufficient ${frozenKey}` });
+        continue;
+      }
 
       if (side === "buy") {
         // Funds were frozen: spent = tx.amount_usd
