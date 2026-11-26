@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Users, Search, Crown, User } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
+import SendPasswordReset from "@/components/admin/SendPasswordReset";
 
 export default function UserManagement({ users, isLoading }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,6 +104,7 @@ export default function UserManagement({ users, isLoading }) {
                 <TableHead>Portfolio Value</TableHead>
                 <TableHead>Registration Date</TableHead>
                 <TableHead>Last Active</TableHead>
+                <TableHead>密码</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -158,6 +160,10 @@ export default function UserManagement({ users, isLoading }) {
                   
                   <TableCell className="font-mono text-sm text-slate-600">
                     {format(new Date(user.updated_date || user.created_date), 'MMM d, HH:mm')}
+                  </TableCell>
+
+                  <TableCell>
+                    <SendPasswordReset email={user.email} />
                   </TableCell>
                 </motion.tr>
               ))}
