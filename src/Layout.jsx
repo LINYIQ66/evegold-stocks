@@ -205,7 +205,7 @@ const AppLayout = ({ children }) => {
                 <h2 className="font-bold text-xl bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
                   EVE FINANCE
                 </h2>
-                <p className="text-xs text-slate-500 font-medium">高端交易平台</p>
+                <p className="text-xs text-slate-500 font-medium">一站式贵金属和美股交易平台</p>
               </div>
             </div>
           </SidebarHeader>

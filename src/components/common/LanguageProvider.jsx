@@ -220,7 +220,7 @@ export const translations = {
     },
     login: {
       company_name: 'EVE FINANCE',
-      company_tagline: '高端交易平台',
+      company_tagline: '一站式贵金属和美股交易平台',
       future_of_trading: '贵金属交易的',
       precious_metals: '未来',
       trading: '',

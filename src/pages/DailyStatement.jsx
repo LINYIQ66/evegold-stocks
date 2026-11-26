@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { motion } from "framer-motion";
+import FundFlowLedger from "@/components/statement/FundFlowLedger";
 
 const SINGAPORE_TZ = 'Asia/Singapore';
 
@@ -149,6 +150,8 @@ export default function DailyStatement() {
     window.URL.revokeObjectURL(url);
   };
 
+  const dayStart = new Date(Date.UTC(selectedDate.getUTCFullYear(), selectedDate.getUTCMonth(), selectedDate.getUTCDate()) - 8 * 3600 * 1000);
+  const dayEnd = new Date(dayStart.getTime() + 24 * 3600 * 1000 - 1000);
   const categories = categorizeTransactions();
   const summary = calculateSummary();
   
@@ -206,6 +209,8 @@ export default function DailyStatement() {
             </div>
           </CardContent></Card>
         </motion.div>
+
+        <FundFlowLedger email={user.email} start={dayStart} end={dayEnd} />
 
         <div className="space-y-6">
           {Object.entries(categories).map(([key, category], index) => {
